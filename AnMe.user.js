@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AnMe
 // @author       zjw
-// @version      9.6
+// @version      9.6.1
 // @namespace    https://github.com/Zhu-junwei/AnMe
 // @description  通用网站多账号切换工具，保存并恢复 Cookie 与存储数据
 // @description:zh  通用网站多账号切换工具，保存并恢复 Cookie 与存储数据
@@ -23,8 +23,8 @@
 // @tag          Switcher
 // @tag          多账号
 // @description:en  Universal multi-account switching tool for websites, supporting saving and restoring of Cookies and storage data.
-// @downloadURL https://update.greasyfork.org/scripts/563142/AnMe.user.js
-// @updateURL https://update.greasyfork.org/scripts/563142/AnMe.meta.js
+// @downloadURL https://raw.githubusercontent.com/Zhu-junwei/AnMe/main/AnMe.user.js
+// @updateURL   https://raw.githubusercontent.com/Zhu-junwei/AnMe/main/AnMe.user.js 
 // ==/UserScript==
 
 (function () {
