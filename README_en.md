@@ -2,7 +2,7 @@
 
 ---
 
-# 👥 AnMe - Universal Website Multi-Account Switcher
+# 👥 AnMe - Universal Multi-Site Account Switcher
 
 [AnMe](https://github.com/Zhu-junwei/AnMe) is an open-source browser script developed for [Tampermonkey](https://www.tampermonkey.net/) designed to manage and switch between multiple website accounts. It utilizes a "snapshot" mechanism to save and restore website login states (Cookies, LocalStorage, and SessionStorage) with one click, enabling seamless account switching within the same browser window.
 

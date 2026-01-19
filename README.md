@@ -2,7 +2,7 @@
 
 ---
 
-# 👥 AnMe - 通用网站多账号切换工具
+# 👥 AnMe - 通用网站多账号切换器
 
 [AnMe](https://github.com/Zhu-junwei/AnMe) 是一款基于浏览器 [篡改猴](https://www.tampermonkey.net/) 开发的开源网站多账号管理切换脚本。它通过“快照”机制，一键保存并恢复网站的登录状态（Cookie、LocalStorage 和 SessionStorage），助您在同一个浏览器窗口中实现多账号无缝切换。
 
