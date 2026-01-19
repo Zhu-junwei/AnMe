@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AnMe
 // @author       zjw
-// @version      9.7.2
+// @version      9.7.3
 // @namespace    https://github.com/Zhu-junwei/AnMe
 // @description  通用网站多账号切换器
 // @description:zh  通用网站多账号切换器
@@ -220,6 +220,11 @@
         .acc-custom-chk { appearance: none !important; width: 14px !important; height: 14px !important; border: 1px solid #ccc !important; border-radius: 3px !important; margin-right: 4px !important; cursor: pointer !important; position: relative !important; background: #fff; }
         .acc-custom-chk:checked { background-color: #2196F3 !important; border-color: #2196F3 !important; }
         .acc-custom-chk:checked::after { content: ''; position: absolute !important; left: 4px !important; top: 1px !important; width: 3px !important; height: 7px !important; border: solid white !important; border-width: 0 2px 2px 0 !important; transform: rotate(45deg) !important; }
+
+        .acc-loading-mask{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,.7);backdrop-filter:blur(2px);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:2000010;border-radius:12px}
+        .acc-spinner{width:30px;height:30px;border:3px solid #f3f3f3;border-top:3px solid #2196F3;border-radius:50%;animation:acc-spin 1s linear infinite}
+        @keyframes acc-spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+        .acc-loading-text{margin-top:10px;font-size:12px;color:#2196F3;font-weight:700}
     `;
 
     // ========================================================================
@@ -287,19 +292,27 @@
         async loadAccount(key) {
             const data = GM_getValue(key);
             if (!data) return;
-            localStorage.clear(); sessionStorage.clear();
-            const ck = await new Promise(res => GM_cookie.list({ url: window.location.href }, res));
-            for (const c of (ck || [])) await new Promise(res => GM_cookie.delete({ url: window.location.href, name: c.name }, res));
-            Object.entries(data.localStorage || {}).forEach(([k, v]) => localStorage.setItem(k, v));
-            Object.entries(data.sessionStorage || {}).forEach(([k, v]) => sessionStorage.setItem(k, v));
-            for (const c of (data.cookies || [])) {
-                const d = { ...c, url: window.location.href }; delete d.hostOnly; delete d.session;
-                await new Promise(res => GM_cookie.set(d, res));
+            UI.toggleLoading(true, "Switching...");
+            try {
+               localStorage.clear(); sessionStorage.clear();
+               const ck = await new Promise(res => GM_cookie.list({ url: window.location.href }, res));
+               for (const c of (ck || [])) await new Promise(res => GM_cookie.delete({ url: window.location.href, name: c.name }, res));
+               Object.entries(data.localStorage || {}).forEach(([k, v]) => localStorage.setItem(k, v));
+               Object.entries(data.sessionStorage || {}).forEach(([k, v]) => sessionStorage.setItem(k, v));
+               for (const c of (data.cookies || [])) {
+                   const d = { ...c, url: window.location.href }; delete d.hostOnly; delete d.session;
+                   await new Promise(res => GM_cookie.set(d, res));
+               }
+               location.reload();
+            } catch (err) {
+                console.error(err);
+                UI.toggleLoading(false);
+                UI.alert("Switch failed!");
             }
-            location.reload();
         },
 
         async cleanEnvironment() {
+            UI.toggleLoading(true, "Cleaning...");
             localStorage.clear(); sessionStorage.clear();
             const ck = await new Promise(res => GM_cookie.list({ url: window.location.href }, res));
             for (const c of (ck || [])) await new Promise(res => GM_cookie.delete({ url: window.location.href, name: c.name }, res));
@@ -618,6 +631,21 @@
                 i.onkeyup = (e) => e.stopPropagation();
                 i.onkeypress = (e) => e.stopPropagation();
             });
+        },
+
+        toggleLoading(show, text = "") {
+            let loader = this.qs('.acc-loading-mask');
+            if (!loader) {
+                loader = document.createElement('div');
+                loader.className = 'acc-loading-mask';
+                loader.innerHTML = `
+                    <div class="acc-spinner"></div>
+                    <div class="acc-loading-text"></div>
+                `;
+                panel.appendChild(loader);
+            }
+            loader.querySelector('.acc-loading-text').innerText = text;
+            loader.style.display = show ? 'flex' : 'none';
         },
 
         refresh() {
