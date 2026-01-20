@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AnMe
 // @author       zjw
-// @version      9.7.5
+// @version      9.7.6
 // @namespace    https://github.com/Zhu-junwei/AnMe
 // @description  通用网站多账号切换器
 // @description:zh  通用网站多账号切换器
@@ -18,7 +18,6 @@
 // @grant        GM_addStyle
 // @grant        GM_registerMenuCommand
 // @grant        GM_info
-// @connect      *
 // ==/UserScript==
 
 (function () {
