@@ -19,12 +19,6 @@
 // @grant        GM_registerMenuCommand
 // @grant        GM_info
 // @connect      *
-// @tag          Account
-// @tag          Cookie
-// @tag          Switcher
-// @tag          多账号
-// @downloadURL https://raw.githubusercontent.com/Zhu-junwei/AnMe/main/AnMe.user.js
-// @updateURL   https://raw.githubusercontent.com/Zhu-junwei/AnMe/main/AnMe.user.js
 // ==/UserScript==
 
 (function () {
