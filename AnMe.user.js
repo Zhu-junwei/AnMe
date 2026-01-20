@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AnMe
 // @author       zjw
-// @version      9.7.3
+// @version      9.7.4
 // @namespace    https://github.com/Zhu-junwei/AnMe
 // @description  通用网站多账号切换器
 // @description:zh  通用网站多账号切换器
@@ -89,18 +89,18 @@
         en: {
             _name: "English",
             nav_switch: "Accounts", nav_mgr: "Manage", nav_set: "Settings", nav_notice: "Disclaimer", nav_about: "About",
-            placeholder_name: "Name this account...", tip_help: "Switch failed? Try checking LS/SS.",
-            tip_lock: "Set 'Allow scripts to access cookies' to 'ALL' in Tampermonkey settings.",
-            btn_save: "Save Current", btn_clean: "New Env",
+            placeholder_name: "Name this account...", tip_help: "Switch failed? Try checking LocalStorage/SessionStorage.",
+            tip_lock: "To ensure cookies can be read correctly, open Tampermonkey’s Advanced Settings and change “Allow scripts to access cookies” to “ALL”.",
+            btn_save: "Save Current", btn_clean: "Switch to a new environment (clear all data for this site)",
             set_fab_mode: "Float Button Mode", fab_auto: "Auto", fab_show: "Show", fab_hide: "Hide",
             fab_auto_title: "Automatically show when accounts exist, hide when none", fab_show_title: "Always show the floating button", fab_hide_title: "Hidden by default, can only be activated via the menu",
-            set_lang: "Language / 语言设置", set_backup: "Backup & Restore",
+            set_lang: "语言设置 / Language", set_backup: "Backup & Restore",
             btn_exp_curr: "Export Current Site", btn_exp_all: "Export All Data", btn_imp: "Import Backup",
-            donate: "Buy me a coffee", btn_clear_all: "Clear All App Data",
+            donate: "Buy me a coffee", btn_clear_all: "Clear all script data (use with caution)",
             notice_title: "Disclaimer & Terms", back: "← Back",
-            no_data: "🍃 No accounts", confirm_clean: "Clear all local traces?",
-            confirm_clear_all: "⚠️ Warning: This deletes ALL data for ALL sites! Continue?",
-            import_ok: "✅ Imported {count} accounts!", import_err: "❌ Invalid format",
+            no_data: "🍃 No accounts", confirm_clean: "Are you sure you want to clear all traces of the current website and start a new environment?",
+            confirm_clear_all: "⚠️ Warning: This will delete all account data for all websites saved by this script, and cannot be undone!",
+            import_ok: "✅ Successfully imported/updated {count} account(s)!", import_err: "❌ Invalid format",
             export_err: "⚠️ No data", menu_open: "🚀 Open Manager",
             tag_ck: "CK", tag_ls: "LS", tag_ss: "SS",
             dlg_ok: "OK", dlg_cancel: "Cancel",
@@ -192,13 +192,13 @@
         /* Updated Input Styling - Added border color transition on hover/focus */
         .acc-mgr-input { flex: 1; border: 1px solid transparent; padding: 4px 6px; font-size: 13px; outline: none; border-radius: 4px; background: transparent; color: #333; transition: all 0.2s; }
         .acc-mgr-input:hover { border-color: #ddd; background: #fdfdfd; }
-        .acc-mgr-input:focus { border-color: #2196F3; background: #fff; box-shadow: 0 0 0 2px rgba(33,150,243,0.1); }
 
         .acc-btn-del { color: #ccc; cursor: pointer; padding: 0 12px; font-size: 20px; font-weight: 300; user-select: none; }
         .acc-btn-del:hover { color: #f44336; }
         .acc-action-fixed { border-top: 1px solid #eee; padding-top: 1px; flex-shrink: 0; background-color: #fcfcfc;}
         .acc-row-btn { display: flex; gap: 8px; align-items: center; }
-        .acc-input-text { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; box-sizing: border-box; background: #fff; color: #333; }
+        .acc-input-text { flex: 1; width:100%; padding: 8px; margin-bottom:8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; box-sizing: border-box; background: #fff; color: #333; outline: none; transition: all 0.2s; }
+        .acc-input-text:focus,.acc-mgr-input:focus { border-color: #2196F3; box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2); }
         .acc-btn { border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 5px; transition: 0.2s; }
         .acc-btn-blue { flex: 1; background: #2196F3; color: white; }
         .acc-btn-plus { width: 38px; height: 38px; background: #fff; color: #666; border: 1px solid #ddd; font-size: 20px; }
@@ -433,17 +433,18 @@
                 <select id="host-sel" style="width:100%; padding:6px; margin-bottom:10px; font-size:12px; border:1px solid #eee; border-radius:4px; outline:none; cursor:pointer; background:#fff; color:#333;"></select>
                 <div class="acc-scroll-area" id="mgr-list-area"></div>
                 <div class="acc-action-fixed" id="mgr-fixed-actions">
-                    <input type="text" id="acc-new-name" class="acc-input-text" placeholder="${Utils.t('placeholder_name')}" style="margin-bottom:8px; width:100%;">
                     <div style="display:flex; align-items:center; flex-wrap:wrap; font-size:11px; color:#666; margin-bottom:10px;">
-                        <label class="acc-chk-label"><input type="checkbox" id="c-ck" class="acc-custom-chk"> Cookie</label>
+                        <label class="acc-chk-label"><input type="checkbox" id="c-ck" class="acc-custom-chk" checked> Cookie</label>
                         <label class="acc-chk-label"><input type="checkbox" id="c-ls" class="acc-custom-chk"> LS</label>
                         <label class="acc-chk-label"><input type="checkbox" id="c-ss" class="acc-custom-chk"> SS</label>
                         <span class="acc-help-tip" title="${Utils.t('tip_help')}">?</span>
                         <span class="acc-lock-tip" title="${Utils.t('tip_lock')}">🔒</span>
                     </div>
+                    <input type="text" id="acc-new-name" class="acc-input-text" placeholder="${Utils.t('placeholder_name')}">
+
                     <div class="acc-row-btn">
                         <button id="do-save" class="acc-btn acc-btn-blue"><span>💾</span> ${Utils.t('btn_save')}</button>
-                        <button id="do-clean" class="acc-btn acc-btn-plus" title="${Utils.t('btn_clean')}">+</button>
+                        <button id="do-clean" class="acc-btn acc-btn-plus" title="${Utils.t('btn_clean')}">🧹</button>
                     </div>
                 </div>
             </div>
@@ -616,13 +617,18 @@
                 const row = i.closest('.acc-mgr-item');
 
                 // --- FIX: Stop Dragging when typing ---
-                i.onfocus = () => { if(row) row.setAttribute('draggable', 'false'); };
+                i.onmouseenter = () => {if(row) row.setAttribute('draggable', 'false');};
+                i.onmouseleave = () => {if(row && uiRoot.activeElement !== i) {row.setAttribute('draggable', 'true');}};
+                i.onfocus = () => {if(row) row.setAttribute('draggable', 'false');};
                 i.onblur = () => {
                     if(row) row.setAttribute('draggable', 'true');
-                    // Rename logic
                     const val = i.value.trim();
-                    if (val && val !== Utils.extractName(i.dataset.key)) { Core.renameAccount(i.dataset.key, val, currentViewingHost); UI.refresh(); }
+                    if (val && val !== Utils.extractName(i.dataset.key)) {
+                        Core.renameAccount(i.dataset.key, val, currentViewingHost);
+                        UI.refresh();
+                    }
                 };
+
                 i.onclick = (e) => { e.stopPropagation(); }; // Prevent click triggering drag start
                 i.onkeydown = (e) => {
                     e.stopPropagation(); // Stop event bubbling
