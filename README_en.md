@@ -18,11 +18,11 @@
 * **Drag-and-Drop Sorting**: Adjust the order of accounts in the management panel by dragging.
 
 
-* **🌐 Multi-language Support**: Supports both Simplified Chinese and English.
+* **🌐 Multi-language Support**: Supports Simplified Chinese, English, and Spanish.
 
 ## 🏠 Screenshots
 
-<img src="./img/run1.png" width="50%" />
+![](./img/run2.gif)
 
 ## 🚀 Installation Steps
 
