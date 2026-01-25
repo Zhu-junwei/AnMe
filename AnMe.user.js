@@ -330,7 +330,7 @@
                     if (type === 'cookies') {
                         if (Array.isArray(content) && content.length > 0) {
                             const originalHeaders = Object.keys(content[0]);
-                            const preferredOrder = ['name', 'value'];
+                            const preferredOrder = ['name', 'value', 'expirationDate'];
                             const headers = [...preferredOrder, ...originalHeaders.filter(h => !preferredOrder.includes(h) && h !== 'partitionKey')];
                             const rowClasses = content.map(c => c.httpOnly ? 'http-only' : '');
                             const dataRows = content.map(cookie =>
@@ -338,8 +338,8 @@
                                     let value = cookie[header];
                                     if (value === undefined || value === null) return '';
                                     if (header === 'expirationDate' && typeof value === 'number') {
-                                        return new Date(value * 1000).toLocaleString();
-                                    }
+                                         return new Date(value * 1000).toLocaleString();
+                                     }
                                     return (typeof value === 'object') ? JSON.stringify(value) : value;
                                 })
                             );
