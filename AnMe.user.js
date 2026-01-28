@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AnMe
 // @author       zjw
-// @version      9.8.3
+// @version      9.8.4
 // @namespace    https://github.com/Zhu-junwei/AnMe
 // @description  通用多网站多账号切换器
 // @description:zh  通用多网站多账号切换器
@@ -910,7 +910,19 @@
             // Save & Clean Logic
             ['#c-ck', '#c-ls', '#c-ss'].forEach(id => $(id).addEventListener('change', this.updateSaveBtnState));
             // 监听输入框打字事件，实时更新保存按钮状态
-            $('#acc-new-name').addEventListener('input', () => this.updateSaveBtnState());
+            const newNameInput = $('#acc-new-name');
+            newNameInput.addEventListener('input', () => this.updateSaveBtnState());
+            // 阻断事件冒泡，防止输入内容泄露到宿主页面
+            ['keydown', 'keyup', 'keypress'].forEach(evtType => {
+                newNameInput.addEventListener(evtType, (e) => {
+                    e.stopPropagation();
+                    // 可选：支持回车保存
+                    if (evtType === 'keydown' && e.key === 'Enter') {
+                        e.preventDefault();
+                        $('#do-save').click();
+                    }
+                });
+            });
             $('#do-save').onclick = async () => {
                 const nameInp = $('#acc-new-name');
                 const name = nameInp.value.trim();
