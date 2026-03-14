@@ -3,6 +3,21 @@ export function createEventMethods({ state, constants, utils, core, ui }) {
     bindPanelEvents() {
       const $ = (selector) => ui.qs(selector);
       const $$ = (selector) => ui.qsa(selector);
+      const shouldPreventWheelLeak = (scrollArea, deltaY) => {
+        if (!scrollArea || scrollArea.scrollHeight <= scrollArea.clientHeight) {
+          return true;
+        }
+
+        if (deltaY < 0 && scrollArea.scrollTop <= 0) {
+          return true;
+        }
+
+        if (deltaY > 0 && scrollArea.scrollTop + scrollArea.clientHeight >= scrollArea.scrollHeight - 1) {
+          return true;
+        }
+
+        return false;
+      };
       const getHosts = () => {
         const hosts = utils.listAllHosts();
         if (!hosts.includes(constants.HOST)) hosts.push(constants.HOST);
@@ -16,7 +31,7 @@ export function createEventMethods({ state, constants, utils, core, ui }) {
             event.stopPropagation();
             if (eventName === 'wheel') {
               const scrollArea = event.target.closest('.acc-scroll-area, .acc-host-menu, .acc-host-list');
-              if (!scrollArea || scrollArea.scrollHeight <= scrollArea.clientHeight) {
+              if (shouldPreventWheelLeak(scrollArea, event.deltaY)) {
                 event.preventDefault();
               }
             }

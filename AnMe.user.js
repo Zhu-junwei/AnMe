@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AnMe
 // @author       zjw
-// @version      10.0.0
+// @version      10.0.1
 // @namespace    https://github.com/Zhu-junwei/AnMe
 // @description  通用多网站多账号切换器
 // @description:zh  通用多网站多账号切换器
@@ -239,11 +239,11 @@
         .acc-host-trigger::after { content:""; position:absolute; right:10px; top:50%; width:7px; height:7px; border-right:1.5px solid currentColor; border-bottom:1.5px solid currentColor; transform:translateY(-65%) rotate(45deg); opacity:0.7; transition:transform 0.15s ease; }
         .acc-host-picker.open .acc-host-trigger { border-color:#2196F3; box-shadow:0 0 0 2px rgba(33, 150, 243, 0.12); }
         .acc-host-picker.open .acc-host-trigger::after { transform:translateY(-30%) rotate(225deg); }
-        .acc-host-menu { position:absolute; top:calc(100% + 4px); left:0; right:0; background:#fff; border:1px solid #e4e8ee; border-radius:8px; box-shadow:0 10px 24px rgba(15, 23, 42, 0.12); padding:6px; display:none; max-height:320px; overflow:hidden; z-index:20; }
+        .acc-host-menu { position:absolute; top:calc(100% + 4px); left:0; right:0; background:#fff; border:1px solid #e4e8ee; border-radius:8px; box-shadow:0 10px 24px rgba(15, 23, 42, 0.12); padding:6px; display:none; max-height:320px; overflow:hidden; z-index:20; overscroll-behavior:contain; }
         .acc-host-picker.open .acc-host-menu { display:block; }
         .acc-account-search-input { width:100%; height:30px; box-sizing:border-box; border:1px solid #e4e8ee; border-radius:6px; padding:7px 10px; font-size:12px; outline:none; color:#333; background:#fff; }
         .acc-account-search-input:focus { border-color:#2196F3; box-shadow:0 0 0 2px rgba(33, 150, 243, 0.12); }
-        .acc-host-list { max-height:266px; overflow-y:auto; }
+        .acc-host-list { max-height:266px; overflow-y:auto; overscroll-behavior:contain; }
         .acc-host-list::-webkit-scrollbar { width:6px; }
         .acc-host-list::-webkit-scrollbar-thumb { background:#d3d9e2; border-radius:999px; }
         .acc-host-option-row { display:flex; align-items:center; gap:6px; border-radius:6px; flex-wrap:wrap; }
@@ -1510,6 +1510,18 @@
       bindPanelEvents() {
         const $ = (selector) => ui.qs(selector);
         const $$ = (selector) => ui.qsa(selector);
+        const shouldPreventWheelLeak = (scrollArea, deltaY) => {
+          if (!scrollArea || scrollArea.scrollHeight <= scrollArea.clientHeight) {
+            return true;
+          }
+          if (deltaY < 0 && scrollArea.scrollTop <= 0) {
+            return true;
+          }
+          if (deltaY > 0 && scrollArea.scrollTop + scrollArea.clientHeight >= scrollArea.scrollHeight - 1) {
+            return true;
+          }
+          return false;
+        };
         const getHosts = () => {
           const hosts = utils.listAllHosts();
           if (!hosts.includes(constants.HOST)) hosts.push(constants.HOST);
@@ -1522,7 +1534,7 @@
               event.stopPropagation();
               if (eventName === "wheel") {
                 const scrollArea = event.target.closest(".acc-scroll-area, .acc-host-menu, .acc-host-list");
-                if (!scrollArea || scrollArea.scrollHeight <= scrollArea.clientHeight) {
+                if (shouldPreventWheelLeak(scrollArea, event.deltaY)) {
                   event.preventDefault();
                 }
               }
