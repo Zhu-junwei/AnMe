@@ -1,0 +1,25 @@
+// ==UserScript==
+// @name         AnMe
+// @author       zjw
+// @version      10.0.0
+// @namespace    https://github.com/Zhu-junwei/AnMe
+// @description  通用多网站多账号切换器
+// @description:zh  通用多网站多账号切换器
+// @description:en  Universal Multi-Site Account Switcher
+// @description:es  Conmutador universal de múltiples cuentas para múltiples sitios web
+// @icon         data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMWVtIiBoZWlnaHQ9IjFlbSIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0yMSAxNy41QzIxIDE5LjQzMyAxOS40MzMgMjEgMTcuNSAyMUMxNS41NjcgMjEgMTQgMTkuNDMzIDE0IDE3LjVDMTQgMTUuNTY3IDE1LjU2NyAxNCAxNy41IDE0QzE5LjQzMyAxNCAyMSAxNS41NjcgMjEgMTcuNVoiIHN0cm9rZT0iY3VycmVudENvbG9yIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxwYXRoIGQ9Ik0yIDExSDIyIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik00IDExTDQuNjEzOCA4LjU0NDc5QzUuMTU5NDcgNi4zNjIxMSA1LjQzMjMxIDUuMjcwNzcgNi4yNDYwOSA0LjYzNTM4QzcuMDU5ODggNCA4LjE4NDggNCAxMC40MzQ3IDRIMTMuNTY1M0MxNS44MTUyIDQgMTYuOTQwMSA0IDE3Ljc1MzkgNC42MzUzOEMxOC41Njc3IDUuMjcwNzcgMTguODQwNSA2LjM2MjExIDE5LjM4NjIgOC41NDQ3OUwyMCAxMSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNMTAgMTcuNUMxMCAxOS40MzMgOC40MzMgMjEgNi41IDIxQzQuNTY3IDIxIDMgMTkuNDMzIDMgMTcuNUMzIDE1LjU2NyA0LjU2NyAxNCA2LjUgMTRDOC40MzMgMTQgMTAgMTUuNTY3IDEwIDE3LjVaIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48cGF0aCBkPSJNMTAgMTcuNDk5OUwxMC42NTg0IDE3LjE3MDdDMTEuNTAyOSAxNi43NDg0IDEyLjQ5NzEgMTYuNzQ4NCAxMy4zNDE2IDE3LjE3MDdMMTQgMTcuNDk5OSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48L3N2Zz4=
+// @match        *://*/*
+// @license      MIT
+// @run-at       document-end
+// @grant        GM_cookie
+// @grant        GM_setValue
+// @grant        GM_getValue
+// @grant        GM_listValues
+// @grant        GM_deleteValue
+// @grant        GM_registerMenuCommand
+// @grant        GM_info
+// @grant        GM_xmlhttpRequest
+// @connect      *
+// @downloadURL https://update.greasyfork.org/scripts/563142/AnMe.user.js
+// @updateURL https://update.greasyfork.org/scripts/563142/AnMe.meta.js
+// ==/UserScript==

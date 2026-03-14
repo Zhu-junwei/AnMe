@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AnMe
 // @author       zjw
-// @version      9.8.5
+// @version      10.0.0
 // @namespace    https://github.com/Zhu-junwei/AnMe
 // @description  通用多网站多账号切换器
 // @description:zh  通用多网站多账号切换器
@@ -18,61 +18,190 @@
 // @grant        GM_deleteValue
 // @grant        GM_registerMenuCommand
 // @grant        GM_info
+// @grant        GM_xmlhttpRequest
+// @connect      *
 // @downloadURL https://update.greasyfork.org/scripts/563142/AnMe.user.js
 // @updateURL https://update.greasyfork.org/scripts/563142/AnMe.meta.js
 // ==/UserScript==
-
-(function () {
-    'use strict';
-
-    if (window.self !== window.top) return;
-
-    // ========================================================================
-    // 1. Constants & Configuration & Styles
-    // ========================================================================
-
-    const CONST = {
-        PREFIX: 'acc_stable_',
-        ORDER_PREFIX: 'acc_order_',
-        CFG: {
-            LANG: 'cfg_lang',
-            FAB_MODE: 'cfg_fab_mode',
-            FAB_POS: 'cfg_fab_pos'
-        },
-        HOST: location.hostname,
-        META: {
-            NAME: GM_info.script.name,
-            VERSION: GM_info.script.version,
-            AUTHOR: GM_info.script.author,
-            LINKS: {
-                PROJECT: "https://github.com/Zhu-junwei/AnMe",
-                DONATE: "https://www.cnblogs.com/zjw-blog/p/19466109"
-            }
-        },
-        ICONS: {
-            LOGO: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 17.5C21 19.433 19.433 21 17.5 21C15.567 21 14 19.433 14 17.5C14 15.567 15.567 14 17.5 14C19.433 14 21 15.567 21 17.5Z" stroke="currentColor" stroke-width="1.5"/><path d="M2 11H22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M4 11L4.6138 8.54479C5.15947 6.36211 5.43231 5.27077 6.24609 4.63538C7.05988 4 8.1848 4 10.4347 4H13.5653C15.8152 4 16.9401 4 17.7539 4.63538C18.5677 5.27077 18.8405 6.36211 19.3862 8.54479L20 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10 17.5C10 19.433 8.433 21 6.5 21C4.567 21 3 19.433 3 17.5C3 15.567 4.567 14 6.5 14C8.433 14 10 15.567 10 17.5Z" stroke="currentColor" stroke-width="1.5"/><path d="M10 17.4999L10.6584 17.1707C11.5029 16.7484 12.4971 16.7484 13.3416 17.1707L14 17.4999" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
-            SWITCH: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 12H6C4.11438 12 3.17157 12 2.58579 12.5858C2 13.1716 2 14.1144 2 16V18C2 19.8856 2 20.8284 2.58579 21.4142C3.17157 22 4.11438 22 6 22H8C9.88562 22 10.8284 22 11.4142 21.4142C12 20.8284 12 19.8856 12 18V17" stroke="currentColor" stroke-width="1.5"/><path d="M12 7H11C9.11438 7 8.17157 7 7.58579 7.58579C7 8.17157 7 9.11438 7 11V13C7 14.8856 7 15.8284 7.58579 16.4142C8.17157 17 9.11438 17 11 17H13C14.8856 17 15.8284 17 16.4142 16.4142C17 15.8284 17 14.8856 17 13V12" stroke="currentColor" stroke-width="1.5"/><path d="M12 6C12 4.11438 12 3.17157 12.5858 2.58579C13.1716 2 14.1144 2 16 2H18C19.8856 2 20.8284 2 21.4142 2.58579C22 3.17157 22 4.11438 22 6V8C22 9.88562 22 10.8284 21.4142 11.4142C20.8284 12 19.8856 12 18 12H16C14.1144 12 13.1716 12 12.5858 11.4142C12 10.8284 12 9.88562 12 8V6Z" stroke="currentColor" stroke-width="1.5"/></svg>`,
-            USER: `<svg width="1em" height="1em" viewBox="0 0 24 24"  fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="6" r="4" stroke="currentColor" stroke-width="1.5"/><ellipse cx="12" cy="17" rx="7" ry="4" stroke="currentColor" stroke-width="1.5"/></svg>`,
-            SETTINGS: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.84308 3.80211C9.8718 2.6007 10.8862 2 12 2C13.1138 2 14.1282 2.6007 16.1569 3.80211L16.8431 4.20846C18.8718 5.40987 19.8862 6.01057 20.4431 7C21 7.98943 21 9.19084 21 11.5937V12.4063C21 14.8092 21 16.0106 20.4431 17C19.8862 17.9894 18.8718 18.5901 16.8431 19.7915L16.1569 20.1979C14.1282 21.3993 13.1138 22 12 22C10.8862 22 9.8718 21.3993 7.84308 20.1979L7.15692 19.7915C5.1282 18.5901 4.11384 17.9894 3.55692 17C3 16.0106 3 14.8092 3 12.4063V11.5937C3 9.19084 3 7.98943 3.55692 7C4.11384 6.01057 5.1282 5.40987 7.15692 4.20846L7.84308 3.80211Z" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/></svg>`,
-            HELP: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.75C12.4142 17.75 12.75 17.4142 12.75 17V11C12.75 10.5858 12.4142 10.25 12 10.25C11.5858 10.25 11.25 10.5858 11.25 11V17C11.25 17.4142 11.5858 17.75 12 17.75Z" fill="currentColor"/><path d="M12 7C12.5523 7 13 7.44772 13 8C13 8.55228 12.5523 9 12 9C11.4477 9 11 8.55228 11 8C11 7.44772 11.4477 7 12 7Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M1.25 12C1.25 6.06294 6.06294 1.25 12 1.25C17.9371 1.25 22.75 6.06294 22.75 12C22.75 17.9371 17.9371 22.75 12 22.75C6.06294 22.75 1.25 17.9371 1.25 12ZM12 2.75C6.89137 2.75 2.75 6.89137 2.75 12C2.75 17.1086 6.89137 21.25 12 21.25C17.1086 21.25 21.25 17.1086 21.25 12C21.25 6.89137 17.1086 2.75 12 2.75Z" fill="currentColor"/></svg>`,
-            LOCK: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M5.25 9.30277V8C5.25 4.27208 8.27208 1.25 12 1.25C15.7279 1.25 18.75 4.27208 18.75 8V9.30277C18.9768 9.31872 19.1906 9.33948 19.3918 9.36652C20.2919 9.48754 21.0497 9.74643 21.6517 10.3483C22.2536 10.9503 22.5125 11.7081 22.6335 12.6082C22.75 13.4752 22.75 14.5775 22.75 15.9451V16.0549C22.75 17.4225 22.75 18.5248 22.6335 19.3918C22.5125 20.2919 22.2536 21.0497 21.6517 21.6516C21.0497 22.2536 20.2919 22.5125 19.3918 22.6335C18.5248 22.75 17.4225 22.75 16.0549 22.75H7.94513C6.57754 22.75 5.47522 22.75 4.60825 22.6335C3.70814 22.5125 2.95027 22.2536 2.34835 21.6516C1.74643 21.0497 1.48754 20.2919 1.36652 19.3918C1.24996 18.5248 1.24998 17.4225 1.25 16.0549V15.9451C1.24998 14.5775 1.24996 13.4752 1.36652 12.6082C1.48754 11.7081 1.74643 10.9503 2.34835 10.3483C2.95027 9.74643 3.70814 9.48754 4.60825 9.36652C4.80938 9.33948 5.02317 9.31872 5.25 9.30277ZM6.75 8C6.75 5.10051 9.10051 2.75 12 2.75C14.8995 2.75 17.25 5.10051 17.25 8V9.25344C16.8765 9.24999 16.4784 9.24999 16.0549 9.25H7.94513C7.52161 9.24999 7.12353 9.24999 6.75 9.25344V8ZM3.40901 11.409C3.68577 11.1322 4.07435 10.9518 4.80812 10.8531C5.56347 10.7516 6.56459 10.75 8 10.75H16C17.4354 10.75 18.4365 10.7516 19.1919 10.8531C19.9257 10.9518 20.3142 11.1322 20.591 11.409C20.8678 11.6858 21.0482 12.0743 21.1469 12.8081C21.2484 13.5635 21.25 14.5646 21.25 16C21.25 17.4354 21.2484 18.4365 21.1469 19.1919C21.0482 19.9257 20.8678 20.3142 20.591 20.591C20.3142 20.8678 19.9257 21.0482 19.1919 21.1469C18.4365 21.2484 17.4354 21.25 16 21.25H8C6.56459 21.25 5.56347 21.2484 4.80812 21.1469C4.07435 21.0482 3.68577 20.8678 3.40901 20.591C3.13225 20.3142 2.9518 19.9257 2.85315 19.1919C2.75159 18.4365 2.75 17.4354 2.75 16C2.75 14.5646 2.75159 13.5635 2.85315 12.8081C2.9518 12.0743 3.13225 11.6858 3.40901 11.409Z" fill="currentColor"/></svg>`,
-            EXPORT: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 15C3 17.8284 3 19.2426 3.87868 20.1213C4.75736 21 6.17157 21 9 21H15C17.8284 21 19.2426 21 20.1213 20.1213C21 19.2426 21 17.8284 21 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 16V3M12 3L16 7.375M12 3L8 7.375" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-            MUTIEXPORT: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17 9.00195C19.175 9.01406 20.3529 9.11051 21.1213 9.8789C22 10.7576 22 12.1718 22 15.0002V16.0002C22 18.8286 22 20.2429 21.1213 21.1215C20.2426 22.0002 18.8284 22.0002 16 22.0002H8C5.17157 22.0002 3.75736 22.0002 2.87868 21.1215C2 20.2429 2 18.8286 2 16.0002L2 15.0002C2 12.1718 2 10.7576 2.87868 9.87889C3.64706 9.11051 4.82497 9.01406 7 9.00195" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M12 15L12 2M12 2L15 5.5M12 2L9 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-            IMPORT: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g transform="translate(0,24) scale(1,-1)"><path d="M3 15C3 17.8284 3 19.2426 3.87868 20.1213C4.75736 21 6.17157 21 9 21H15C17.8284 21 19.2426 21 20.1213 20.1213C21 19.2426 21 17.8284 21 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 16V3M12 3L16 7.375M12 3L8 7.375" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-            DELETE: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.1709 4C9.58273 2.83481 10.694 2 12.0002 2C13.3064 2 14.4177 2.83481 14.8295 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M20.5001 6H3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M18.8332 8.5L18.3732 15.3991C18.1962 18.054 18.1077 19.3815 17.2427 20.1907C16.3777 21 15.0473 21 12.3865 21H11.6132C8.95235 21 7.62195 21 6.75694 20.1907C5.89194 19.3815 5.80344 18.054 5.62644 15.3991L5.1665 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M9.5 11L10 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M14.5 11L14 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
-            DONATE: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.28441 11.2661C3.15113 9.26687 3.08449 8.26726 3.67729 7.63363C4.27009 7 5.27191 7 7.27555 7H12.7245C14.7281 7 15.7299 7 16.3227 7.63363C16.9155 8.26726 16.8489 9.26687 16.7156 11.2661L16.3734 16.3991C16.1964 19.054 16.1079 20.3815 15.2429 21.1907C14.3779 22 13.0475 22 10.3867 22H9.61333C6.95253 22 5.62212 22 4.75712 21.1907C3.89211 20.3815 3.80361 19.054 3.62662 16.3991L3.28441 11.2661Z" stroke="currentColor" stroke-width="1.5"/><path d="M17 17H18C20.2091 17 22 15.2091 22 13C22 10.7909 20.2091 9 18 9H17" stroke="currentColor" stroke-width="1.5"/><path d="M16 18H4" stroke="currentColor" stroke-width="1.5"/><path d="M6.05081 5.0614L6.46143 4.48574C6.6882 4.16781 6.61431 3.72623 6.29638 3.49945C5.97845 3.27267 5.90455 2.8311 6.13133 2.51317L6.54195 1.9375M14.0508 5.0614L14.4614 4.48574C14.6882 4.16781 14.6143 3.72623 14.2964 3.49945C13.9784 3.27267 13.9046 2.8311 14.1313 2.51317L14.5419 1.9375M10.0508 5.0614L10.4614 4.48574C10.6882 4.16781 10.6143 3.72623 10.2964 3.49945C9.97845 3.27267 9.90455 2.8311 10.1313 2.51317L10.5419 1.9375" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
-        }
-    };
-
-    const I18N_DATA = {
-      zh: {_name:"简体中文",nav_switch:"账号切换",nav_mgr:"管理账号",nav_set:"高级设置",nav_notice:"使用声明",nav_about:"关于脚本",confirm_delete: "确定要删除该账号记录吗？",placeholder_name:"给新账号命名...",tip_help:"切换登录失败？尝试勾选 LocalStorage 和 SessionStorage。",tip_lock:"为保证正常读取Cookie，请在篡改猴高级模式下，设置允许脚本访问 Cookie: ALL",btn_save:"保存当前账号",confirm_overwrite: "⚠️ 该名称已存在，确定要覆盖原有记录吗？",btn_clean:"切换新环境 (清空本站痕迹)",save_empty_err:"⚠️ 没有检测到可保存的数据",set_fab_mode:"悬浮球显示模式",fab_auto:"智能",fab_show:"常驻",fab_hide:"隐藏",fab_auto_title:"有账号记录时自动显示，无记录时隐藏",fab_show_title:"始终显示悬浮球",fab_hide_title:"平时不显示，仅能通过菜单唤起",set_lang:"语言设置 / Language",set_backup:"数据备份与还原",btn_exp_curr:"导出当前网站数据",btn_exp_all:"导出脚本全部数据",btn_imp:"导入备份文件",donate:"支持作者",btn_clear_all:"清空脚本所有数据 (慎用)",notice_title:"《使用声明与免责条款》",back:"← 返回上一级",no_data:"🍃 暂无账号记录",confirm_clean:"确定清空当前网站所有痕迹并开启新环境？",confirm_clear_all:"⚠️ 警告：这将删除本脚本保存的所有网站的所有账号数据！且无法恢复！",import_ok:"✅ 成功导入/更新 {count} 个账号！",import_err:"❌ 导入失败：文件格式错误",export_err:"⚠️ 没有可导出的数据",menu_open:"🚀 开启账号管理",dlg_ok:"确定",dlg_cancel:"取消",about_desc:"通用多网站多账号切换器",notice_content:`<h4>1. 脚本功能说明</h4><p>本脚本通过篡改猴插件提供的存储API，将当前网站的 Cookie、LocalStorage 和 SessionStorage 进行快照保存。当您点击切换时，脚本会清空当前痕迹并还原选中的快照数据，从而实现多账号快速登录。</p><h4>2. 数据存储安全</h4><p>所有账号数据均存储在您浏览器的篡改猴插件内部管理器中（GM_setValue），脚本没有联网权限，更不会上传任何数据到远程服务器。如果您需要云端同步数据，可以使用篡改猴自带的云端备份功能。</p><h4>3. 风险提示</h4><p>由于浏览器环境的开放性，本脚本无法阻止同域名下的其他恶意脚本通过篡改猴 API 或存储机制尝试获取这些数据。请勿在公共电脑或不可信的设备环境中使用本脚本保存重要账号。</p><h4>4. 免责声明</h4><p>本脚本仅供学习交流使用。因使用本脚本导致的账号被封禁、数据泄露或任何形式的损失，作者不承担任何法律责任。</p>`},
-      en: {_name:"English",nav_switch:"Accounts",nav_mgr:"Manage",nav_set:"Settings",nav_notice:"Disclaimer",nav_about:"About",confirm_delete: "Are you sure you want to delete this account?",placeholder_name:"Name this account...",tip_help:"Switch failed? Try checking LocalStorage/SessionStorage.",tip_lock:"To ensure cookies can be read correctly, open Tampermonkey’s Advanced Settings and change “Allow scripts to access cookies” to “ALL”.",btn_save:"Save Current",confirm_overwrite: "⚠️ Name already exists. Do you want to overwrite it?",btn_clean:"Switch to a new environment (clear all data for this site)",save_empty_err:"⚠️ No data detected to save",set_fab_mode:"Float Button Mode",fab_auto:"Auto",fab_show:"Show",fab_hide:"Hide",fab_auto_title:"Automatically show when accounts exist, hide when none",fab_show_title:"Always show the floating button",fab_hide_title:"Hidden by default, can only be activated via the menu",set_lang:"语言设置 / Language",set_backup:"Backup & Restore",btn_exp_curr:"Export Current Site",btn_exp_all:"Export All Data",btn_imp:"Import Backup",donate:"Buy me a coffee",btn_clear_all:"Clear all script data (use with caution)",notice_title:"Disclaimer & Terms",back:"← Back",no_data:"🍃 No accounts",confirm_clean:"Are you sure you want to clear all traces of the current website and start a new environment?",confirm_clear_all:"⚠️ Warning: This will delete all account data for all websites saved by this script, and cannot be undone!",import_ok:"✅ Successfully imported/updated {count} account(s)!",import_err:"❌ Invalid format",export_err:"⚠️ No data",menu_open:"🚀 Open Manager",dlg_ok:"OK",dlg_cancel:"Cancel",about_desc:"Universal Multi-Site Account Switcher",notice_content:`<h4>1. Script Functionality</h4><p>This script utilizes the storage API provided by Tampermonkey to take snapshots of the current website's Cookies, LocalStorage, and SessionStorage. When switching accounts, the script clears current session data and restores the selected snapshot, enabling rapid multi-account login.</p><h4>2. Data Storage & Security</h4><p>All account data is stored locally within your browser's Tampermonkey extension manager (via GM_setValue). This script has no network permissions and will never upload any data to remote servers. If you require cloud synchronization, please use Tampermonkey's built-in cloud backup feature.</p><h4>3. Risk Warning</h4><p>Due to the open nature of browser environments, this script cannot prevent other malicious scripts on the same domain from attempting to access data via storage mechanisms. Please avoid using this script to save sensitive accounts on public or untrusted devices.</p><h4>4. Disclaimer</h4><p>This script is intended for educational and exchange purposes only. The author shall not be held legally responsible for any account bans, data breaches, or any form of loss resulting from the use of this script.</p>`},
-      es: {_name:"Español",nav_switch:"Cuentas",nav_mgr:"Administrar",nav_set:"Configuración",nav_notice:"Aviso legal",nav_about:"Acerca de",confirm_delete: "¿Estás seguro de que deseas eliminar esta cuenta?",placeholder_name:"Nombre para esta cuenta...",tip_help:"¿Falló el cambio de cuenta? Intenta marcar LocalStorage y SessionStorage.",tip_lock:"Para garantizar la correcta lectura de cookies, abre la configuración avanzada de Tampermonkey y establece “Permitir que los scripts accedan a cookies” en “ALL”.",btn_save:"Guardar cuenta actual",confirm_overwrite: "⚠️ El nombre ya existe. ¿Deseas sobrescribirlo?",btn_clean:"Cambiar a un nuevo entorno (borrar datos del sitio)",save_empty_err:"⚠️ No se detectaron datos para guardar",set_fab_mode:"Modo del botón flotante",fab_auto:"Automático",fab_show:"Siempre visible",fab_hide:"Oculto",fab_auto_title:"Se muestra automáticamente cuando hay cuentas guardadas; se oculta si no hay ninguna",fab_show_title:"El botón flotante se muestra siempre",fab_hide_title:"Oculto por defecto, solo accesible desde el menú",set_lang:"Idioma / Language",set_backup:"Copia de seguridad y restauración",btn_exp_curr:"Exportar datos del sitio actual",btn_exp_all:"Exportar todos los datos del script",btn_imp:"Importar archivo de respaldo",donate:"Apoyar al autor",btn_clear_all:"Borrar todos los datos del script (usar con precaución)",notice_title:"Términos de uso y descargo de responsabilidad",back:"← Volver",no_data:"🍃 No hay cuentas",confirm_clean:"¿Seguro que deseas borrar todos los rastros del sitio actual y comenzar un nuevo entorno?",confirm_clear_all:"⚠️ Advertencia: Esto eliminará todos los datos de cuentas de todos los sitios guardados por este script. ¡Esta acción no se puede deshacer!",import_ok:"✅ Se importaron/actualizaron correctamente {count} cuenta(s)",import_err:"❌ Error de importación: formato de archivo inválido",export_err:"⚠️ No hay datos para exportar",menu_open:"🚀 Abrir gestor de cuentas",dlg_ok:"Aceptar",dlg_cancel:"Cancelar",about_desc:"Conmutador universal de múltiples cuentas para múltiples sitios",notice_content:`<h4>1. Funcionalidad del script</h4><p>Este script utiliza la API de almacenamiento proporcionada por Tampermonkey para guardar instantáneas de las Cookies, LocalStorage y SessionStorage del sitio web actual. Al cambiar de cuenta, el script borra los datos actuales y restaura la instantánea seleccionada, permitiendo un inicio de sesión rápido con múltiples cuentas.</p><h4>2. Almacenamiento y seguridad de datos</h4><p>Todos los datos de las cuentas se almacenan localmente en el administrador interno de Tampermonkey (mediante GM_setValue). El script no tiene permisos de red y nunca sube datos a servidores remotos. Si necesitas sincronización en la nube, utiliza la función de respaldo en la nube integrada de Tampermonkey.</p><h4>3. Advertencia de riesgo</h4><p>Debido a la naturaleza abierta del entorno del navegador, este script no puede impedir que otros scripts maliciosos bajo el mismo dominio intenten acceder a estos datos mediante mecanismos de almacenamiento. Evita guardar cuentas sensibles en equipos públicos o no confiables.</p><h4>4. Descargo de responsabilidad</h4><p>Este script se proporciona únicamente con fines educativos y de intercambio. El autor no asume ninguna responsabilidad legal por bloqueos de cuentas, fugas de datos o cualquier tipo de pérdida derivada del uso de este script.</p>`}
-    };
-
-
-    // Shadow DOM CSS
-    const STYLE_CSS = `
+(() => {
+  // src/app/config.js
+  var CONST = {
+    PREFIX: "acc_stable_",
+    ORDER_PREFIX: "acc_order_",
+    SITE_NAME_PREFIX: "acc_site_name_",
+    CFG: {
+      LANG: "cfg_lang",
+      FAB_MODE: "cfg_fab_mode",
+      FAB_POS: "cfg_fab_pos",
+      HOST_DISPLAY_MODE: "cfg_host_display_mode",
+      WEBDAV_CONFIG: "cfg_webdav_config",
+      WEBDAV_BACKUPS_CACHE: "cfg_webdav_backups_cache"
+    },
+    HOST: location.hostname,
+    META: {
+      NAME: GM_info.script.name,
+      VERSION: GM_info.script.version,
+      AUTHOR: GM_info.script.author,
+      LINKS: {
+        PROJECT: "https://github.com/Zhu-junwei/AnMe",
+        DONATE: "https://www.cnblogs.com/zjw-blog/p/19466109"
+      }
+    },
+    ICONS: {
+      LOGO: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 17.5C21 19.433 19.433 21 17.5 21C15.567 21 14 19.433 14 17.5C14 15.567 15.567 14 17.5 14C19.433 14 21 15.567 21 17.5Z" stroke="currentColor" stroke-width="1.5"/><path d="M2 11H22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M4 11L4.6138 8.54479C5.15947 6.36211 5.43231 5.27077 6.24609 4.63538C7.05988 4 8.1848 4 10.4347 4H13.5653C15.8152 4 16.9401 4 17.7539 4.63538C18.5677 5.27077 18.8405 6.36211 19.3862 8.54479L20 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10 17.5C10 19.433 8.433 21 6.5 21C4.567 21 3 19.433 3 17.5C3 15.567 4.567 14 6.5 14C8.433 14 10 15.567 10 17.5Z" stroke="currentColor" stroke-width="1.5"/><path d="M10 17.4999L10.6584 17.1707C11.5029 16.7484 12.4971 16.7484 13.3416 17.1707L14 17.4999" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+      GITHUB: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 .5C5.648.5.5 5.648.5 12a11.5 11.5 0 0 0 7.86 10.92c.575.105.785-.25.785-.555l-.015-2.145c-3.198.695-3.873-1.36-3.873-1.36-.525-1.335-1.28-1.69-1.28-1.69-1.045-.715.08-.7.08-.7 1.155.08 1.765 1.185 1.765 1.185 1.025 1.76 2.69 1.25 3.345.955.105-.745.4-1.25.725-1.535-2.555-.29-5.24-1.28-5.24-5.695 0-1.255.45-2.28 1.185-3.085-.12-.29-.515-1.46.11-3.04 0 0 .965-.31 3.165 1.18a10.96 10.96 0 0 1 5.76 0c2.2-1.49 3.165-1.18 3.165-1.18.625 1.58.23 2.75.115 3.04.735.805 1.18 1.83 1.18 3.085 0 4.425-2.69 5.4-5.255 5.685.41.355.775 1.055.775 2.125l-.015 3.15c0 .31.205.67.79.555A11.502 11.502 0 0 0 23.5 12C23.5 5.648 18.352.5 12 .5Z"/></svg>`,
+      CLOUD: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.5 18.5H16.25C18.8734 18.5 21 16.3734 21 13.75C21 11.2747 19.1066 9.24147 16.6879 9.02035C16.0218 6.69436 13.8837 5 11.375 5C8.34144 5 5.875 7.46644 5.875 10.5C5.875 10.7171 5.88772 10.9312 5.91246 11.1413C4.02877 11.7215 2.75 13.4754 2.75 15.4375C2.75 17.1243 4.11713 18.5 5.8125 18.5H7.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+      USER: `<svg width="1em" height="1em" viewBox="0 0 24 24"  fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="6" r="4" stroke="currentColor" stroke-width="1.5"/><ellipse cx="12" cy="17" rx="7" ry="4" stroke="currentColor" stroke-width="1.5"/></svg>`,
+      SETTINGS: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.84308 3.80211C9.8718 2.6007 10.8862 2 12 2C13.1138 2 14.1282 2.6007 16.1569 3.80211L16.8431 4.20846C18.8718 5.40987 19.8862 6.01057 20.4431 7C21 7.98943 21 9.19084 21 11.5937V12.4063C21 14.8092 21 16.0106 20.4431 17C19.8862 17.9894 18.8718 18.5901 16.8431 19.7915L16.1569 20.1979C14.1282 21.3993 13.1138 22 12 22C10.8862 22 9.8718 21.3993 7.84308 20.1979L7.15692 19.7915C5.1282 18.5901 4.11384 17.9894 3.55692 17C3 16.0106 3 14.8092 3 12.4063V11.5937C3 9.19084 3 7.98943 3.55692 7C4.11384 6.01057 5.1282 5.40987 7.15692 4.20846L7.84308 3.80211Z" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/></svg>`,
+      HELP: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.75C12.4142 17.75 12.75 17.4142 12.75 17V11C12.75 10.5858 12.4142 10.25 12 10.25C11.5858 10.25 11.25 10.5858 11.25 11V17C11.25 17.4142 11.5858 17.75 12 17.75Z" fill="currentColor"/><path d="M12 7C12.5523 7 13 7.44772 13 8C13 8.55228 12.5523 9 12 9C11.4477 9 11 8.55228 11 8C11 7.44772 11.4477 7 12 7Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M1.25 12C1.25 6.06294 6.06294 1.25 12 1.25C17.9371 1.25 22.75 6.06294 22.75 12C22.75 17.9371 17.9371 22.75 12 22.75C6.06294 22.75 1.25 17.9371 1.25 12ZM12 2.75C6.89137 2.75 2.75 6.89137 2.75 12C2.75 17.1086 6.89137 21.25 12 21.25C17.1086 21.25 21.25 17.1086 21.25 12C21.25 6.89137 17.1086 2.75 12 2.75Z" fill="currentColor"/></svg>`,
+      LOCK: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M5.25 9.30277V8C5.25 4.27208 8.27208 1.25 12 1.25C15.7279 1.25 18.75 4.27208 18.75 8V9.30277C18.9768 9.31872 19.1906 9.33948 19.3918 9.36652C20.2919 9.48754 21.0497 9.74643 21.6517 10.3483C22.2536 10.9503 22.5125 11.7081 22.6335 12.6082C22.75 13.4752 22.75 14.5775 22.75 15.9451V16.0549C22.75 17.4225 22.75 18.5248 22.6335 19.3918C22.5125 20.2919 22.2536 21.0497 21.6517 21.6516C21.0497 22.2536 20.2919 22.5125 19.3918 22.6335C18.5248 22.75 17.4225 22.75 16.0549 22.75H7.94513C6.57754 22.75 5.47522 22.75 4.60825 22.6335C3.70814 22.5125 2.95027 22.2536 2.34835 21.6516C1.74643 21.0497 1.48754 20.2919 1.36652 19.3918C1.24996 18.5248 1.24998 17.4225 1.25 16.0549V15.9451C1.24998 14.5775 1.24996 13.4752 1.36652 12.6082C1.48754 11.7081 1.74643 10.9503 2.34835 10.3483C2.95027 9.74643 3.70814 9.48754 4.60825 9.36652C4.80938 9.33948 5.02317 9.31872 5.25 9.30277ZM6.75 8C6.75 5.10051 9.10051 2.75 12 2.75C14.8995 2.75 17.25 5.10051 17.25 8V9.25344C16.8765 9.24999 16.4784 9.24999 16.0549 9.25H7.94513C7.52161 9.24999 7.12353 9.24999 6.75 9.25344V8ZM3.40901 11.409C3.68577 11.1322 4.07435 10.9518 4.80812 10.8531C5.56347 10.7516 6.56459 10.75 8 10.75H16C17.4354 10.75 18.4365 10.7516 19.1919 10.8531C19.9257 10.9518 20.3142 11.1322 20.591 11.409C20.8678 11.6858 21.0482 12.0743 21.1469 12.8081C21.2484 13.5635 21.25 14.5646 21.25 16C21.25 17.4354 21.2484 18.4365 21.1469 19.1919C21.0482 19.9257 20.8678 20.3142 20.591 20.591C20.3142 20.8678 19.9257 21.0482 19.1919 21.1469C18.4365 21.2484 17.4354 21.25 16 21.25H8C6.56459 21.25 5.56347 21.2484 4.80812 21.1469C4.07435 21.0482 3.68577 20.8678 3.40901 20.591C3.13225 20.3142 2.9518 19.9257 2.85315 19.1919C2.75159 18.4365 2.75 17.4354 2.75 16C2.75 14.5646 2.75159 13.5635 2.85315 12.8081C2.9518 12.0743 3.13225 11.6858 3.40901 11.409Z" fill="currentColor"/></svg>`,
+      EXPORT: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 15C3 17.8284 3 19.2426 3.87868 20.1213C4.75736 21 6.17157 21 9 21H15C17.8284 21 19.2426 21 20.1213 20.1213C21 19.2426 21 17.8284 21 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 16V3M12 3L16 7.375M12 3L8 7.375" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+      MUTIEXPORT: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17 9.00195C19.175 9.01406 20.3529 9.11051 21.1213 9.8789C22 10.7576 22 12.1718 22 15.0002V16.0002C22 18.8286 22 20.2429 21.1213 21.1215C20.2426 22.0002 18.8284 22.0002 16 22.0002H8C5.17157 22.0002 3.75736 22.0002 2.87868 21.1215C2 20.2429 2 18.8286 2 16.0002L2 15.0002C2 12.1718 2 10.7576 2.87868 9.87889C3.64706 9.11051 4.82497 9.01406 7 9.00195" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M12 15L12 2M12 2L15 5.5M12 2L9 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+      IMPORT: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g transform="translate(0,24) scale(1,-1)"><path d="M3 15C3 17.8284 3 19.2426 3.87868 20.1213C4.75736 21 6.17157 21 9 21H15C17.8284 21 19.2426 21 20.1213 20.1213C21 19.2426 21 17.8284 21 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 16V3M12 3L16 7.375M12 3L8 7.375" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+      DELETE: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.1709 4C9.58273 2.83481 10.694 2 12.0002 2C13.3064 2 14.4177 2.83481 14.8295 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M20.5001 6H3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M18.8332 8.5L18.3732 15.3991C18.1962 18.054 18.1077 19.3815 17.2427 20.1907C16.3777 21 15.0473 21 12.3865 21H11.6132C8.95235 21 7.62195 21 6.75694 20.1907C5.89194 19.3815 5.80344 18.054 5.62644 15.3991L5.1665 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M9.5 11L10 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M14.5 11L14 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+      DONATE: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.28441 11.2661C3.15113 9.26687 3.08449 8.26726 3.67729 7.63363C4.27009 7 5.27191 7 7.27555 7H12.7245C14.7281 7 15.7299 7 16.3227 7.63363C16.9155 8.26726 16.8489 9.26687 16.7156 11.2661L16.3734 16.3991C16.1964 19.054 16.1079 20.3815 15.2429 21.1907C14.3779 22 13.0475 22 10.3867 22H9.61333C6.95253 22 5.62212 22 4.75712 21.1907C3.89211 20.3815 3.80361 19.054 3.62662 16.3991L3.28441 11.2661Z" stroke="currentColor" stroke-width="1.5"/><path d="M17 17H18C20.2091 17 22 15.2091 22 13C22 10.7909 20.2091 9 18 9H17" stroke="currentColor" stroke-width="1.5"/><path d="M16 18H4" stroke="currentColor" stroke-width="1.5"/><path d="M6.05081 5.0614L6.46143 4.48574C6.6882 4.16781 6.61431 3.72623 6.29638 3.49945C5.97845 3.27267 5.90455 2.8311 6.13133 2.51317L6.54195 1.9375M14.0508 5.0614L14.4614 4.48574C14.6882 4.16781 14.6143 3.72623 14.2964 3.49945C13.9784 3.27267 13.9046 2.8311 14.1313 2.51317L14.5419 1.9375M10.0508 5.0614L10.4614 4.48574C10.6882 4.16781 10.6143 3.72623 10.2964 3.49945C9.97845 3.27267 9.90455 2.8311 10.1313 2.51317L10.5419 1.9375" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+      SAVE: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 7.8C4 6.11984 4 5.27976 4.32698 4.63803C4.6146 4.07354 5.07354 3.6146 5.63803 3.32698C6.27976 3 7.11984 3 8.8 3H15.2C16.8802 3 17.7202 3 18.362 3.32698C18.9265 3.6146 19.3854 4.07354 19.673 4.63803C20 5.27976 20 6.11984 20 7.8V16.2C20 17.8802 20 18.7202 19.673 19.362C19.3854 19.9265 18.9265 20.3854 18.362 20.673C17.7202 21 16.8802 21 15.2 21H8.8C7.11984 21 6.27976 21 5.63803 20.673C5.07354 20.3854 4.6146 19.9265 4.32698 19.362C4 18.7202 4 17.8802 4 16.2V7.8Z" stroke="currentColor" stroke-width="1.5"/><path d="M8 3V8H15V3" stroke="currentColor" stroke-width="1.5"/><path d="M8 21V15H16V21" stroke="currentColor" stroke-width="1.5"/><path d="M16 8H16.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
+      SEARCH: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M20 20L16.2 16.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+      EDIT: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 6.5L17.5 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M4 20L7.5 19.5L18.5 8.5C19.3284 7.67157 19.3284 6.32843 18.5 5.5V5.5C17.6716 4.67157 16.3284 4.67157 15.5 5.5L4.5 16.5L4 20Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>`,
+      CLOSE: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 7L17 17M17 7L7 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+      CLEAN: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 7V5.5C10 4.11929 11.1193 3 12.5 3H17.5C18.8807 3 20 4.11929 20 5.5V18.5C20 19.8807 18.8807 21 17.5 21H12.5C11.1193 21 10 19.8807 10 18.5V17" stroke="currentColor" stroke-width="1.5"/><path d="M14 12H4M4 12L7 9M4 12L7 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+      BACK: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 12H4M4 12L10 6M4 12L10 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+      HOME: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 10.75L10.4697 4.72557C11.3788 3.99241 12.6212 3.99241 13.5303 4.72557L21 10.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.75 9.5V18C5.75 19.2426 6.75736 20.25 8 20.25H16C17.2426 20.25 18.25 19.2426 18.25 18V9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10 20.25V15.5C10 14.8096 10.5596 14.25 11.25 14.25H12.75C13.4404 14.25 14 14.8096 14 15.5V20.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+      NOTICE: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 3.75H14.7574C15.753 3.75 16.7078 4.14509 17.4118 4.84835L19.1517 6.58691C19.8561 7.29054 20.2522 8.24559 20.2527 9.24102L20.2571 18C20.2571 19.7949 18.802 21.25 17.0071 21.25H7C5.20507 21.25 3.75 19.7949 3.75 18V7C3.75 5.20507 5.20507 3.75 7 3.75Z" stroke="currentColor" stroke-width="1.5"/><path d="M8 9H16M8 13H16M8 17H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`
+    }
+  };
+  var I18N_DATA = {
+    zh: { _name: "简体中文", nav_set: "高级设置", nav_notice: "使用声明", nav_about: "关于脚本", back_current_host: "返回当前网站账号", open_site: "打开网站", edit_site_name: "编辑站点名字", search_site: "搜索网站...", search_accounts: "搜索账号", close_search_accounts: "关闭搜索", search_accounts_placeholder: "搜索当前网站账号...", account_settings: "账号设置", site_name: "站点名称", account_name: "账号名称", save_changes: "保存修改", btn_delete_account: "删除该账号", danger_zone: "危险操作", rename_conflict: "该名称已存在，请换一个名称。", confirm_delete: "确定要删除该账号记录吗？", placeholder_site_name: "给当前网站命名...", placeholder_name: "给新账号命名...", tip_help: "切换登录失败？尝试勾选 LocalStorage 和 SessionStorage。", tip_lock: "为保证正常读取Cookie，请在篡改猴高级模式下，设置允许脚本访问 Cookie: ALL", btn_save: "保存当前账号", confirm_overwrite: "⚠️ 该名称已存在，确定要覆盖原有记录吗？", btn_clean: "切换新环境 (清空本站痕迹)", save_empty_err: "⚠️ 没有检测到可保存的数据", copy_account_name: "复制账号名", copy_failed: "复制失败，请手动复制。", toast_saved: "账号已保存", toast_renamed: "账号名称已更新", toast_deleted: "账号已删除", toast_copied: "账号名已复制", toast_site_name_updated: "站点名称已更新", set_fab_mode: "悬浮球显示模式", fab_auto: "智能", fab_show: "常驻", fab_hide: "隐藏", fab_auto_title: "有账号记录时自动显示，无记录时隐藏", fab_show_title: "始终显示悬浮球", fab_hide_title: "平时不显示，仅能通过菜单唤起", set_lang: "语言设置 / Language", set_host_display_mode: "站点列表显示模式", host_display_mode_site_name: "站点名字", host_display_mode_domain: "域名", set_backup: "数据备份与还原", btn_exp_curr: "导出当前网站数据", btn_exp_all: "导出脚本全部数据", btn_imp: "导入备份文件", donate: "支持作者", btn_clear_all: "清空脚本所有数据 (慎用)", notice_title: "《使用声明与免责条款》", back: "← 返回上一级", no_data: "🍃 暂无账号记录", confirm_clean: "确定清空当前网站所有痕迹并开启新环境？", confirm_clear_all: "⚠️ 警告：这将删除本脚本保存的所有网站的所有账号数据！且无法恢复！", import_ok: "✅ 成功导入/更新 {count} 个账号！", import_err: "❌ 导入失败：文件格式错误", export_err: "⚠️ 没有可导出的数据", menu_open: "🚀 开启账号管理", dlg_ok: "确定", dlg_cancel: "取消", about_desc: "通用多网站多账号切换器", notice_content: `<h4>1. 脚本功能说明</h4><p>本脚本通过篡改猴插件提供的存储API，将当前网站的 Cookie、LocalStorage 和 SessionStorage 进行快照保存。当您点击切换时，脚本会清空当前痕迹并还原选中的快照数据，从而实现多账号快速登录。</p><h4>2. 数据存储与联网说明</h4><p>账号数据默认存储在您浏览器的篡改猴插件内部管理器中（GM_setValue）。脚本默认不会主动联网或上传数据；只有在您手动配置并使用 WebDAV 云同步功能时，脚本才会按您的操作访问您指定的远程服务并上传或下载备份文件。</p><h4>3. 风险提示</h4><p>由于浏览器环境的开放性，本脚本无法阻止同域名下的其他恶意脚本通过篡改猴 API 或存储机制尝试获取这些数据。请勿在公共电脑或不可信的设备环境中使用本脚本保存重要账号。</p><h4>4. 免责声明</h4><p>本脚本仅供学习交流使用。因使用本脚本导致的账号被封禁、数据泄露或任何形式的损失，作者不承担任何法律责任。</p>` },
+    en: { _name: "English", nav_set: "Settings", nav_notice: "Disclaimer", nav_about: "About", back_current_host: "Back to current site", open_site: "Open site", edit_site_name: "Edit site name", search_site: "Search sites...", search_accounts: "Search accounts", close_search_accounts: "Close search", search_accounts_placeholder: "Search accounts on this site...", account_settings: "Account Settings", site_name: "Site Name", account_name: "Account Name", save_changes: "Save Changes", btn_delete_account: "Delete Account", danger_zone: "Danger Zone", rename_conflict: "This name already exists. Please choose another one.", confirm_delete: "Are you sure you want to delete this account?", placeholder_site_name: "Name this site...", placeholder_name: "Name this account...", tip_help: "Switch failed? Try checking LocalStorage/SessionStorage.", tip_lock: "To ensure cookies can be read correctly, open Tampermonkey’s Advanced Settings and change “Allow scripts to access cookies” to “ALL”.", btn_save: "Save Current", confirm_overwrite: "⚠️ Name already exists. Do you want to overwrite it?", btn_clean: "Switch to a new environment (clear all data for this site)", save_empty_err: "⚠️ No data detected to save", copy_account_name: "Copy account name", copy_failed: "Copy failed. Please copy it manually.", toast_saved: "Account saved", toast_renamed: "Account name updated", toast_deleted: "Account deleted", toast_copied: "Account name copied", toast_site_name_updated: "Site name updated", set_fab_mode: "Float Button Mode", fab_auto: "Auto", fab_show: "Show", fab_hide: "Hide", fab_auto_title: "Automatically show when accounts exist, hide when none", fab_show_title: "Always show the floating button", fab_hide_title: "Hidden by default, can only be activated via the menu", set_lang: "语言设置 / Language", set_host_display_mode: "Site List Display", host_display_mode_site_name: "Site Name", host_display_mode_domain: "Domain", set_backup: "Backup & Restore", btn_exp_curr: "Export Current Site", btn_exp_all: "Export All Data", btn_imp: "Import Backup", donate: "Buy me a coffee", btn_clear_all: "Clear all script data (use with caution)", notice_title: "Disclaimer & Terms", back: "← Back", no_data: "🍃 No accounts", confirm_clean: "Are you sure you want to clear all traces of the current website and start a new environment?", confirm_clear_all: "⚠️ Warning: This will delete all account data for all websites saved by this script, and cannot be undone!", import_ok: "✅ Successfully imported/updated {count} account(s)!", import_err: "❌ Invalid format", export_err: "⚠️ No data", menu_open: "🚀 Open Manager", dlg_ok: "OK", dlg_cancel: "Cancel", about_desc: "Universal Multi-Site Account Switcher", notice_content: `<h4>1. Script Functionality</h4><p>This script utilizes the storage API provided by Tampermonkey to take snapshots of the current website's Cookies, LocalStorage, and SessionStorage. When switching accounts, the script clears current session data and restores the selected snapshot, enabling rapid multi-account login.</p><h4>2. Data Storage & Network Access</h4><p>Account data is stored locally in your browser's Tampermonkey extension manager (via GM_setValue) by default. The script does not proactively upload data or access remote services unless you explicitly configure and use the WebDAV sync feature; only then will it connect to the WebDAV server you specified to upload or download backup files.</p><h4>3. Risk Warning</h4><p>Due to the open nature of browser environments, this script cannot prevent other malicious scripts on the same domain from attempting to access data via storage mechanisms. Please avoid using this script to save sensitive accounts on public or untrusted devices.</p><h4>4. Disclaimer</h4><p>This script is intended for educational and exchange purposes only. The author shall not be held legally responsible for any account bans, data breaches, or any form of loss resulting from the use of this script.</p>` },
+    es: { _name: "Español", nav_set: "Configuración", nav_notice: "Aviso legal", nav_about: "Acerca de", back_current_host: "Volver al sitio actual", open_site: "Abrir sitio", edit_site_name: "Editar nombre del sitio", search_site: "Buscar sitios...", search_accounts: "Buscar cuentas", close_search_accounts: "Cerrar búsqueda", search_accounts_placeholder: "Buscar cuentas en este sitio...", account_settings: "Configuración de la cuenta", site_name: "Nombre del sitio", account_name: "Nombre de la cuenta", save_changes: "Guardar cambios", btn_delete_account: "Eliminar cuenta", danger_zone: "Zona peligrosa", rename_conflict: "Ese nombre ya existe. Usa otro nombre.", confirm_delete: "¿Estás seguro de que deseas eliminar esta cuenta?", placeholder_site_name: "Nombre para este sitio...", placeholder_name: "Nombre para esta cuenta...", tip_help: "¿Falló el cambio de cuenta? Intenta marcar LocalStorage y SessionStorage.", tip_lock: "Para garantizar la correcta lectura de cookies, abre la configuración avanzada de Tampermonkey y establece “Permitir que los scripts accedan a cookies” en “ALL”.", btn_save: "Guardar cuenta actual", confirm_overwrite: "⚠️ El nombre ya existe. ¿Deseas sobrescribirlo?", btn_clean: "Cambiar a un nuevo entorno (borrar datos del sitio)", save_empty_err: "⚠️ No se detectaron datos para guardar", copy_account_name: "Copiar nombre de la cuenta", copy_failed: "No se pudo copiar. Cópialo manualmente.", toast_saved: "Cuenta guardada", toast_renamed: "Nombre de cuenta actualizado", toast_deleted: "Cuenta eliminada", toast_copied: "Nombre de cuenta copiado", toast_site_name_updated: "Nombre del sitio actualizado", set_fab_mode: "Modo del botón flotante", fab_auto: "Automático", fab_show: "Siempre visible", fab_hide: "Oculto", fab_auto_title: "Se muestra automáticamente cuando hay cuentas guardadas; se oculta si no hay ninguna", fab_show_title: "El botón flotante se muestra siempre", fab_hide_title: "Oculto por defecto, solo accesible desde el menú", set_lang: "Idioma / Language", set_host_display_mode: "Modo de lista de sitios", host_display_mode_site_name: "Nombre del sitio", host_display_mode_domain: "Dominio", set_backup: "Copia de seguridad y restauración", btn_exp_curr: "Exportar datos del sitio actual", btn_exp_all: "Exportar todos los datos del script", btn_imp: "Importar archivo de respaldo", donate: "Apoyar al autor", btn_clear_all: "Borrar todos los datos del script (usar con precaución)", notice_title: "Términos de uso y descargo de responsabilidad", back: "← Volver", no_data: "🍃 No hay cuentas", confirm_clean: "¿Seguro que deseas borrar todos los rastros del sitio actual y comenzar un nuevo entorno?", confirm_clear_all: "⚠️ Advertencia: Esto eliminará todos los datos de cuentas de todos los sitios guardados por este script. ¡Esta acción no se puede deshacer!", import_ok: "✅ Se importaron/actualizaron correctamente {count} cuenta(s)", import_err: "❌ Error de importación: formato de archivo inválido", export_err: "⚠️ No hay datos para exportar", menu_open: "🚀 Abrir gestor de cuentas", dlg_ok: "Aceptar", dlg_cancel: "Cancelar", about_desc: "Conmutador universal de múltiples cuentas para múltiples sitios", notice_content: `<h4>1. Funcionalidad del script</h4><p>Este script utiliza la API de almacenamiento proporcionada por Tampermonkey para guardar instantáneas de las Cookies, LocalStorage y SessionStorage del sitio web actual. Al cambiar de cuenta, el script borra los datos actuales y restaura la instantánea seleccionada, permitiendo un inicio de sesión rápido con múltiples cuentas.</p><h4>2. Almacenamiento y acceso de red</h4><p>Los datos de las cuentas se almacenan localmente en el administrador interno de Tampermonkey (mediante GM_setValue) de forma predeterminada. El script no sube datos ni accede a servicios remotos por iniciativa propia; solo se conectará al servidor WebDAV que configures cuando habilites y utilices explícitamente la función de sincronización para subir o descargar copias de seguridad.</p><h4>3. Advertencia de riesgo</h4><p>Debido a la naturaleza abierta del entorno del navegador, este script no puede impedir que otros scripts maliciosos bajo el mismo dominio intenten acceder a estos datos mediante mecanismos de almacenamiento. Evita guardar cuentas sensibles en equipos públicos o no confiables.</p><h4>4. Descargo de responsabilidad</h4><p>Este script se proporciona únicamente con fines educativos y de intercambio. El autor no asume ninguna responsabilidad legal por bloqueos de cuentas, fugas de datos o cualquier tipo de pérdida derivada del uso de este script.</p>` }
+  };
+  Object.assign(I18N_DATA.zh, {
+    nav_webdav: "WebDAV 同步",
+    webdav_account: "WebDAV 账号",
+    webdav_config: "设置",
+    webdav_not_configured: "尚未配置 WebDAV",
+    webdav_connected_as: "当前账号：{user}",
+    webdav_url: "服务地址",
+    webdav_url_placeholder: "例如: https://dav.example.com/remote.php/dav/files/user",
+    webdav_username: "用户名",
+    webdav_username_placeholder: "请输入 WebDAV 用户名",
+    webdav_password: "密码",
+    webdav_password_placeholder: "请输入 WebDAV 密码",
+    webdav_verify_save: "验证并保存",
+    webdav_sync: "云同步",
+    webdav_sync_now: "备份",
+    webdav_refresh: "刷新列表",
+    webdav_backup_list: "云端备份列表",
+    webdav_restore: "恢复",
+    webdav_delete: "删除",
+    webdav_no_backups: "暂无云端备份",
+    webdav_need_config: "请先填写并验证 WebDAV 配置。",
+    webdav_loading: "正在加载云端备份...",
+    webdav_validating: "正在验证 WebDAV...",
+    webdav_verified: "WebDAV 验证成功",
+    webdav_verify_err: "WebDAV 验证失败",
+    webdav_missing_config: "请完整填写 WebDAV 服务地址、用户名和密码。",
+    webdav_syncing: "正在同步到 WebDAV...",
+    webdav_sync_ok: "同步已完成",
+    webdav_sync_err: "同步失败",
+    webdav_list_err: "获取云端备份列表失败",
+    webdav_delete_confirm: "确定删除云端备份：{name}？",
+    webdav_delete_ok: "云端备份已删除",
+    webdav_delete_err: "删除云端备份失败",
+    webdav_restore_confirm: "确定用该云端备份恢复本地数据：{name}？",
+    webdav_restoring: "正在从 WebDAV 恢复...",
+    webdav_logout: "退出 WebDAV",
+    webdav_logout_confirm: "确定退出 WebDAV 并删除本地保存的账号信息吗？",
+    webdav_logout_ok: "已退出 WebDAV",
+    webdav_timeout: "WebDAV 请求超时，请检查网络或服务状态。",
+    sync_restore_ok: "✅ 已从云端同步恢复 {count} 个账号！",
+    sync_restore_err: "云端恢复失败，压缩包或数据文件无效。"
+  });
+  Object.assign(I18N_DATA.en, {
+    nav_webdav: "WebDAV Sync",
+    webdav_account: "WebDAV Account",
+    webdav_config: "Settings",
+    webdav_not_configured: "WebDAV is not configured yet",
+    webdav_connected_as: "Current account: {user}",
+    webdav_url: "Server URL",
+    webdav_url_placeholder: "Example: https://dav.example.com/remote.php/dav/files/user",
+    webdav_username: "Username",
+    webdav_username_placeholder: "Enter WebDAV username",
+    webdav_password: "Password",
+    webdav_password_placeholder: "Enter WebDAV password",
+    webdav_verify_save: "Verify and Save",
+    webdav_sync: "Cloud Sync",
+    webdav_sync_now: "Backup",
+    webdav_refresh: "Refresh List",
+    webdav_backup_list: "Cloud Backup List",
+    webdav_restore: "Restore",
+    webdav_delete: "Delete",
+    webdav_no_backups: "No cloud backups yet",
+    webdav_need_config: "Fill in and verify your WebDAV settings first.",
+    webdav_loading: "Loading cloud backups...",
+    webdav_validating: "Validating WebDAV...",
+    webdav_verified: "WebDAV verified",
+    webdav_verify_err: "WebDAV validation failed",
+    webdav_missing_config: "Please fill in the WebDAV URL, username, and password.",
+    webdav_syncing: "Syncing to WebDAV...",
+    webdav_sync_ok: "Sync completed",
+    webdav_sync_err: "Sync failed",
+    webdav_list_err: "Failed to load cloud backups",
+    webdav_delete_confirm: "Delete cloud backup: {name}?",
+    webdav_delete_ok: "Cloud backup deleted",
+    webdav_delete_err: "Failed to delete cloud backup",
+    webdav_restore_confirm: "Restore local data from cloud backup: {name}?",
+    webdav_restoring: "Restoring from WebDAV...",
+    webdav_logout: "Sign out of WebDAV",
+    webdav_logout_confirm: "Sign out of WebDAV and remove the saved local account info?",
+    webdav_logout_ok: "Signed out of WebDAV",
+    webdav_timeout: "WebDAV request timed out. Check the network or server status.",
+    sync_restore_ok: "✅ Restored {count} account(s) from cloud sync!",
+    sync_restore_err: "Cloud restore failed. The archive or data file is invalid."
+  });
+  Object.assign(I18N_DATA.es, {
+    nav_webdav: "Sincronización WebDAV",
+    webdav_account: "Cuenta WebDAV",
+    webdav_config: "Configurar",
+    webdav_not_configured: "WebDAV aún no está configurado",
+    webdav_connected_as: "Cuenta actual: {user}",
+    webdav_url: "URL del servidor",
+    webdav_url_placeholder: "Ejemplo: https://dav.example.com/remote.php/dav/files/user",
+    webdav_username: "Usuario",
+    webdav_username_placeholder: "Introduce el usuario de WebDAV",
+    webdav_password: "Contraseña",
+    webdav_password_placeholder: "Introduce la contraseña de WebDAV",
+    webdav_verify_save: "Verificar y guardar",
+    webdav_sync: "Sincronización en la nube",
+    webdav_sync_now: "Respaldar",
+    webdav_refresh: "Actualizar lista",
+    webdav_backup_list: "Lista de copias en la nube",
+    webdav_restore: "Restaurar",
+    webdav_delete: "Eliminar",
+    webdav_no_backups: "Todavía no hay copias en la nube",
+    webdav_need_config: "Primero completa y verifica la configuración de WebDAV.",
+    webdav_loading: "Cargando copias en la nube...",
+    webdav_validating: "Validando WebDAV...",
+    webdav_verified: "WebDAV verificado",
+    webdav_verify_err: "La validación de WebDAV falló",
+    webdav_missing_config: "Completa la URL, el usuario y la contraseña de WebDAV.",
+    webdav_syncing: "Sincronizando con WebDAV...",
+    webdav_sync_ok: "Sincronización completada",
+    webdav_sync_err: "La sincronización falló",
+    webdav_list_err: "No se pudieron cargar las copias en la nube",
+    webdav_delete_confirm: "¿Eliminar la copia en la nube: {name}?",
+    webdav_delete_ok: "Copia en la nube eliminada",
+    webdav_delete_err: "No se pudo eliminar la copia en la nube",
+    webdav_restore_confirm: "¿Restaurar los datos locales desde la copia en la nube: {name}?",
+    webdav_restoring: "Restaurando desde WebDAV...",
+    webdav_logout: "Cerrar sesión de WebDAV",
+    webdav_logout_confirm: "¿Cerrar sesión de WebDAV y eliminar la información guardada localmente?",
+    webdav_logout_ok: "WebDAV desconectado",
+    webdav_timeout: "La solicitud de WebDAV agotó el tiempo de espera. Revisa la red o el servidor.",
+    sync_restore_ok: "✅ Se restauraron {count} cuenta(s) desde la sincronización en la nube.",
+    sync_restore_err: "La restauración en la nube falló. El archivo comprimido o los datos no son válidos."
+  });
+  var STYLE_CSS = `
         :host {
             all: initial; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif!important;font-size: 14px!important;line-height: 1.5;color: #333!important;z-index: 2147483647; position: fixed;
             top: 0;left: 0;width: 0;height: 0;pointer-events: none;
@@ -85,24 +214,67 @@
         #acc-mgr-fab { padding: 10px;position: fixed; bottom: 100px; right: 30px; width: 44px; height: 44px; background: #2196F3; color: white; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 20px; cursor: move; z-index: 1000000; box-shadow: 0 8px 30px rgba(0,0,0,0.25); user-select: none; border: none; touch-action: none; transition: transform 0.1s; }
         #acc-mgr-fab:active { transform: scale(0.95); }
 
-        .acc-panel { position: fixed; width: 340px; background: white; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.25); z-index: 1000001; display: flex; flex-direction: column; font-family: inherit; border: 1px solid #ddd; overflow: hidden; height: 480px; overscroll-behavior: none !important; opacity: 0; visibility: hidden; transform: translateY(20px) scale(0.95); transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; }
-        .acc-panel.show { opacity: 1; visibility: visible; transform: translateY(0) scale(1); pointer-events: auto; }
-        .acc-header { display: flex; align-items: center; justify-content: center; padding: 8px 15px; border-bottom: 1px solid #eee; background: #fff; position: relative; flex-shrink: 0; }
+        .acc-panel { position: fixed; width: 340px; background: white; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.25); z-index: 1000001; display: flex; flex-direction: column; font-family: inherit; border: 1px solid #ddd; overflow: hidden; height: 480px; overscroll-behavior: none !important; opacity: 0; visibility: hidden; transition: opacity 0.12s ease, visibility 0.12s ease; pointer-events: none; }
+        .acc-panel.show { opacity: 1; visibility: visible; pointer-events: auto; }
+        .acc-header { display: flex; align-items: center; justify-content: center; padding: 8px 15px; border-bottom: 1px solid #eee; background: #fff; position: relative; flex-shrink: 0; min-height: 44px; }
+        .acc-header-actions { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); display: none; gap: 6px; align-items: center; }
+        .acc-header-right-actions { position:absolute; right:15px; top:50%; transform:translateY(-50%); display:flex; gap:6px; align-items:center; }
         .acc-header-title { font-size: 14px; font-weight: bold; color: #333; text-align: center; }
-        #acc-close-btn { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #ccc; font-size: 16px; padding: 5px; transition: color 0.2s; }
+        #acc-close-btn { cursor: pointer; color: #ccc; font-size: 16px; padding: 5px; transition: color 0.2s; line-height:1; }
         #acc-close-btn:hover { color: #666; }
 
         .acc-tab-content { flex: 1; display: none; padding: 15px 15px 0 15px; overflow: hidden; flex-direction: column; background: #fff; }
         .acc-tab-content.active { display: flex; }
-        .acc-tab-btn span { font-size: 18px; margin-bottom: 2px; }
-        .acc-tabs-footer { display: flex; background: #fff; border-top: 1px solid #eee; flex-shrink: 0; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); position: relative; z-index: 10; }
-        .acc-tab-btn { position: relative; flex: 1; padding: 6px 0; cursor: pointer; transition: color 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .acc-tab-btn::after { content: ""; position: absolute; bottom: 0; left: 0; width: 100%; height: 1px; background-color: transparent; transition: all 0.2s; }
-        .acc-tab-btn.active { color: #2196F3; background: #f2f8fd }
-        .acc-tab-btn.active::after { background-color: #2196F3; box-shadow: 0 -1px 4px rgba(33, 150, 243, 0.4); }
-
-        .acc-host-sel {flex:1; padding:6px; font-size:12px; border:1px solid #eee; border-radius:4px; outline:none; cursor:pointer; background:#fff; color:#333;}
-        .aac-btn-goto-host {width:30px; height:30px; border:1px solid #ddd; background:#fff; border-radius:4px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; color:#555; font-size:16px;}
+        .acc-mgr-toolbar { display:flex; gap:8px; margin-bottom:10px; align-items:center; min-height:30px; }
+        .acc-mgr-host-row { display:flex; gap:5px; align-items:center; flex:1; min-width:0; position:relative; min-height:30px; }
+        .acc-host-picker { position:relative; flex:1; min-width:0; min-height:30px; }
+        .acc-host-search-input { display:none; width:100%; height:30px; box-sizing:border-box; border:1px solid #e4e8ee; border-radius:6px; padding:7px 10px; font-size:12px; outline:none; color:#333; background:#fff; }
+        .acc-host-search-input:focus { border-color:#2196F3; box-shadow:0 0 0 2px rgba(33, 150, 243, 0.12); }
+        .acc-host-picker.open .acc-host-trigger { display:none; }
+        .acc-host-picker.open .acc-host-search-input { display:block; }
+        .acc-account-search-box { display:none; flex:1; min-width:0; min-height:30px; }
+        .acc-mgr-host-row.searching .acc-host-picker { display:none; }
+        .acc-mgr-host-row.searching .acc-account-search-box { display:block; }
+        .acc-host-trigger { width:100%; min-width:0; height:30px; box-sizing:border-box; padding:6px 28px 6px 10px; font-size:12px; border:1px solid #eee; border-radius:4px; outline:none; cursor:pointer; background:#fff; color:#333; text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; position:relative; }
+        .acc-host-trigger::after { content:""; position:absolute; right:10px; top:50%; width:7px; height:7px; border-right:1.5px solid currentColor; border-bottom:1.5px solid currentColor; transform:translateY(-65%) rotate(45deg); opacity:0.7; transition:transform 0.15s ease; }
+        .acc-host-picker.open .acc-host-trigger { border-color:#2196F3; box-shadow:0 0 0 2px rgba(33, 150, 243, 0.12); }
+        .acc-host-picker.open .acc-host-trigger::after { transform:translateY(-30%) rotate(225deg); }
+        .acc-host-menu { position:absolute; top:calc(100% + 4px); left:0; right:0; background:#fff; border:1px solid #e4e8ee; border-radius:8px; box-shadow:0 10px 24px rgba(15, 23, 42, 0.12); padding:6px; display:none; max-height:320px; overflow:hidden; z-index:20; }
+        .acc-host-picker.open .acc-host-menu { display:block; }
+        .acc-account-search-input { width:100%; height:30px; box-sizing:border-box; border:1px solid #e4e8ee; border-radius:6px; padding:7px 10px; font-size:12px; outline:none; color:#333; background:#fff; }
+        .acc-account-search-input:focus { border-color:#2196F3; box-shadow:0 0 0 2px rgba(33, 150, 243, 0.12); }
+        .acc-host-list { max-height:266px; overflow-y:auto; }
+        .acc-host-list::-webkit-scrollbar { width:6px; }
+        .acc-host-list::-webkit-scrollbar-thumb { background:#d3d9e2; border-radius:999px; }
+        .acc-host-option-row { display:flex; align-items:center; gap:6px; border-radius:6px; flex-wrap:wrap; }
+        .acc-host-option-row:hover { background:#f2f8fd; }
+        .acc-host-option-row.active { background:#e3f2fd; }
+        .acc-host-option { flex:1; min-width:0; border:none; background:transparent; color:#333; display:flex; align-items:center; gap:6px; padding:8px 10px; border-radius:6px; cursor:pointer; font-size:12px; text-align:left; }
+        .acc-host-option-row:hover .acc-host-option { color:#2196F3; }
+        .acc-host-option-row.active .acc-host-option { color:#1976D2; font-weight:600; }
+        .acc-host-edit-link,
+        .acc-host-open-link { flex-shrink:0; margin-right:10px; border:none; background:transparent; color:#7d93a8; font-size:12px; line-height:1; cursor:pointer; padding:0; opacity:0; visibility:hidden; text-decoration:underline; text-underline-offset:2px; transition:color 0.15s ease, opacity 0.15s ease; }
+        .acc-host-edit-link { margin-right:0; text-decoration:none; display:flex; align-items:center; justify-content:center; width:18px; height:18px; }
+        .acc-host-edit-link svg { font-size:13px; }
+        .acc-host-option-row:hover .acc-host-edit-link,
+        .acc-host-option-row:hover .acc-host-open-link,
+        .acc-host-edit-link:focus-visible,
+        .acc-host-open-link:focus-visible { opacity:1; visibility:visible; }
+        .acc-host-edit-link:hover,
+        .acc-host-edit-link:focus-visible,
+        .acc-host-open-link:hover,
+        .acc-host-open-link:focus-visible { color:#2196F3; outline:none; }
+        .acc-host-edit-box { width:100%; display:flex; gap:6px; padding:0 8px 8px 8px; }
+        .acc-host-edit-input { flex:1; min-width:0; border:1px solid #d9e2ec; border-radius:6px; padding:6px 8px; font-size:12px; outline:none; background:#fff; }
+        .acc-host-edit-input:focus { border-color:#2196F3; box-shadow:0 0 0 2px rgba(33, 150, 243, 0.12); }
+        .acc-host-edit-save,
+        .acc-host-edit-cancel { border:1px solid #d9e2ec; background:#fff; color:#475467; border-radius:6px; padding:0 8px; font-size:12px; cursor:pointer; }
+        .acc-host-edit-save:hover,
+        .acc-host-edit-cancel:hover { border-color:#2196F3; color:#2196F3; background:#f5fbff; }
+        .acc-host-empty { padding:10px; font-size:12px; color:#8a94a3; text-align:center; }
+        .acc-toolbar-btn { width:30px; height:30px; border:1px solid #ddd; background:#fff; border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#555; padding:0; transition:0.2s; }
+        .acc-toolbar-btn svg { font-size:16px; }
+        .acc-toolbar-btn:hover { background:#e3f2fd; border-color:#2196F3; color:#2196F3; }
 
         .acc-scroll-area { flex: 1; overflow-y: auto; padding-right: 4px; margin-top: 2px; overscroll-behavior: contain;}
         .acc-scroll-area::-webkit-scrollbar { width: 4px; }
@@ -111,19 +283,19 @@
         /* --- Customized Elements --- */
         .acc-backup-row { display: flex; gap: 8px; margin-bottom: 10px; justify-content: space-between; }
         .acc-icon-btn { flex: 1; height: 38px; padding: 0; border-radius: 6px; border: 1px solid #eee; background: #f9f9f9; cursor: pointer; font-size: 18px; transition: 0.2s; display: flex; align-items: center; justify-content: center; color: #555; }
-        .acc-icon-btn:hover,.aac-btn-goto-host:hover { background: #e3f2fd; border-color: #2196F3; color:#2196F3}
+        .acc-icon-btn:hover { background: #e3f2fd; border-color: #2196F3; color:#2196F3}
         .acc-icon-btn.danger:hover { background: #ffebee; border-color: #f44336; color: #f44336; }
 
         .acc-about-content { padding: 5px; color: #444 !important; font-size: 13px !important; line-height: 1.6 !important; text-align: left !important; }
         .acc-about-header { text-align: center !important; margin-bottom: 20px !important; }
-        .acc-about-logo { font-size: 20px !important; margin-bottom: 5px !important; display: block !important; }
+        .acc-about-logo { font-size: 20px !important; display: inline-flex !important; margin-bottom: 5px !important; }
         .acc-about-name { font-weight: bold !important; font-size: 16px !important; color: #333 !important; }
         .acc-about-ver { color: #999 !important; font-size: 12px !important; }
         .acc-about-item { display: flex !important; justify-content: space-between !important; padding: 3px 0 !important; border-bottom: 1px solid #f5f5f5 !important; }
         .acc-about-label { color: #888 !important; font-weight: bold !important; }
 
         /* Custom Dialog UI */
-        .acc-dialog-mask { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 2000005; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .acc-dialog-mask { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 2000007; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .acc-dialog-box { background: white; width: 280px; border-radius: 12px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: accPop 0.05s ease-out; display: flex; flex-direction: column; }
         @keyframes accPop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .acc-dialog-msg { font-size: 14px; color: #333; margin-bottom: 20px; line-height: 1.5; text-align: center; white-space: pre-wrap; font-weight: 500; }
@@ -133,35 +305,56 @@
         .acc-dialog-btn-ok:hover { background: #1976D2; }
         .acc-dialog-btn-cancel { background: #f5f5f5; color: #666; }
         .acc-dialog-btn-cancel:hover { background: #e0e0e0; }
+        .acc-form-mask { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 2000006; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .acc-form-box { background: white; width: 300px; border-radius: 12px; padding: 18px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 10px; animation: accPop 0.05s ease-out; }
+        .acc-form-title { font-size: 14px; font-weight: 700; color: #333; }
+        .acc-form-label { font-size: 12px; font-weight: 700; color: #667085; margin-bottom: -4px; }
+        .acc-form-footer { display: flex; gap: 10px; margin-top: 4px; }
+        .acc-toast { position:absolute; top:12px; left:50%; transform:translateX(-50%) translateY(-8px); display:flex; align-items:center; gap:6px; max-width:260px; padding:7px 10px; border:1px solid #d7e5f5; border-radius:999px; background:rgba(255,255,255,0.96); color:#36506b; box-shadow:0 10px 24px rgba(15, 23, 42, 0.12); font-size:12px; line-height:1; opacity:0; visibility:hidden; transition:opacity 0.18s ease, transform 0.18s ease; z-index:2000012; pointer-events:none; white-space:nowrap; }
+        .acc-toast.show { opacity:1; visibility:visible; transform:translateX(-50%) translateY(0); }
+        .acc-toast-icon { width:14px; height:14px; display:flex; align-items:center; justify-content:center; color:#2196F3; flex-shrink:0; }
+        .acc-toast-icon svg { font-size:14px; }
+        .acc-toast-text { overflow:hidden; text-overflow:ellipsis; }
 
         /* Others ... */
-        .acc-switch-card { padding: 12px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: 0.2s; position: relative; background: #fff; }
-        .acc-switch-card:hover { border-color: #2196F3; background: #f7fbff; }
-        .acc-switch-card:hover svg {fill: #2196F3 !important;stroke: #2196F3 !important;transition: all 0.2s ease;}
-        .acc-card-name { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 6px; margin-bottom: 6px; color: #333; }
+        .acc-switch-item { display:flex; align-items:stretch; gap:2px; margin-bottom:8px; position:relative; }
+        .acc-switch-card { flex:1; min-width:0; padding: 12px; padding-right: 40px; border: 1px solid #eee; border-radius: 8px; cursor: pointer; transition: 0.2s; position: relative; background: #fff; }
+        .acc-switch-card:hover { border-color: #2196F3; }
+        .acc-switch-card:hover .acc-card-name svg {fill: #2196F3 !important;stroke: #2196F3 !important;transition: all 0.2s ease;}
+        .acc-switch-card-static { cursor: default; }
+        .acc-switch-handle { width:6px; flex-shrink:0; align-self:stretch; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; color:#c4c4c4; font-size:9px; font-weight:700; user-select:none; cursor:grab; line-height:1; border-radius:4px; padding:0; opacity:0; visibility:hidden; pointer-events:none; transition:opacity 0.15s ease, color 0.15s ease, background 0.15s ease; }
+        .acc-switch-handle span { display:block; letter-spacing:0; }
+        .acc-switch-item:hover .acc-switch-handle,
+        .acc-switch-item.dragging-source .acc-switch-handle { color:#2196F3; background:#f2f8fd; opacity:1; visibility:visible; pointer-events:auto; }
+        .acc-switch-ghost { box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18); opacity: 0.96; }
+        .acc-switch-item.dragging-source .acc-switch-card { border:1px dashed #2196F3; opacity:0.45; background:#fff; }
+        .acc-switch-list-sorting .acc-switch-card:hover { border-color:#eee; background:#fff; }
+        .acc-switch-list-sorting .acc-switch-card:hover .acc-card-name svg { fill: currentColor !important; stroke: currentColor !important; }
+        .acc-switch-settings-btn { position:absolute; right:8px; bottom:8px; width:24px; height:24px; border:1px solid #ddd; border-radius:6px; background:transparent; color:#7d93a8; display:flex; align-items:center; justify-content:center; padding:0; cursor:pointer; opacity:0; visibility:hidden; transition:all 0.15s ease; }
+        .acc-switch-settings-btn svg { font-size:14px; }
+        .acc-switch-item:hover .acc-switch-settings-btn,
+        .acc-switch-settings-btn:focus-visible { opacity:1; visibility:visible; }
+        .acc-switch-settings-btn:hover,
+        .acc-switch-settings-btn:active,
+        .acc-switch-settings-btn:focus-visible { color:#2196F3; border-color:#2196F3; background:#e3f2fd; }
+        .acc-card-body { flex:1; min-width:0; }
+        .acc-card-name { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 6px; margin-bottom: 6px; color: #333; min-width:0; }
+        .acc-card-name-icon { flex-shrink:0; display:flex; align-items:center; justify-content:center; color:inherit; background:transparent; border:none; padding:0; cursor:pointer; transition:color 0.15s ease; }
+        .acc-card-name-icon:hover,
+        .acc-card-name-icon:focus-visible { color:#2196F3; outline:none; }
+        .acc-card-name-text { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
         .acc-card-meta { font-size: 10px; color: #999; display: flex; flex-wrap: wrap; gap: 4px; }
         .acc-mini-tag { background: #f0f0f0; padding: 1px 5px; border-radius: 3px; color: #777; transition: all 0.2s; border: 1px solid transparent; }
         .acc-click-tag { cursor: pointer; text-decoration: none; position: relative; }
         .acc-click-tag:hover { background: #2196F3; color: white; border-color: #1976D2; z-index: 2; }
 
-        .acc-mgr-item { display: flex; align-items: center; margin-top: 2px; border-bottom: 1px solid #f9f9f9; background: white; cursor: grab; color: #333; }
-        .acc-mgr-item.dragging { opacity: 0.4; background: #e3f2fd; border: 1px dashed #2196F3; }
-        .acc-mgr-handle { margin: 0 8px; color: #ccc; font-size: 14px; user-select: none; cursor: grab; }
-
-        /* Updated Input Styling - Added border color transition on hover/focus */
-        .acc-mgr-input { flex: 1; border: 1px solid transparent; padding: 4px 6px; font-size: 13px; outline: none; border-radius: 4px; background: transparent; color: #333; transition: all 0.2s; }
-        .acc-mgr-input:hover { border-color: #ddd; background: #fdfdfd; }
-
-        .acc-btn-del { color: #ccc; cursor: pointer; padding: 0 12px; font-size: 20px; font-weight: 300; user-select: none; }
-        .acc-btn-del:hover { color: #f44336; }
-        .acc-action-fixed { border-top: 1px solid #eee; padding-top: 1px; flex-shrink: 0; background-color: #fcfcfc;}
         .acc-row-btn { display: flex; gap: 8px; align-items: center; margin-bottom:3px}
         .acc-input-text { flex: 1; width:100%; padding: 8px; margin-bottom:8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; box-sizing: border-box; background: #fff; color: #333; outline: none; transition: all 0.2s; }
-        .acc-input-text:focus,.acc-mgr-input:focus { border-color: #2196F3; box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2); }
+        .acc-input-text:focus { border-color: #2196F3; box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2); }
         .acc-btn { border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 5px; transition: 0.2s; }
         .acc-btn-blue { flex: 1; background: #2196F3; color: white; }
-        .acc-btn-plus { width: 38px; height: 38px; background: #fff; color: #666; border: 1px solid #ddd; font-size: 20px; }
-        .acc-btn-plus:hover { border-color: #2196F3; color: #2196F3; }
+        .acc-btn-danger { width:100%; background:#ffebee; color:#c62828; border:1px solid #ffcdd2; }
+        .acc-btn-danger:hover { background:#ffcdd2; border-color:#ef9a9a; }
         .acc-help-tip, .acc-lock-tip { display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; cursor: help; font-size: 16px; }
         .acc-help-tip { color:#f5a623; margin-left:10px; margin-right:4px}
         .acc-lock-tip { color: #999; }
@@ -177,7 +370,9 @@
         .acc-select-ui { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; background: #fff; cursor: pointer; outline: none; color: #333; }
         .acc-chk {display:flex; align-items:center; flex-wrap:wrap; font-size:11px; color:#666; margin:5px 0;-webkit-user-select: none;}
         .acc-chk-label { display: inline-flex !important; align-items: center !important; cursor: pointer !important; margin-right:4px; font-size: 12px; color: #666; }
+        .acc-chk-label.disabled { opacity: 0.45; cursor: not-allowed !important; }
         .acc-custom-chk { appearance: none !important; width: 14px !important; height: 14px !important; border: 1px solid #ccc !important; border-radius: 3px !important; margin-right: 4px !important; cursor: pointer !important; position: relative !important; background: #fff; }
+        .acc-custom-chk:disabled { cursor: not-allowed !important; background: #f3f4f6 !important; border-color: #d0d5dd !important; }
         .acc-custom-chk:checked { background-color: #2196F3 !important; border-color: #2196F3 !important; }
         .acc-custom-chk:checked::after { content: ''; position: absolute !important; left: 4px !important; top: 1px !important; width: 3px !important; height: 7px !important; border: solid white !important; border-width: 0 2px 2px 0 !important; transform: rotate(45deg) !important; }
 
@@ -185,834 +380,2407 @@
         .acc-spinner{width:30px;height:30px;border:3px solid #f3f3f3;border-top:3px solid #2196F3;border-radius:50%;animation:acc-spin 1s linear infinite}
         @keyframes acc-spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
         .acc-loading-text{margin-top:10px;font-size:12px;color:#2196F3;font-weight:700}
+        .acc-webdav-list { display:flex; flex-direction:column; gap:8px; }
+        .acc-webdav-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+        .acc-webdav-status-row { display:flex; align-items:center; gap:6px; }
+        .acc-webdav-status { font-size:12px; color:#667085; }
+        .acc-webdav-logout-btn { width:24px; height:24px; min-width:24px; }
+        .acc-webdav-logout-btn:disabled { opacity:.5; cursor:not-allowed; }
+        .acc-webdav-config-btn { flex:0 0 auto; padding:8px 12px; }
+        .acc-webdav-item { border:1px solid #e5e7eb; border-radius:8px; padding:10px; background:#fff; display:flex; flex-direction:column; gap:8px; position:relative; }
+        .acc-webdav-item-main { min-width:0; }
+        .acc-webdav-item-name { font-size:12px; font-weight:700; color:#344054; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .acc-webdav-item-meta { display:flex; gap:4px; flex-wrap:wrap; margin-top:4px; }
+        .acc-webdav-meta-tag { font-size:10px; padding:0 4px; line-height:16px; }
+        .acc-webdav-item-actions { position:absolute; right:8px; bottom:8px; display:flex; gap:6px; opacity:0; visibility:hidden; transition:opacity .15s ease; }
+        .acc-webdav-item:hover .acc-webdav-item-actions,
+        .acc-webdav-item-actions:focus-within { opacity:1; visibility:visible; }
+        .acc-webdav-action-btn { width:24px; height:24px; min-width:24px; }
+        .acc-webdav-action-btn svg { font-size:14px; }
+        .acc-webdav-action-btn.danger { color:#c62828; border-color:#ffcdd2; background:#fff5f5; }
+        .acc-webdav-action-btn.danger:hover { background:#ffebee; border-color:#ef9a9a; color:#c62828; }
+        .acc-webdav-empty { padding:14px 10px; color:#98a2b3; text-align:center; font-size:12px; border:1px dashed #d0d5dd; border-radius:8px; background:#fafafa; }
 
     `;
 
-    // ========================================================================
-    // 2. Global State & Utils
-    // ========================================================================
-
-    const navLang = navigator.language.split('-')[0];
-    let currentLang = GM_getValue(CONST.CFG.LANG, I18N_DATA[navLang] ? navLang : 'en');
-    if (!I18N_DATA[currentLang]) currentLang = 'en';
-
-    let currentViewingHost = CONST.HOST;
-    let isForcedShow = false;
-
-    // Shadow DOM Refs
-    let uiRoot = null;
-    let fab = null;
-    let panel = null;
-    let dialogMask = null;
-
-    const Utils = {
-        t: (key) => I18N_DATA[currentLang][key] || key,
-        extractName: (key) => key.split('::')[1] || key,
-        makeKey: (name, host = CONST.HOST) => `${CONST.PREFIX}${host}::${name}`,
-        listAllHosts: () => [...new Set(GM_listValues().filter(v => v.startsWith(CONST.PREFIX)).map(v => v.split('::')[0].replace(CONST.PREFIX, '')))],
-        getSortedKeysByHost: (host) => {
-            const allKeys = GM_listValues().filter(k => k.startsWith(`${CONST.PREFIX}${host}::`));
-            const savedOrder = GM_getValue(CONST.ORDER_PREFIX + host, []);
-            return allKeys.sort((a, b) => {
-                const nameA = Utils.extractName(a);
-                const nameB = Utils.extractName(b);
-                let idxA = savedOrder.indexOf(nameA);
-                let idxB = savedOrder.indexOf(nameB);
-                if (idxA === -1) idxA = 9999;
-                if (idxB === -1) idxB = 9999;
-                if (idxA !== idxB) return idxA - idxB;
-                const dataA = GM_getValue(a);
-                const dataB = GM_getValue(b);
-                return new Date(dataB.time || 0) - new Date(dataA.time || 0);
-            });
-        },
-        formatTime: (timestamp) => {
-            if (!timestamp) return '';
-            return typeof timestamp === 'number'? new Date(timestamp).toLocaleString(): timestamp;
-        }
+  // src/app/state.js
+  function createState({ constants, i18nData }) {
+    const navLang = navigator.language.split("-")[0];
+    let currentLang = GM_getValue(constants.CFG.LANG, i18nData[navLang] ? navLang : "en");
+    if (!i18nData[currentLang]) {
+      currentLang = "en";
+    }
+    return {
+      currentLang,
+      currentViewingHost: constants.HOST,
+      hostDisplayMode: GM_getValue(constants.CFG.HOST_DISPLAY_MODE, "siteName"),
+      hostEditingHost: null,
+      hostEditingValue: "",
+      isForcedShow: false,
+      activePage: "pg-switch",
+      settingsReturnPage: "pg-switch",
+      accountSettingsKey: null,
+      accountSettingsReturnPage: "pg-switch",
+      accountSettingsHost: constants.HOST,
+      hostSearchQuery: "",
+      accountSearchQuery: "",
+      accountSearchActive: false,
+      webdavBackups: [],
+      uiRoot: null,
+      fab: null,
+      panel: null,
+      dialogMask: null,
+      saveFormMask: null,
+      toastEl: null,
+      toastTimer: null
     };
+  }
 
-    // ========================================================================
-    // 3. Core Logic (Data & Storage)
-    // ========================================================================
+  // src/app/utils.js
+  function createUtils({ state, constants, i18nData }) {
+    return {
+      normalizeText(value) {
+        return String(value || "").replace(/\s+/g, " ").trim();
+      },
+      t(key) {
+        return i18nData[state.currentLang][key] || key;
+      },
+      escapeHtml(value) {
+        return String(value || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+      },
+      extractName(key) {
+        return key.split("::")[1] || key;
+      },
+      makeKey(name, host = constants.HOST) {
+        return `${constants.PREFIX}${host}::${name}`;
+      },
+      listAllHosts() {
+        return [
+          ...new Set(
+            GM_listValues().filter((value) => value.startsWith(constants.PREFIX)).map((value) => value.split("::")[0].replace(constants.PREFIX, ""))
+          )
+        ];
+      },
+      getSortedKeysByHost(host) {
+        const allKeys = GM_listValues().filter((key) => key.startsWith(`${constants.PREFIX}${host}::`));
+        const savedOrder = GM_getValue(constants.ORDER_PREFIX + host, []);
+        return allKeys.sort((a, b) => {
+          const nameA = this.extractName(a);
+          const nameB = this.extractName(b);
+          let idxA = savedOrder.indexOf(nameA);
+          let idxB = savedOrder.indexOf(nameB);
+          if (idxA === -1) idxA = 9999;
+          if (idxB === -1) idxB = 9999;
+          if (idxA !== idxB) return idxA - idxB;
+          const dataA = GM_getValue(a);
+          const dataB = GM_getValue(b);
+          return new Date(dataB.time || 0) - new Date(dataA.time || 0);
+        });
+      },
+      formatTime(timestamp) {
+        if (!timestamp) return "";
+        if (typeof timestamp === "number") {
+          return new Date(timestamp).toLocaleString();
+        }
+        const parsed = new Date(timestamp);
+        return Number.isNaN(parsed.getTime()) ? String(timestamp) : parsed.toLocaleString();
+      },
+      formatBytes(size) {
+        const bytes = Number(size) || 0;
+        if (bytes < 1024) return `${bytes} B`;
+        if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+        return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+      },
+      normalizeSiteName(siteName, host = constants.HOST) {
+        return this.normalizeText(siteName) || host;
+      },
+      getPageTitle() {
+        return typeof document !== "undefined" ? document.title : "";
+      },
+      findStoredSiteName(host) {
+        const savedSiteName = this.normalizeText(GM_getValue(constants.SITE_NAME_PREFIX + host, ""));
+        if (savedSiteName) {
+          return savedSiteName;
+        }
+        const keys = this.getSortedKeysByHost(host);
+        for (const key of keys) {
+          const siteName = this.normalizeText(GM_getValue(key)?.siteName);
+          if (siteName) {
+            return siteName;
+          }
+        }
+        return "";
+      },
+      getSiteNameByHost(host, fallbackTitle = "") {
+        const storedSiteName = this.findStoredSiteName(host);
+        if (storedSiteName) {
+          return storedSiteName;
+        }
+        return host;
+      },
+      getHostDisplayName(host, mode = state.hostDisplayMode || "siteName") {
+        return mode === "domain" ? host : this.getSiteNameByHost(host);
+      },
+      suggestSiteName(pageTitle = this.getPageTitle(), host = constants.HOST) {
+        const storedSiteName = this.findStoredSiteName(host);
+        if (storedSiteName) {
+          return storedSiteName;
+        }
+        return this.normalizeSiteName(pageTitle, host);
+      },
+      suggestAccountName(host = constants.HOST) {
+        const existingNames = this.getSortedKeysByHost(host).map((key) => this.extractName(key));
+        let index = existingNames.length + 1;
+        let candidate = "";
+        do {
+          candidate = `账号-${String(index).padStart(2, "0")}`;
+          index += 1;
+        } while (existingNames.includes(candidate));
+        return candidate;
+      }
+    };
+  }
 
-    const Core = {
-        async saveAccount(name, options = { ck: true, ls: false, ss: false }) {
-            const snapshot = {
-                time: Date.now(),
-                localStorage: options.ls ? { ...localStorage } : {},
-                sessionStorage: options.ss ? { ...sessionStorage } : {},
-                cookies: []
-            };
-            if (options.ck) {
-                snapshot.cookies = await new Promise(res => GM_cookie.list({}, res));
+  // src/app/templates.js
+  function createTemplates({ state, constants, i18nData, utils }) {
+    return {
+      panel() {
+        const langOptions = Object.keys(i18nData).map(
+          (code) => `<option value="${code}" ${state.currentLang === code ? "selected" : ""}>${i18nData[code]._name}</option>`
+        ).join("");
+        return `
+      <div class="acc-header">
+          <div class="acc-header-actions" id="acc-header-actions">
+              <button class="acc-toolbar-btn" id="btn-header-back" title="${utils.t("back")}">${constants.ICONS.BACK}</button>
+              <button class="acc-toolbar-btn" id="btn-go-current-host" title="${utils.t("back_current_host")}">${constants.ICONS.HOME}</button>
+              <button class="acc-toolbar-btn" id="btn-clean-env" title="${utils.t("btn_clean")}">${constants.ICONS.CLEAN}</button>
+              <button class="acc-toolbar-btn" id="btn-open-save-modal" title="${utils.t("btn_save")}">${constants.ICONS.SAVE}</button>
+          </div>
+          <div class="acc-header-title" id="acc-header-text"></div>
+          <div class="acc-header-right-actions">
+              <button class="acc-toolbar-btn" id="btn-open-project" title="GitHub">${constants.ICONS.GITHUB}</button>
+              <button class="acc-toolbar-btn" id="btn-open-webdav" title="${utils.t("nav_webdav")}">${constants.ICONS.CLOUD}</button>
+              <button class="acc-toolbar-btn" id="btn-open-settings" title="${utils.t("nav_set")}">${constants.ICONS.SETTINGS}</button>
+              <div id="acc-close-btn">&times;</div>
+          </div>
+      </div>
+
+      <div class="acc-tab-content active" id="pg-switch">
+          <div class="acc-mgr-toolbar">
+              <div class="acc-mgr-host-row" id="acc-host-row">
+                  <div class="acc-host-picker" id="host-picker">
+                      <button class="acc-host-trigger" id="host-trigger" type="button"></button>
+                      <input type="text" id="host-search-input" class="acc-host-search-input" placeholder="${utils.t("search_site")}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+                      <div class="acc-host-menu" id="host-menu"></div>
+                  </div>
+                  <div class="acc-account-search-box" id="acc-account-search-box">
+                      <input type="text" id="account-search-input" class="acc-account-search-input" placeholder="${utils.t("search_accounts_placeholder")}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+                  </div>
+                  <button class="acc-toolbar-btn" id="btn-account-search-toggle" title="${utils.t("search_accounts")}">${constants.ICONS.SEARCH}</button>
+              </div>
+          </div>
+          <div class="acc-scroll-area" id="switch-area"></div>
+      </div>
+
+      <div class="acc-tab-content" id="pg-set">
+          <div class="acc-scroll-area">
+              <div class="acc-set-group">
+                  <div class="acc-set-title">${utils.t("set_fab_mode")}</div>
+                  <div class="acc-set-row">
+                      <button class="acc-btn acc-btn-light fab-mode-btn" data-val="auto" title="${utils.t("fab_auto_title")}">${utils.t("fab_auto")}</button>
+                      <button class="acc-btn acc-btn-light fab-mode-btn" data-val="show" title="${utils.t("fab_show_title")}">${utils.t("fab_show")}</button>
+                      <button class="acc-btn acc-btn-light fab-mode-btn" data-val="hide" title="${utils.t("fab_hide_title")}">${utils.t("fab_hide")}</button>
+                  </div>
+              </div>
+              <div class="acc-set-group">
+                  <div class="acc-set-title">${utils.t("set_lang")}</div>
+                  <div class="acc-set-row"><select id="lang-sel" class="acc-select-ui">${langOptions}</select></div>
+              </div>
+              <div class="acc-set-group">
+                  <div class="acc-set-title">${utils.t("set_host_display_mode")}</div>
+                  <div class="acc-set-row">
+                      <select id="host-display-mode-sel" class="acc-select-ui">
+                          <option value="siteName" ${state.hostDisplayMode === "siteName" ? "selected" : ""}>${utils.t("host_display_mode_site_name")}</option>
+                          <option value="domain" ${state.hostDisplayMode === "domain" ? "selected" : ""}>${utils.t("host_display_mode_domain")}</option>
+                      </select>
+                  </div>
+              </div>
+              <div class="acc-set-group">
+                  <div class="acc-set-title">${utils.t("set_backup")}</div>
+                  <div class="acc-backup-row">
+                      <button class="acc-icon-btn" id="btn-export-curr" title="${utils.t("btn_exp_curr")}">${constants.ICONS.EXPORT}</button>
+                      <button class="acc-icon-btn" id="btn-export-all" title="${utils.t("btn_exp_all")}">${constants.ICONS.MUTIEXPORT}</button>
+                      <button class="acc-icon-btn" id="btn-import-trigger" title="${utils.t("btn_imp")}">${constants.ICONS.IMPORT}</button>
+                      <button class="acc-icon-btn danger" id="btn-clear-all" title="${utils.t("btn_clear_all")}">${constants.ICONS.DELETE}</button>
+                      <input type="file" id="inp-import-file" accept=".json" style="display:none">
+                  </div>
+              </div>
+              <div class="acc-set-group">
+                  <div class="acc-set-title">${utils.t("nav_about")}</div>
+                  <button class="acc-btn acc-btn-light" id="go-about" style="width:100%">${utils.t("nav_about")}</button>
+              </div>
+              <div style="text-align:center;margin-top:20px;">
+                  <span class="acc-link-btn" id="go-notice">${utils.t("notice_title")}</span>
+              </div>
+          </div>
+      </div>
+
+      <div class="acc-tab-content" id="pg-about">
+           <div class="acc-scroll-area">
+              <div class="acc-about-content">
+                  <div class="acc-about-header">
+                      <div class="acc-about-logo">${constants.ICONS.LOGO}</div>
+                      <div class="acc-about-name">${constants.META.NAME}</div>
+                      <div class="acc-about-ver">Version ${constants.META.VERSION}</div>
+                      <div style="margin:3px 0; color:#666;">${utils.t("about_desc")}</div>
+                  </div>
+                  <div class="acc-about-item"><span class="acc-about-label">Author</span><span>${constants.META.AUTHOR}</span></div>
+                  <div class="acc-about-item"><span class="acc-about-label">License</span><span>MIT</span></div>
+                  <div class="acc-about-item"><span class="acc-about-label">Github</span><a href="${constants.META.LINKS.PROJECT}" target="_blank" style="color:#2196F3">View Repo</a></div>
+                  <div style="text-align:center;margin-top:20px;">
+                      <a href="${constants.META.LINKS.DONATE}" target="_blank" class="acc-btn acc-btn-blue" style="display:inline-flex; width:80%;">${constants.ICONS.DONATE} ${utils.t("donate")}</a>
+                  </div>
+              </div>
+           </div>
+      </div>
+
+      <div class="acc-tab-content" id="pg-notice">
+         <div class="acc-scroll-area"><div class="acc-notice-content">${utils.t("notice_content")}</div></div>
+      </div>
+
+      <div class="acc-tab-content" id="pg-account-settings">
+          <div class="acc-scroll-area">
+              <div class="acc-set-group">
+                  <div class="acc-set-title">${utils.t("account_name")}</div>
+                  <input type="text" id="account-settings-name" class="acc-input-text" placeholder="${utils.t("placeholder_name")}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+              </div>
+              <div class="acc-row-btn">
+                  <button class="acc-btn acc-btn-blue" id="btn-account-rename-save">${utils.t("save_changes")}</button>
+              </div>
+              <div class="acc-set-group">
+                  <div class="acc-set-title">${utils.t("danger_zone")}</div>
+                  <button class="acc-btn acc-btn-danger" id="btn-account-delete">${constants.ICONS.DELETE} ${utils.t("btn_delete_account")}</button>
+              </div>
+          </div>
+      </div>
+
+      <div class="acc-tab-content" id="pg-webdav">
+          <div class="acc-scroll-area">
+              <div class="acc-set-group">
+                  <div class="acc-webdav-head">
+                      <div>
+                          <div class="acc-set-title" style="margin-bottom:4px">${utils.t("webdav_account")}</div>
+                          <div class="acc-webdav-status-row">
+                              <span id="webdav-status" class="acc-webdav-status"></span>
+                              <button class="acc-toolbar-btn acc-webdav-logout-btn" id="btn-webdav-logout" type="button" title="${utils.t("webdav_logout")}">${constants.ICONS.CLEAN}</button>
+                          </div>
+                      </div>
+                      <button class="acc-btn acc-btn-light acc-webdav-config-btn" id="btn-webdav-config" type="button">${utils.t("webdav_config")}</button>
+                  </div>
+              </div>
+              <div class="acc-set-group">
+                  <div class="acc-set-title">${utils.t("webdav_sync")}</div>
+                  <div class="acc-row-btn">
+                      <button class="acc-btn acc-btn-blue" id="btn-webdav-sync" type="button">${utils.t("webdav_sync_now")}</button>
+                      <button class="acc-btn acc-btn-light" id="btn-webdav-refresh" type="button">${utils.t("webdav_refresh")}</button>
+                  </div>
+              </div>
+              <div class="acc-set-group">
+                  <div class="acc-set-title">${utils.t("webdav_backup_list")}</div>
+                  <div id="webdav-backup-list" class="acc-webdav-list"></div>
+              </div>
+          </div>
+      </div>
+      `;
+      },
+      switchCard(key, data) {
+        const switchable = state.currentViewingHost === constants.HOST;
+        const accountName = utils.extractName(key);
+        const escapedAccountName = utils.escapeHtml(accountName);
+        return `
+      <div class="acc-switch-item" data-key="${key}" draggable="false">
+          <span class="acc-switch-handle" aria-hidden="true"><span>::</span><span>::</span></span>
+          <div class="acc-switch-card${switchable ? "" : " acc-switch-card-static"}" data-key="${key}">
+              <button class="acc-switch-settings-btn" data-key="${key}" title="${utils.t("account_settings")}">${constants.ICONS.SETTINGS}</button>
+              <div class="acc-card-body">
+                  <div class="acc-card-name">
+                      <button class="acc-card-name-icon" type="button" data-name="${escapedAccountName}" title="${utils.t("copy_account_name")}">${constants.ICONS.USER}</button>
+                      <span class="acc-card-name-text" title="${escapedAccountName}">${escapedAccountName}</span>
+                  </div>
+                  <div class="acc-card-meta">
+                      <span class="acc-mini-tag">${utils.formatTime(data.time)}</span>
+                      ${data.cookies?.length || 0 ? `<span class="acc-mini-tag acc-click-tag" title="Cookie" data-type="cookies">CK: ${data.cookies.length}</span>` : ""}
+                      ${Object.keys(data.localStorage || {}).length ? `<span class="acc-mini-tag acc-click-tag" title="LocalStorage" data-type="localStorage">LS: ${Object.keys(data.localStorage).length}</span>` : ""}
+                      ${Object.keys(data.sessionStorage || {}).length ? `<span class="acc-mini-tag acc-click-tag" title="SessionStorage" data-type="sessionStorage">SS: ${Object.keys(data.sessionStorage).length}</span>` : ""}
+                  </div>
+              </div>
+          </div>
+      </div>
+      `;
+      },
+      noData() {
+        return `<div style="text-align:center;color:#ccc;margin-top:100px;font-size:13px;">${utils.t("no_data")}</div>`;
+      }
+    };
+  }
+
+  // src/app/core/accounts.js
+  function createAccountMethods({ constants, utils, getUI, shared }) {
+    return {
+      async detectAvailableSnapshotSources() {
+        const cookies = await shared.listCookies();
+        return {
+          ck: Array.isArray(cookies) && cookies.length > 0,
+          ls: Object.keys(localStorage || {}).length > 0,
+          ss: Object.keys(sessionStorage || {}).length > 0
+        };
+      },
+      async saveAccount(name, siteName, options = { ck: true, ls: false, ss: false }) {
+        const ui = getUI();
+        const snapshot = {
+          time: Date.now(),
+          siteName: utils.normalizeSiteName(siteName),
+          localStorage: options.ls ? { ...localStorage } : {},
+          sessionStorage: options.ss ? { ...sessionStorage } : {},
+          cookies: []
+        };
+        if (options.ck) {
+          snapshot.cookies = await shared.listCookies();
+        }
+        const hasCookies = snapshot.cookies && snapshot.cookies.length > 0;
+        const hasLS = Object.keys(snapshot.localStorage).length > 0;
+        const hasSS = Object.keys(snapshot.sessionStorage).length > 0;
+        if (!hasCookies && !hasLS && !hasSS) {
+          await ui.alert(utils.t("save_empty_err"));
+          return false;
+        }
+        GM_setValue(utils.makeKey(name), snapshot);
+        this.updateSiteName(constants.HOST, snapshot.siteName);
+        const currentOrder = GM_getValue(constants.ORDER_PREFIX + constants.HOST, []);
+        if (!currentOrder.includes(name)) {
+          currentOrder.push(name);
+          GM_setValue(constants.ORDER_PREFIX + constants.HOST, currentOrder);
+        }
+        return true;
+      },
+      renameAccount(oldKey, newName, host) {
+        const data = GM_getValue(oldKey);
+        GM_deleteValue(oldKey);
+        GM_setValue(utils.makeKey(newName, host), data);
+        const orderKey = constants.ORDER_PREFIX + host;
+        const order = GM_getValue(orderKey, []);
+        const idx = order.indexOf(utils.extractName(oldKey));
+        if (idx !== -1) {
+          order[idx] = newName;
+          GM_setValue(orderKey, order);
+        }
+      },
+      updateSiteName(host, siteName) {
+        const normalizedSiteName = utils.normalizeSiteName(siteName, host);
+        GM_setValue(constants.SITE_NAME_PREFIX + host, normalizedSiteName);
+        utils.getSortedKeysByHost(host).forEach((key) => {
+          const data = GM_getValue(key);
+          if (!data) return;
+          GM_setValue(key, {
+            ...data,
+            siteName: normalizedSiteName
+          });
+        });
+      },
+      deleteAccount(key, host) {
+        GM_deleteValue(key);
+        const orderKey = constants.ORDER_PREFIX + host;
+        const name = utils.extractName(key);
+        const order = GM_getValue(orderKey, []);
+        const newOrder = order.filter((item) => item !== name);
+        if (newOrder.length === 0) {
+          GM_deleteValue(orderKey);
+        } else {
+          GM_setValue(orderKey, newOrder);
+        }
+      },
+      updateOrder(host, nameList) {
+        GM_setValue(constants.ORDER_PREFIX + host, nameList);
+      }
+    };
+  }
+
+  // src/app/core/backup.js
+  function createBackupMethods({ constants, utils, getUI }) {
+    return {
+      buildExportObject(scope) {
+        const exportObj = {};
+        const allKeys = GM_listValues();
+        const targetAccountKeys = scope === "current" ? allKeys.filter((key) => key.startsWith(`${constants.PREFIX}${constants.HOST}::`)) : allKeys.filter((key) => key.startsWith(constants.PREFIX));
+        if (targetAccountKeys.length === 0) {
+          return null;
+        }
+        targetAccountKeys.forEach((key) => {
+          exportObj[key] = GM_getValue(key);
+        });
+        if (scope === "current") {
+          const orderKey = constants.ORDER_PREFIX + constants.HOST;
+          const orderValue = GM_getValue(orderKey);
+          if (orderValue) exportObj[orderKey] = orderValue;
+          const siteNameKey = constants.SITE_NAME_PREFIX + constants.HOST;
+          const siteNameValue = GM_getValue(siteNameKey);
+          if (siteNameValue) exportObj[siteNameKey] = siteNameValue;
+        } else {
+          allKeys.filter((key) => key.startsWith(constants.ORDER_PREFIX) || key.startsWith(constants.SITE_NAME_PREFIX)).forEach((key) => {
+            exportObj[key] = GM_getValue(key);
+          });
+        }
+        return exportObj;
+      },
+      async exportData(scope) {
+        const ui = getUI();
+        const exportObj = this.buildExportObject(scope);
+        if (!exportObj) {
+          await ui.alert(utils.t("export_err"));
+          return;
+        }
+        const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const downloadSite = scope === "current" ? constants.HOST : "All_Sites";
+        const anchor = document.createElement("a");
+        anchor.href = url;
+        anchor.download = `${constants.META.NAME}_Backup_${downloadSite}_${(/* @__PURE__ */ new Date()).toLocaleString("sv-SE").replace(" ", "_").replace(/:/g, "-")}.json`;
+        anchor.click();
+        URL.revokeObjectURL(url);
+      },
+      importBackupObject(data, source = "import") {
+        let count = 0;
+        const hostsInFile = [
+          ...new Set(
+            Object.keys(data).filter((key) => key.startsWith(constants.PREFIX)).map((key) => key.replace(constants.PREFIX, "").split("::")[0])
+          )
+        ];
+        hostsInFile.forEach((host) => {
+          const orderKey = constants.ORDER_PREFIX + host;
+          const siteNameKey = constants.SITE_NAME_PREFIX + host;
+          const fileOrder = data[orderKey] || [];
+          const localOrder = GM_getValue(orderKey, []);
+          if (data[siteNameKey]) {
+            GM_setValue(siteNameKey, data[siteNameKey]);
+          }
+          const namesToImport = fileOrder.length > 0 ? fileOrder : Object.keys(data).filter((key) => key.startsWith(`${constants.PREFIX}${host}::`)).map((key) => key.split("::")[1]);
+          namesToImport.forEach((name) => {
+            const fullKey = `${constants.PREFIX}${host}::${name}`;
+            if (!data[fullKey]) return;
+            GM_setValue(fullKey, data[fullKey]);
+            if (!localOrder.includes(name)) {
+              localOrder.push(name);
             }
-
-            const hasCookies = snapshot.cookies && snapshot.cookies.length > 0;
-            const hasLS = Object.keys(snapshot.localStorage).length > 0;
-            const hasSS = Object.keys(snapshot.sessionStorage).length > 0;
-
-            if (!hasCookies && !hasLS && !hasSS) {
-                await UI.alert(Utils.t('save_empty_err'));
-                return;
-            }
-
-            GM_setValue(Utils.makeKey(name), snapshot);
-            const currentOrder = GM_getValue(CONST.ORDER_PREFIX + CONST.HOST, []);
-            if (!currentOrder.includes(name)) {
-                currentOrder.push(name);
-                GM_setValue(CONST.ORDER_PREFIX + CONST.HOST, currentOrder);
-            }
-        },
-
-        async loadAccount(key) {
-            const data = GM_getValue(key);
-            if (!data) return;
-            UI.toggleLoading(true, "Switching...");
-            try {
-               localStorage.clear(); sessionStorage.clear();
-               const ck = await new Promise(res => GM_cookie.list({}, res));
-               for (const c of (ck || [])) await new Promise(res => GM_cookie.delete({name: c.name }, res));
-               Object.entries(data.localStorage || {}).forEach(([k, v]) => localStorage.setItem(k, v));
-               Object.entries(data.sessionStorage || {}).forEach(([k, v]) => sessionStorage.setItem(k, v));
-               for (const c of (data.cookies || [])) {
-                   const d = { ...c}; delete d.hostOnly; delete d.session;
-                   await new Promise(res => GM_cookie.set(d, res));
-               }
-               location.reload();
-            } catch (err) {
-                console.error(err);
-                UI.toggleLoading(false);
-                UI.alert("Switch failed!");
-            }
-        },
-
-        async cleanEnvironment() {
-            UI.toggleLoading(true, "Cleaning...");
-            localStorage.clear(); sessionStorage.clear();
-            const ck = await new Promise(res => GM_cookie.list({}, res));
-            for (const c of (ck || [])) await new Promise(res => GM_cookie.delete({name: c.name }, res));
-            location.reload();
-        },
-
-        inspectData(key, type) {
-            const data = GM_getValue(key);
-            if (!data) return;
-            let content = null;
-            if (type === 'cookies') content = data.cookies;
-            else if (type === 'localStorage') content = data.localStorage;
-            else if (type === 'sessionStorage') content = data.sessionStorage;
-            if (content) {
-                const win = window.open("", "_blank");
-                if (win) {
-                    win.document.head.innerHTML = `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(CONST.ICONS.LOGO)}">`;
-                    let inspectorHtml;
-                    const noDataHtml = '<p>No data to display.</p>';
-                    const escapeHtml = (str) => {
-                        if (str === null || str === undefined) return '';
-                        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-                    };
-
-                    const createTable = (headers, dataRows, rowClasses = []) => {
-                        const wrap = (content) => `<div class="cell-content">${content}</div>`;
-                        const extraClass = headers.length === 2 ? ' kv-table' : '';
-                        let table = `<div class="table-container${extraClass}"><table>`;
-                        table += `<thead><tr>${headers.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr></thead>`;
-                        table += '<tbody>';
-                        table += dataRows.map((row, i) => {
-                            const trClass = rowClasses[i] ? ` class="${rowClasses[i]}"` : '';
-                            return `<tr${trClass}>${row.map(cell => `<td>${wrap(escapeHtml(cell))}</td>`).join('')}</tr>`;
-                        }).join('');
-                        table += '</tbody></table></div>';
-                        return table;
-                    };
-
-                    if (type === 'cookies') {
-                        if (Array.isArray(content) && content.length > 0) {
-                            const originalHeaders = Object.keys(content[0]);
-                            const preferredOrder = ['name', 'value', 'expirationDate'];
-                            const headers = [...preferredOrder, ...originalHeaders.filter(h => !preferredOrder.includes(h) && h !== 'partitionKey')];
-                            const rowClasses = content.map(c => c.httpOnly ? 'http-only' : '');
-                            const dataRows = content.map(cookie =>
-                                headers.map(header => {
-                                    let value = cookie[header];
-                                    if (value === undefined || value === null) return '';
-                                    if (header === 'expirationDate' && typeof value === 'number') {
-                                         return new Date(value * 1000).toLocaleString();
-                                     }
-                                    return (typeof value === 'object') ? JSON.stringify(value) : value;
-                                })
-                            );
-                            inspectorHtml = createTable(headers, dataRows, rowClasses);
-                        } else {
-                            inspectorHtml = noDataHtml;
-                        }
-                    } else {
-                        if (typeof content === 'object' && content !== null && Object.keys(content).length > 0) {
-                            const headers = ['Key', 'Value'];
-                            const dataRows = Object.entries(content);
-                            inspectorHtml = createTable(headers, dataRows);
-                        } else {
-                            inspectorHtml = noDataHtml;
-                        }
-                    }
-
-                    // Use DOM manipulation instead of document.write to avoid deprecation warnings
-                    win.document.title = "AnMe Inspector";
-
-                    const style = win.document.createElement('style');
-                    style.textContent = `
-                        body { font-family: system-ui, -apple-system, sans-serif; padding: 20px; background: #f8f9fa; color: #212529; margin: 0; }
-                        h3 { color: #212529; border-bottom: 1px solid #dee2e6; padding-bottom: 10px; margin-top: 0; }
-                        .table-container { border: 1px solid #dee2e6; border-radius: 8px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); overflow-y: auto; max-height: 90vh; }
-                        table { width: 100%; border-collapse: collapse; }
-                        th, td { border: 1px solid #e9ecef; text-align: left; font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; font-size: 13px; padding: 0; }
-                        .cell-content { padding: 12px 15px; white-space: nowrap; overflow-x: auto; max-width: 350px; }
-                        .kv-table td:nth-child(1) .cell-content { max-width: 300px; }
-                        .kv-table td:nth-child(2) .cell-content { max-width: 75vw; }
-                        th { background-color: #f1f3f5; font-weight: 600; position: sticky; top: 0; z-index: 10; text-align: center; padding: 12px 15px; white-space: nowrap; }
-                        tr:nth-child(even) { background-color: #f8f9fa; }
-                        tr.http-only { background-color: #e2e6ea; border-bottom: 1px solid #d6d8db; }
-                        p { margin-top: 20px; }
-                    `;
-                    win.document.head.appendChild(style);
-
-                    win.document.body.innerHTML = `
-                        <h3>${Utils.extractName(key)} - ${type}</h3>
-                        ${inspectorHtml}
-                    `;
-                }
-            }
-        },
-
-        renameAccount(oldKey, newName, host) {
-            const data = GM_getValue(oldKey);
-            GM_deleteValue(oldKey);
-            GM_setValue(Utils.makeKey(newName, host), data);
-            const orderKey = CONST.ORDER_PREFIX + host;
-            let order = GM_getValue(orderKey, []);
-            const idx = order.indexOf(Utils.extractName(oldKey));
-            if(idx !== -1) { order[idx] = newName; GM_setValue(orderKey, order); }
-        },
-
-        deleteAccount(key, host) {
+            count += 1;
+          });
+          GM_setValue(orderKey, localOrder);
+        });
+        return {
+          count,
+          messageKey: source === "sync" ? "sync_restore_ok" : "import_ok"
+        };
+      },
+      async importData(file) {
+        const ui = getUI();
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+          try {
+            const data = JSON.parse(event.target.result);
+            const result = this.importBackupObject(data, "import");
+            await ui.alert(utils.t(result.messageKey).replace("{count}", result.count));
+            ui.refresh();
+          } catch {
+            await ui.alert(utils.t("import_err"));
+          }
+        };
+        reader.readAsText(file);
+      },
+      clearAllData() {
+        GM_listValues().forEach((key) => {
+          if (key.startsWith(constants.PREFIX) || key.startsWith(constants.ORDER_PREFIX) || key.startsWith(constants.SITE_NAME_PREFIX)) {
             GM_deleteValue(key);
-            const orderKey = CONST.ORDER_PREFIX + host;
-            const name = Utils.extractName(key);
-            const order = GM_getValue(orderKey, []);
-            const newOrder = order.filter(n => n !== name);
-            if (newOrder.length === 0) {GM_deleteValue(orderKey);} else {GM_setValue(orderKey, newOrder);}
-        },
+          }
+        });
+      }
+    };
+  }
 
-        updateOrder(host, nameList) { GM_setValue(CONST.ORDER_PREFIX + host, nameList); },
-
-        async exportData(scope) {
-            let exportObj = {};
-            const allKeys = GM_listValues();
-            const targetAccKeys = scope === 'current' ? allKeys.filter(k => k.startsWith(`${CONST.PREFIX}${CONST.HOST}::`)) : allKeys.filter(k => k.startsWith(CONST.PREFIX));
-
-            if (targetAccKeys.length === 0) { await UI.alert(Utils.t('export_err')); return; }
-            targetAccKeys.forEach(key => {exportObj[key] = GM_getValue(key)});
-
-            if (scope === 'current') {
-                const orderKey = CONST.ORDER_PREFIX + CONST.HOST;
-                const orderVal = GM_getValue(orderKey);
-                if (orderVal) exportObj[orderKey] = orderVal;
-            } else {
-                allKeys.filter(k => k.startsWith(CONST.ORDER_PREFIX)).forEach(k => {exportObj[k] = GM_getValue(k)});
-            }
-
-            const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const downsite = scope === 'current' ? CONST.HOST : 'All_Sites';
-            const a = document.createElement('a'); a.href = url; a.download = `${CONST.META.NAME}_Backup_${downsite}_${new Date().toLocaleString('sv-SE').replace(' ', '_').replace(/:/g, '-')}.json`; a.click(); URL.revokeObjectURL(url);
-        },
-
-        async importData(file) {
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    let count = 0;
-                    const hostsInFile = [...new Set(Object.keys(data).filter(k => k.startsWith(CONST.PREFIX)).map(k => k.replace(CONST.PREFIX, '').split('::')[0]))];
-                    hostsInFile.forEach(host => {
-                        const orderKey = CONST.ORDER_PREFIX + host;
-                        const fileOrder = data[orderKey] || [];
-                        let localOrder = GM_getValue(orderKey, []);
-                        const namesToImport = fileOrder.length > 0 ? fileOrder : Object.keys(data).filter(k => k.startsWith(`${CONST.PREFIX}${host}::`)).map(k => k.split('::')[1]);
-                        namesToImport.forEach(name => {
-                            const fullKey = `${CONST.PREFIX}${host}::${name}`;
-                            if (data[fullKey]) {
-                                GM_setValue(fullKey, data[fullKey]);
-                                if (!localOrder.includes(name)) localOrder.push(name);
-                                count++;
-                            }
-                        });
-                        GM_setValue(orderKey, localOrder);
-                    });
-                    await UI.alert(Utils.t('import_ok').replace('{count}', count));
-                    UI.refresh();
-                } catch (err) {
-                    await UI.alert(Utils.t('import_err'));
-                }
-            };
-            reader.readAsText(file);
-        },
-
-        clearAllData() {
-            GM_listValues().forEach(k => { if (k.startsWith(CONST.PREFIX) || k.startsWith(CONST.ORDER_PREFIX)) GM_deleteValue(k); });
+  // src/app/core/environment.js
+  function createEnvironmentMethods({ getUI, shared }) {
+    return {
+      async loadAccount(key) {
+        const ui = getUI();
+        const data = GM_getValue(key);
+        if (!data) return;
+        ui.toggleLoading(true, "Switching...");
+        try {
+          shared.clearBrowserStorage();
+          await shared.deleteAllCookies();
+          Object.entries(data.localStorage || {}).forEach(([storageKey, value]) => localStorage.setItem(storageKey, value));
+          Object.entries(data.sessionStorage || {}).forEach(([storageKey, value]) => sessionStorage.setItem(storageKey, value));
+          for (const cookie of data.cookies || []) {
+            const cookieData = { ...cookie };
+            delete cookieData.hostOnly;
+            delete cookieData.session;
+            await shared.setCookie(cookieData);
+          }
+          location.reload();
+        } catch (error) {
+          console.error(error);
+          ui.toggleLoading(false);
+          ui.alert("Switch failed!");
         }
+      },
+      async cleanEnvironment() {
+        const ui = getUI();
+        ui.toggleLoading(true, "Cleaning...");
+        shared.clearBrowserStorage();
+        await shared.deleteAllCookies();
+        location.reload();
+      }
     };
+  }
 
-    // ========================================================================
-    // 4. UI Rendering & Templates
-    // ========================================================================
-
-    const Templates = {
-        panel: () => {
-            const langOptions = Object.keys(I18N_DATA).map(code => `<option value="${code}" ${currentLang === code ? 'selected' : ''}>${I18N_DATA[code]._name}</option>`).join('');
-
-            return `
-            <div class="acc-header">
-                <div class="acc-header-title" id="acc-header-text">${Utils.t('nav_switch')}</div>
-                <div  id="acc-close-btn">✕</div>
-            </div>
-
-            <div class="acc-tab-content active" id="pg-switch"><div class="acc-scroll-area" id="switch-area"></div></div>
-
-            <div class="acc-tab-content" id="pg-mgr">
-                <div style="display:flex; gap:5px; margin-bottom:10px; align-items:center;">
-                    <select class="acc-host-sel" id="host-sel"></select>
-                    <button class="aac-btn-goto-host" id="btn-goto-host">→</button>
-                </div>
-                <div class="acc-scroll-area" id="mgr-list-area"></div>
-                <div class="acc-action-fixed" id="mgr-fixed-actions">
-                    <div class="acc-chk">
-                        <label class="acc-chk-label" title="Cookie" ><input type="checkbox" id="c-ck" class="acc-custom-chk" checked> Cookie</label>
-                        <label class="acc-chk-label" title="LocalStorage"><input type="checkbox" id="c-ls" class="acc-custom-chk"> LS</label>
-                        <label class="acc-chk-label" title="SessionStorage"><input type="checkbox" id="c-ss" class="acc-custom-chk"> SS</label>
-                        <span class="acc-help-tip" title="${Utils.t('tip_help')}">${CONST.ICONS.HELP}</span>
-                        <span class="acc-lock-tip" title="${Utils.t('tip_lock')}">${CONST.ICONS.LOCK}</span>
-                    </div>
-                    <input type="text" id="acc-new-name" class="acc-input-text" placeholder="${Utils.t('placeholder_name')}">
-
-                    <div class="acc-row-btn">
-                        <button id="do-save" class="acc-btn acc-btn-blue">${Utils.t('btn_save')}</button>
-                        <button id="do-clean" class="acc-btn acc-btn-plus" title="${Utils.t('btn_clean')}">+</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="acc-tab-content" id="pg-set">
-                <div class="acc-scroll-area">
-                    <div class="acc-set-group">
-                        <div class="acc-set-title">${Utils.t('set_fab_mode')}</div>
-                        <div class="acc-set-row">
-                            <button class="acc-btn acc-btn-light fab-mode-btn" data-val="auto" title="${Utils.t('fab_auto_title')}">${Utils.t('fab_auto')}</button>
-                            <button class="acc-btn acc-btn-light fab-mode-btn" data-val="show" title="${Utils.t('fab_show_title')}">${Utils.t('fab_show')}</button>
-                            <button class="acc-btn acc-btn-light fab-mode-btn" data-val="hide" title="${Utils.t('fab_hide_title')}">${Utils.t('fab_hide')}</button>
-                        </div>
-                    </div>
-                    <div class="acc-set-group">
-                        <div class="acc-set-title">${Utils.t('set_lang')}</div>
-                        <div class="acc-set-row"><select id="lang-sel" class="acc-select-ui">${langOptions}</select></div>
-                    </div>
-                    <div class="acc-set-group">
-                        <div class="acc-set-title">${Utils.t('set_backup')}</div>
-                        <div class="acc-backup-row">
-                            <button class="acc-icon-btn" id="btn-export-curr" title="${Utils.t('btn_exp_curr')}">${CONST.ICONS.EXPORT}</button>
-                            <button class="acc-icon-btn" id="btn-export-all" title="${Utils.t('btn_exp_all')}">${CONST.ICONS.MUTIEXPORT}</button>
-                            <button class="acc-icon-btn" id="btn-import-trigger" title="${Utils.t('btn_imp')}">${CONST.ICONS.IMPORT}</button>
-                            <button class="acc-icon-btn danger" id="btn-clear-all" title="${Utils.t('btn_clear_all')}">${CONST.ICONS.DELETE}</button>
-                            <input type="file" id="inp-import-file" accept=".json" style="display:none">
-                        </div>
-                    </div>
-                    <div class="acc-set-group">
-                        <div class="acc-set-title">${Utils.t('nav_about')}</div>
-                        <button class="acc-btn acc-btn-light" id="go-about" style="width:100%">${Utils.t('nav_about')}</button>
-                    </div>
-                    <div style="text-align: center; margin-top: 20px;">
-                       <span class="acc-link-btn" id="go-notice">${Utils.t('notice_title')}</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="acc-tab-content" id="pg-about">
-                 <div style="margin-bottom: 5px; font-weight: bold; color: #2196F3; cursor: pointer;" class="back-to-set-btn">${Utils.t('back')}</div>
-                 <div class="acc-scroll-area">
-                    <div class="acc-about-content">
-                        <div class="acc-about-header">
-                            <div class="acc-about-logo">${CONST.ICONS.LOGO}</div>
-                            <div class="acc-about-name">${CONST.META.NAME}</div>
-                            <div class="acc-about-ver">Version ${CONST.META.VERSION}</div>
-                            <div style="margin:3px 0; color:#666;">${Utils.t('about_desc')}</div>
-                        </div>
-                        <div class="acc-about-item"><span class="acc-about-label">Author</span><span>${CONST.META.AUTHOR}</span></div>
-                        <div class="acc-about-item"><span class="acc-about-label">License</span><span>MIT</span></div>
-                        <div class="acc-about-item"><span class="acc-about-label">Github</span><a href="${CONST.META.LINKS.PROJECT}" target="_blank" style="color:#2196F3">View Repo</a></div>
-                        <div style="text-align:center;margin-top:20px;">
-                            <a href="${CONST.META.LINKS.DONATE}" target="_blank" class="acc-btn acc-btn-blue" style="display:inline-flex; width:80%;">${CONST.ICONS.DONATE} ${Utils.t('donate')}</a>
-                        </div>
-                    </div>
-                 </div>
-            </div>
-
-            <div class="acc-tab-content" id="pg-notice">
-               <div style="margin-bottom: 5px; font-weight: bold; color: #2196F3; cursor: pointer;" class="back-to-set-btn">${Utils.t('back')}</div>
-               <div class="acc-scroll-area"><div class="acc-notice-content">${Utils.t('notice_content')}</div></div>
-            </div>
-
-            <div class="acc-tabs-footer">
-                <div class="acc-tab-btn active" data-pg="pg-switch" data-title="${Utils.t('nav_switch')}"><span>${CONST.ICONS.SWITCH}</span>${Utils.t('nav_switch')}</div>
-                <div class="acc-tab-btn" data-pg="pg-mgr" data-title="${Utils.t('nav_mgr')}"><span>${CONST.ICONS.LOGO}</span>${Utils.t('nav_mgr')}</div>
-                <div class="acc-tab-btn" data-pg="pg-set" data-title="${Utils.t('nav_set')}"><span>${CONST.ICONS.SETTINGS}</span>${Utils.t('nav_set')}</div>
-            </div>
-        `},
-        switchCard: (key, data) => `
-            <div class="acc-switch-card" data-key="${key}">
-                <span class="acc-card-name">${CONST.ICONS.USER} ${Utils.extractName(key)}</span>
-                <div class="acc-card-meta">
-                    <span class="acc-mini-tag">${Utils.formatTime(data.time)}</span>
-                    ${(data.cookies?.length || 0) ? `<span class="acc-mini-tag acc-click-tag" title="Cookie"data-type="cookies">CK: ${data.cookies.length}</span>` : ''}
-                    ${Object.keys(data.localStorage || {}).length ? `<span class="acc-mini-tag acc-click-tag" title="LocalStorage" data-type="localStorage">LS: ${Object.keys(data.localStorage).length}</span>` : ''}
-                    ${Object.keys(data.sessionStorage || {}).length ? `<span class="acc-mini-tag acc-click-tag" title="SessionStorage" data-type="sessionStorage">SS: ${Object.keys(data.sessionStorage).length}</span>` : ''}
-                </div>
-            </div>
-        `,
-        mgrItem: (key) => `
-            <div class="acc-mgr-item" draggable="true">
-                <span class="acc-mgr-handle">☰</span>
-                <input type="text" class="acc-mgr-input" value="${Utils.extractName(key)}" data-key="${key}">
-                <span class="acc-btn-del" data-key="${key}">×</span>
-            </div>
-        `,
-        noData: () => `<div style="text-align:center;color:#ccc;margin-top:100px;font-size:13px;">${Utils.t('no_data')}</div>`
+  // src/app/core/inspector.js
+  function createInspectorMethods({ constants, utils }) {
+    return {
+      inspectData(key, type) {
+        const data = GM_getValue(key);
+        if (!data) return;
+        let content = null;
+        if (type === "cookies") content = data.cookies;
+        if (type === "localStorage") content = data.localStorage;
+        if (type === "sessionStorage") content = data.sessionStorage;
+        if (!content) return;
+        const inspectorWindow = window.open("", "_blank");
+        if (!inspectorWindow) return;
+        inspectorWindow.document.head.innerHTML = `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(constants.ICONS.LOGO)}">`;
+        const noDataHtml = "<p>No data to display.</p>";
+        const escapeHtml = (value) => {
+          if (value === null || value === void 0) return "";
+          return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        };
+        const createTable = (headers, dataRows, rowClasses = [], options = {}) => {
+          const wrap = (cellContent, className = "") => `<div class="cell-content${className ? ` ${className}` : ""}">${cellContent}</div>`;
+          const extraClass = headers.length === 2 ? " kv-table" : "";
+          const columnWidths = options.columnWidths || headers.map(() => "");
+          const cellClasses = options.cellClasses || headers.map(() => "");
+          const colGroup = columnWidths.some(Boolean) ? `<colgroup>${columnWidths.map((width) => `<col${width ? ` style="width:${width}"` : ""}>`).join("")}</colgroup>` : "";
+          let table = `<div class="table-container${extraClass}"><table>`;
+          table += colGroup;
+          table += `<thead><tr>${headers.map((header) => `<th>${escapeHtml(header)}</th>`).join("")}</tr></thead>`;
+          table += "<tbody>";
+          table += dataRows.map((row, index) => {
+            const trClass = rowClasses[index] ? ` class="${rowClasses[index]}"` : "";
+            return `<tr${trClass}>${row.map((cell, cellIndex) => {
+              const cellValue = typeof cell === "object" && cell !== null ? cell.value : cell;
+              const cellClassName = [cellClasses[cellIndex], typeof cell === "object" && cell !== null ? cell.className : ""].filter(Boolean).join(" ");
+              return `<td>${wrap(escapeHtml(cellValue), cellClassName)}</td>`;
+            }).join("")}</tr>`;
+          }).join("");
+          table += "</tbody></table></div>";
+          return table;
+        };
+        let inspectorHtml;
+        if (type === "cookies") {
+          if (Array.isArray(content) && content.length > 0) {
+            const originalHeaders = Object.keys(content[0]);
+            const preferredOrder = ["name", "value", "expirationDate"];
+            const headers = [
+              ...preferredOrder,
+              ...originalHeaders.filter((header) => !preferredOrder.includes(header) && header !== "partitionKey")
+            ];
+            const rowClasses = content.map((cookie) => cookie.httpOnly ? "http-only" : "");
+            const dataRows = content.map(
+              (cookie) => headers.map((header) => {
+                const value = cookie[header];
+                if (value === void 0 || value === null) return "";
+                if (header === "expirationDate" && typeof value === "number") {
+                  return {
+                    value: new Date(value * 1e3).toLocaleString(),
+                    className: value * 1e3 < Date.now() ? "cell-expired" : ""
+                  };
+                }
+                return typeof value === "object" ? JSON.stringify(value) : value;
+              })
+            );
+            inspectorHtml = createTable(headers, dataRows, rowClasses, {
+              columnWidths: headers.map((header) => {
+                if (header === "name") return "180px";
+                if (header === "value") return "min(560px, 48vw)";
+                if (header === "expirationDate") return "180px";
+                return "140px";
+              }),
+              cellClasses: headers.map((header) => header === "value" || header === "domain" ? "cell-break" : "")
+            });
+          } else {
+            inspectorHtml = noDataHtml;
+          }
+        } else if (typeof content === "object" && Object.keys(content).length > 0) {
+          inspectorHtml = createTable(["Key", "Value"], Object.entries(content), [], {
+            columnWidths: ["260px", "auto"],
+            cellClasses: ["", "cell-break"]
+          });
+        } else {
+          inspectorHtml = noDataHtml;
+        }
+        inspectorWindow.document.title = "AnMe Inspector";
+        const style = inspectorWindow.document.createElement("style");
+        style.textContent = `
+        body { font-family: system-ui, -apple-system, sans-serif; padding: 20px; background: #f8f9fa; color: #212529; margin: 0; }
+        h3 { color: #212529; border-bottom: 1px solid #dee2e6; padding-bottom: 10px; margin-top: 0; }
+        .table-container { border: 1px solid #dee2e6; border-radius: 8px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); overflow: auto; max-height: 90vh; }
+        table { width: 100%; min-width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th, td { border: 1px solid #e9ecef; text-align: left; vertical-align: top; font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; font-size: 13px; padding: 0; }
+        .cell-content { display: block; width: 100%; min-width: 0; box-sizing: border-box; padding: 12px 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .cell-break { white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; text-overflow: clip; }
+        .cell-expired { color: #d92d20; font-weight: 600; }
+        th { background-color: #f1f3f5; font-weight: 600; position: sticky; top: 0; z-index: 10; text-align: center; padding: 12px 15px; white-space: nowrap; }
+        tr:nth-child(even) { background-color: #f8f9fa; }
+        tr.http-only { background-color: #e2e6ea; border-bottom: 1px solid #d6d8db; }
+        p { margin-top: 20px; }
+      `;
+        inspectorWindow.document.head.appendChild(style);
+        inspectorWindow.document.body.innerHTML = `
+        <h3>${utils.extractName(key)} - ${type}</h3>
+        ${inspectorHtml}
+      `;
+      }
     };
+  }
 
-    const UI = {
-        // --- Helper to query inside shadow root ---
-        qs(selector) { return uiRoot ? uiRoot.querySelector(selector) : null; },
-        qsa(selector) { return uiRoot ? uiRoot.querySelectorAll(selector) : []; },
+  // src/app/core/shared.js
+  function createCoreShared() {
+    return {
+      listCookies() {
+        return new Promise((resolve) => GM_cookie.list({}, resolve));
+      },
+      deleteCookie(name) {
+        return new Promise((resolve) => GM_cookie.delete({ name }, resolve));
+      },
+      setCookie(cookieData) {
+        return new Promise((resolve) => GM_cookie.set(cookieData, resolve));
+      },
+      async deleteAllCookies() {
+        const cookies = await this.listCookies();
+        for (const cookie of cookies || []) {
+          await this.deleteCookie(cookie.name);
+        }
+      },
+      clearBrowserStorage() {
+        localStorage.clear();
+        sessionStorage.clear();
+      }
+    };
+  }
 
-        // --- Custom Dialog System ---
-        async alert(msg) { return this.showDialog(msg, false); },
-        async confirm(msg) { return this.showDialog(msg, true); },
-        showDialog(msg, isConfirm) {
-            return new Promise(resolve => {
-                if (!dialogMask) {
-                    const panel = this.qs('.acc-panel');
-                    dialogMask = document.createElement('div'); dialogMask.className = 'acc-dialog-mask';
-                    panel.appendChild(dialogMask); // Append to Panel
+  // src/app/core/webdav.js
+  function encodeBasicAuth(username, password) {
+    return `Basic ${btoa(unescape(encodeURIComponent(`${username}:${password}`)))}`;
+  }
+  var textEncoder = new TextEncoder();
+  var textDecoder = new TextDecoder();
+  function normalizeBaseUrl(url) {
+    return String(url || "").trim().replace(/\/+$/, "");
+  }
+  function normalizeDirectory(directory) {
+    return String(directory || "").trim().replace(/^\/+/, "").replace(/\/+$/, "");
+  }
+  function getManagedDirectory(constants) {
+    return normalizeDirectory(
+      `${String(constants.META.NAME || "anme").toLowerCase().replace(/[^a-z0-9]+/g, "-")}-webdav`
+    );
+  }
+  function getBackupExtension(constants) {
+    return ".anme";
+  }
+  function withManagedDirectory(config, constants) {
+    return {
+      ...config,
+      directory: getManagedDirectory(constants),
+      storageMode: "directory"
+    };
+  }
+  function withFlatNamespace(config) {
+    return {
+      ...config,
+      directory: "",
+      storageMode: "flat"
+    };
+  }
+  function joinRemoteUrl(remoteUrl, fileName) {
+    return `${remoteUrl.replace(/\/+$/, "")}/${encodeURIComponent(fileName)}`;
+  }
+  function getNamespacePrefix(constants) {
+    return `${String(constants.META.NAME || "anme").toLowerCase().replace(/[^a-z0-9]+/g, "-")}-webdav`;
+  }
+  function normalizeStorageMode(storageMode) {
+    return storageMode === "flat" ? "flat" : "directory";
+  }
+  function getManifestName(config, constants) {
+    return normalizeStorageMode(config.storageMode) === "flat" ? `${getNamespacePrefix(constants)}.index.json` : ".anme-index.json";
+  }
+  function getRemoteBackupName(config, constants, displayName) {
+    return normalizeStorageMode(config.storageMode) === "flat" ? `${getNamespacePrefix(constants)}__${displayName}` : displayName;
+  }
+  function toRemoteUrl(config) {
+    const baseUrl = normalizeBaseUrl(config.url);
+    const directory = normalizeDirectory(config.directory);
+    return directory ? `${baseUrl}/${directory}` : baseUrl;
+  }
+  function isBackupArchiveFile(fileName, constants) {
+    const normalizedName = String(fileName || "").toLowerCase();
+    return normalizedName.endsWith(".zip") || normalizedName.endsWith(getBackupExtension(constants));
+  }
+  function isGzipData(bytes) {
+    return bytes.length >= 2 && bytes[0] === 31 && bytes[1] === 139;
+  }
+  function isZipData(bytes) {
+    return bytes.length >= 4 && bytes[0] === 80 && bytes[1] === 75 && bytes[2] === 3 && bytes[3] === 4;
+  }
+  async function readStreamToUint8Array(stream) {
+    const response = new Response(stream);
+    return new Uint8Array(await response.arrayBuffer());
+  }
+  async function gzipBytes(bytes) {
+    if (typeof CompressionStream === "undefined") {
+      return bytes;
+    }
+    return readStreamToUint8Array(new Blob([bytes]).stream().pipeThrough(new CompressionStream("gzip")));
+  }
+  async function gunzipBytes(bytes, utils) {
+    if (typeof DecompressionStream === "undefined") {
+      throw new Error(utils.t("sync_restore_err"));
+    }
+    return readStreamToUint8Array(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip")));
+  }
+  async function encodeBackupPayload(exportObj, constants) {
+    const payload = {
+      format: "anme-webdav-v2",
+      meta: {
+        name: constants.META.NAME,
+        version: constants.META.VERSION,
+        exportedAt: (/* @__PURE__ */ new Date()).toISOString()
+      },
+      backup: exportObj
+    };
+    return gzipBytes(textEncoder.encode(JSON.stringify(payload)));
+  }
+  async function decodeBackupPayload(arrayBuffer, utils) {
+    const bytes = new Uint8Array(arrayBuffer);
+    if (isZipData(bytes)) {
+      throw new Error(utils.t("sync_restore_err"));
+    }
+    const rawBytes = isGzipData(bytes) ? await gunzipBytes(bytes, utils) : bytes;
+    const parsed = JSON.parse(textDecoder.decode(rawBytes));
+    return parsed && typeof parsed === "object" && parsed.backup ? parsed.backup : parsed;
+  }
+  function parseWebDavList(xmlText, baseUrl, constants) {
+    const doc = new DOMParser().parseFromString(xmlText, "application/xml");
+    const responses = [...doc.getElementsByTagNameNS("*", "response")];
+    const basePath = new URL(baseUrl).pathname.replace(/\/+$/, "");
+    return responses.map((response) => {
+      const href = response.getElementsByTagNameNS("*", "href")[0]?.textContent || "";
+      const prop = response.getElementsByTagNameNS("*", "prop")[0];
+      const resourcetype = prop?.getElementsByTagNameNS("*", "resourcetype")[0];
+      const isCollection = Boolean(resourcetype?.getElementsByTagNameNS("*", "collection")[0]);
+      const lastModified = prop?.getElementsByTagNameNS("*", "getlastmodified")[0]?.textContent || "";
+      const contentLength = prop?.getElementsByTagNameNS("*", "getcontentlength")[0]?.textContent || "0";
+      const hrefUrl = href ? new URL(href, baseUrl) : null;
+      const pathname = hrefUrl?.pathname.replace(/\/+$/, "") || "";
+      const fileName = hrefUrl ? decodeURIComponent(pathname.split("/").pop() || "") : "";
+      return {
+        pathname,
+        fileName,
+        isCollection,
+        lastModified,
+        size: Number(contentLength) || 0
+      };
+    }).filter((item) => item.fileName && item.pathname !== basePath && !item.isCollection && isBackupArchiveFile(item.fileName, constants)).sort((a, b) => new Date(b.lastModified || 0) - new Date(a.lastModified || 0));
+  }
+  function createWebDavMethods({ constants, utils, getUI, getCore }) {
+    const request = (config, { method = "GET", url, headers = {}, data, responseType = "text", fetch = false }) => new Promise((resolve, reject) => {
+      let settled = false;
+      let timeoutTimer = null;
+      const finish = (handler) => (payload) => {
+        if (settled) return;
+        settled = true;
+        if (timeoutTimer) {
+          clearTimeout(timeoutTimer);
+          timeoutTimer = null;
+        }
+        handler(payload);
+      };
+      const requestOptions = {
+        method,
+        url,
+        fetch,
+        responseType,
+        headers: {
+          Authorization: encodeBasicAuth(config.username, config.password),
+          ...headers
+        },
+        onload: finish((response) => {
+          if (response.status >= 200 && response.status < 300) {
+            resolve(response);
+            return;
+          }
+          reject(new Error(`${method} ${url} failed with ${response.status}`));
+        }),
+        onerror: finish(() => reject(new Error(`${method} ${url} failed`)))
+      };
+      if (data !== void 0 && data !== null) {
+        requestOptions.data = data;
+      }
+      const xhr = GM_xmlhttpRequest(requestOptions);
+      timeoutTimer = setTimeout(() => {
+        try {
+          xhr?.abort?.();
+        } catch {
+        }
+        finish(() => reject(new Error(utils.t("webdav_timeout"))))();
+      }, 1e4);
+    });
+    return {
+      getCachedWebDavBackups() {
+        const backups = GM_getValue(constants.CFG.WEBDAV_BACKUPS_CACHE, []);
+        return Array.isArray(backups) ? backups : [];
+      },
+      saveCachedWebDavBackups(backups) {
+        const normalizedBackups = Array.isArray(backups) ? backups.map((item) => ({
+          fileName: String(item.fileName || ""),
+          remoteFileName: String(item.remoteFileName || item.fileName || ""),
+          lastModified: String(item.lastModified || ""),
+          size: Number(item.size) || 0
+        })) : [];
+        GM_setValue(constants.CFG.WEBDAV_BACKUPS_CACHE, normalizedBackups);
+        return normalizedBackups;
+      },
+      getWebDavConfig() {
+        const config = GM_getValue(constants.CFG.WEBDAV_CONFIG, {});
+        return {
+          url: String(config.url || ""),
+          username: String(config.username || ""),
+          password: String(config.password || ""),
+          directory: normalizeStorageMode(config.storageMode) === "flat" ? "" : typeof config.directory === "string" ? config.directory : getManagedDirectory(constants),
+          storageMode: normalizeStorageMode(config.storageMode)
+        };
+      },
+      saveWebDavConfig(config) {
+        const normalizedConfig = normalizeStorageMode(config.storageMode) === "flat" ? withFlatNamespace(config) : withManagedDirectory(config, constants);
+        GM_setValue(constants.CFG.WEBDAV_CONFIG, {
+          url: normalizeBaseUrl(normalizedConfig.url),
+          username: String(normalizedConfig.username || "").trim(),
+          password: String(normalizedConfig.password || ""),
+          storageMode: normalizedConfig.storageMode
+        });
+      },
+      clearWebDavConfig() {
+        GM_deleteValue(constants.CFG.WEBDAV_CONFIG);
+        GM_deleteValue(constants.CFG.WEBDAV_BACKUPS_CACHE);
+      },
+      hasWebDavConfig() {
+        const config = this.getWebDavConfig();
+        return Boolean(config.url && config.username && config.password);
+      },
+      async verifyWriteAccess(config) {
+        const remoteUrl = toRemoteUrl(config);
+        const tempFileName = `.anme-webdav-check-${Date.now()}.tmp`;
+        const tempFileUrl = joinRemoteUrl(remoteUrl, tempFileName);
+        const uploadTempFile = async () => request(config, {
+          method: "PUT",
+          url: tempFileUrl,
+          data: "anme-webdav-check",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          }
+        });
+        if (!config.directory) {
+          await uploadTempFile();
+        } else {
+          try {
+            await uploadTempFile();
+          } catch (uploadError) {
+            try {
+              await request(config, {
+                method: "MKCOL",
+                url: remoteUrl
+              });
+            } catch {
+            }
+            try {
+              await uploadTempFile();
+            } catch (retryError) {
+              throw retryError || uploadError;
+            }
+          }
+        }
+        try {
+          await request(config, {
+            method: "DELETE",
+            url: tempFileUrl
+          });
+        } catch {
+        }
+        return remoteUrl;
+      },
+      async readWebDavDirectory(config) {
+        const remoteUrl = toRemoteUrl(config);
+        const response = await request(config, {
+          method: "PROPFIND",
+          url: remoteUrl,
+          headers: {
+            Depth: "1"
+          }
+        });
+        return parseWebDavList(response.responseText || "", remoteUrl, constants).map((item) => ({
+          fileName: normalizeStorageMode(config.storageMode) === "flat" ? item.fileName.replace(new RegExp(`^${getNamespacePrefix(constants)}__`), "") : item.fileName,
+          remoteFileName: item.fileName,
+          lastModified: item.lastModified ? new Date(item.lastModified).toISOString() : "",
+          size: item.size
+        }));
+      },
+      async readWebDavIndex(config) {
+        const remoteUrl = toRemoteUrl(config);
+        const manifestName = getManifestName(config, constants);
+        try {
+          const response = await request(config, {
+            method: "GET",
+            url: joinRemoteUrl(remoteUrl, manifestName),
+            responseType: "text"
+          });
+          const parsed = JSON.parse(response.responseText || "{}");
+          return Array.isArray(parsed.backups) ? parsed.backups : [];
+        } catch (error) {
+          if (/ 404$/.test(error.message)) {
+            return [];
+          }
+          throw error;
+        }
+      },
+      async writeWebDavIndex(config, backups) {
+        const remoteUrl = toRemoteUrl(config);
+        const manifestName = getManifestName(config, constants);
+        await request(config, {
+          method: "PUT",
+          url: joinRemoteUrl(remoteUrl, manifestName),
+          data: JSON.stringify({ backups }, null, 2),
+          headers: {
+            "Content-Type": "application/json;charset=utf-8"
+          }
+        });
+      },
+      async validateWebDavConfig(config) {
+        const baseConfig = {
+          url: normalizeBaseUrl(config.url),
+          username: String(config.username || "").trim(),
+          password: String(config.password || ""),
+          storageMode: normalizeStorageMode(config.storageMode)
+        };
+        if (!baseConfig.url || !baseConfig.username || !baseConfig.password) {
+          throw new Error(utils.t("webdav_missing_config"));
+        }
+        const candidateConfigs = [withManagedDirectory(baseConfig, constants), withFlatNamespace(baseConfig)];
+        let firstError = null;
+        for (const candidate of candidateConfigs) {
+          try {
+            await this.verifyWriteAccess(candidate);
+            await this.readWebDavIndex(candidate);
+            this.saveWebDavConfig(candidate);
+            return candidate;
+          } catch (error) {
+            if (!firstError) {
+              firstError = error;
+            }
+          }
+        }
+        throw firstError || new Error(utils.t("webdav_verify_err"));
+      },
+      async listWebDavBackups() {
+        const config = await this.validateWebDavConfig(this.getWebDavConfig());
+        let backups = await this.readWebDavIndex(config);
+        if (!backups.length) {
+          backups = await this.readWebDavDirectory(config);
+        }
+        backups = backups.sort((a, b) => new Date(b.lastModified || 0) - new Date(a.lastModified || 0));
+        return this.saveCachedWebDavBackups(backups);
+      },
+      async uploadWebDavBackup() {
+        const config = await this.validateWebDavConfig(this.getWebDavConfig());
+        const core = getCore();
+        const exportObj = core.buildExportObject("all");
+        if (!exportObj) {
+          await getUI().alert(utils.t("export_err"));
+          return null;
+        }
+        const remoteUrl = toRemoteUrl(config);
+        const archiveBytes = await encodeBackupPayload(exportObj, constants);
+        const timestamp = (/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-");
+        const fileName = `${constants.META.NAME}_Sync_${timestamp}${getBackupExtension(constants)}`;
+        const remoteFileName = getRemoteBackupName(config, constants, fileName);
+        await request(config, {
+          method: "PUT",
+          url: joinRemoteUrl(remoteUrl, remoteFileName),
+          data: archiveBytes.buffer,
+          headers: {
+            "Content-Type": "application/octet-stream"
+          }
+        });
+        const backups = await this.readWebDavIndex(config);
+        backups.unshift({
+          fileName,
+          remoteFileName,
+          lastModified: (/* @__PURE__ */ new Date()).toISOString(),
+          size: archiveBytes.byteLength
+        });
+        await this.writeWebDavIndex(config, backups);
+        this.saveCachedWebDavBackups(backups);
+        return fileName;
+      },
+      async restoreWebDavBackup(fileName) {
+        const config = await this.validateWebDavConfig(this.getWebDavConfig());
+        const remoteUrl = toRemoteUrl(config);
+        let backups = await this.readWebDavIndex(config);
+        if (!backups.length) {
+          backups = await this.readWebDavDirectory(config);
+        }
+        const matchedBackup = backups.find((item) => item.fileName === fileName);
+        const remoteFileName = matchedBackup?.remoteFileName || getRemoteBackupName(config, constants, fileName);
+        const response = await request(config, {
+          method: "GET",
+          url: joinRemoteUrl(remoteUrl, remoteFileName),
+          responseType: "arraybuffer",
+          fetch: true,
+          headers: {
+            Accept: "application/octet-stream",
+            "X-Requested-With": "XMLHttpRequest",
+            "Cache-Control": "no-store"
+          }
+        });
+        const backupData = await decodeBackupPayload(response.response, utils);
+        const result = getCore().importBackupObject(backupData, "sync");
+        getUI().refresh();
+        return result;
+      },
+      async deleteWebDavBackup(fileName) {
+        const config = await this.validateWebDavConfig(this.getWebDavConfig());
+        const remoteUrl = toRemoteUrl(config);
+        let backups = await this.readWebDavIndex(config);
+        if (!backups.length) {
+          backups = await this.readWebDavDirectory(config);
+        }
+        const matchedBackup = backups.find((item) => item.fileName === fileName);
+        const remoteFileName = matchedBackup?.remoteFileName || getRemoteBackupName(config, constants, fileName);
+        await request(config, {
+          method: "DELETE",
+          url: joinRemoteUrl(remoteUrl, remoteFileName)
+        });
+        const nextBackups = backups.filter((item) => item.fileName !== fileName);
+        await this.writeWebDavIndex(config, nextBackups);
+        this.saveCachedWebDavBackups(nextBackups);
+      }
+    };
+  }
+
+  // src/app/core.js
+  function createCore({ constants, utils }) {
+    let ui = null;
+    const shared = createCoreShared();
+    const core = {
+      setUI(nextUi) {
+        ui = nextUi;
+      }
+    };
+    const getUI = () => ui;
+    const getCore = () => core;
+    Object.assign(
+      core,
+      createAccountMethods({ constants, utils, getUI, shared }),
+      createEnvironmentMethods({ getUI, shared }),
+      createInspectorMethods({ constants, utils }),
+      createBackupMethods({ constants, utils, getUI }),
+      createWebDavMethods({ constants, utils, getUI, getCore })
+    );
+    return core;
+  }
+
+  // src/app/ui/events.js
+  function createEventMethods({ state, constants, utils, core, ui }) {
+    return {
+      bindPanelEvents() {
+        const $ = (selector) => ui.qs(selector);
+        const $$ = (selector) => ui.qsa(selector);
+        const getHosts = () => {
+          const hosts = utils.listAllHosts();
+          if (!hosts.includes(constants.HOST)) hosts.push(constants.HOST);
+          return hosts;
+        };
+        ["keydown", "keyup", "keypress", "input", "contextmenu", "wheel"].forEach((eventName) => {
+          state.panel.addEventListener(
+            eventName,
+            (event) => {
+              event.stopPropagation();
+              if (eventName === "wheel") {
+                const scrollArea = event.target.closest(".acc-scroll-area, .acc-host-menu, .acc-host-list");
+                if (!scrollArea || scrollArea.scrollHeight <= scrollArea.clientHeight) {
+                  event.preventDefault();
                 }
-                dialogMask.innerHTML = `
-                    <div class="acc-dialog-box">
-                        <div class="acc-dialog-msg">${msg}</div>
-                        <div class="acc-dialog-footer">
-                            ${isConfirm ? `<button class="acc-dialog-btn acc-dialog-btn-cancel" id="acc-dlg-cancel">${Utils.t('dlg_cancel')}</button>` : ''}
-                            <button class="acc-dialog-btn acc-dialog-btn-ok" id="acc-dlg-ok">${Utils.t('dlg_ok')}</button>
-                        </div>
+              }
+            },
+            { passive: false }
+          );
+        });
+        $("#acc-close-btn").onclick = ui.closePanel;
+        state.panel.onclick = (event) => {
+          event.stopPropagation();
+          if (document.activeElement !== state.panel && !state.panel.contains(state.uiRoot.activeElement)) {
+            state.panel.focus();
+          }
+        };
+        $$(".fab-mode-btn").forEach((button) => {
+          button.addEventListener("click", () => {
+            GM_setValue(constants.CFG.FAB_MODE, button.dataset.val);
+            ui.refresh();
+          });
+        });
+        $("#lang-sel").onchange = (event) => {
+          const activePageBeforeRebuild = state.activePage;
+          const isPanelShown = Boolean(state.panel && state.panel.classList.contains("show"));
+          state.currentLang = event.target.value;
+          GM_setValue(constants.CFG.LANG, state.currentLang);
+          if (state.toastTimer) {
+            clearTimeout(state.toastTimer);
+          }
+          document.body.removeChild(document.getElementById("anme-app-host"));
+          state.uiRoot = null;
+          state.panel = null;
+          state.fab = null;
+          state.dialogMask = null;
+          state.saveFormMask = null;
+          state.toastEl = null;
+          state.toastTimer = null;
+          ui.init();
+          const newPanel = ui.qs("#acc-mgr-panel");
+          if (!newPanel) return;
+          if (isPanelShown) {
+            newPanel.classList.add("show");
+            ui.syncPanelPos();
+          }
+          ui.activatePage(activePageBeforeRebuild, ui.getPageTitle(activePageBeforeRebuild));
+        };
+        $("#host-display-mode-sel").onchange = (event) => {
+          state.hostDisplayMode = event.target.value || "siteName";
+          if (state.hostDisplayMode !== "siteName") {
+            state.hostEditingHost = null;
+            state.hostEditingValue = "";
+          }
+          GM_setValue(constants.CFG.HOST_DISPLAY_MODE, state.hostDisplayMode);
+          ui.refresh();
+        };
+        $("#switch-area").onclick = (event) => {
+          if (event.target.closest(".acc-switch-handle")) {
+            event.stopPropagation();
+            return;
+          }
+          const avatarBtn = event.target.closest(".acc-card-name-icon");
+          if (avatarBtn) {
+            event.stopPropagation();
+            ui.copyText(avatarBtn.dataset.name || "").then((copied) => {
+              if (!copied) {
+                ui.alert(utils.t("copy_failed"));
+                return;
+              }
+              ui.showToast(utils.t("toast_copied"));
+            });
+            return;
+          }
+          const settingsBtn = event.target.closest(".acc-switch-settings-btn");
+          if (settingsBtn) {
+            event.stopPropagation();
+            ui.openAccountSettings(settingsBtn.dataset.key);
+            return;
+          }
+          const tag = event.target.closest(".acc-click-tag");
+          if (tag) {
+            event.stopPropagation();
+            const card2 = tag.closest(".acc-switch-card");
+            core.inspectData(card2.dataset.key, tag.dataset.type);
+            return;
+          }
+          if (state.currentViewingHost !== constants.HOST) {
+            event.stopPropagation();
+            return;
+          }
+          const card = event.target.closest(".acc-switch-card");
+          if (card) {
+            core.loadAccount(card.dataset.key);
+          }
+        };
+        $("#host-trigger").onclick = (event) => {
+          event.stopPropagation();
+          const picker = $("#host-picker");
+          if (!picker) return;
+          const willOpen = !picker.classList.contains("open");
+          picker.classList.toggle("open", willOpen);
+          if (willOpen) {
+            state.hostSearchQuery = "";
+            state.hostEditingHost = null;
+            state.hostEditingValue = "";
+            ui.renderHostSelector(getHosts());
+            ui.qs("#host-search-input")?.focus();
+          }
+        };
+        $("#host-search-input").oninput = (event) => {
+          state.hostSearchQuery = event.target.value;
+          ui.renderHostSelector(getHosts());
+          ui.qs("#host-search-input")?.focus();
+          ui.qs("#host-search-input")?.setSelectionRange(state.hostSearchQuery.length, state.hostSearchQuery.length);
+        };
+        $("#host-search-input").onkeydown = (event) => {
+          if (event.key !== "Escape") return;
+          event.preventDefault();
+          event.stopPropagation();
+          state.hostSearchQuery = "";
+          state.hostEditingHost = null;
+          state.hostEditingValue = "";
+          $("#host-picker")?.classList.remove("open");
+          ui.renderHostSelector(getHosts());
+          ui.qs("#host-search-input")?.blur();
+          state.panel?.focus();
+        };
+        $("#host-menu").onclick = (event) => {
+          const editToggle = event.target.closest(".acc-host-edit-link");
+          if (editToggle) {
+            event.stopPropagation();
+            state.hostEditingHost = editToggle.dataset.editHost;
+            state.hostEditingValue = utils.getSiteNameByHost(state.hostEditingHost);
+            ui.renderHostSelector(getHosts());
+            ui.qs(`.acc-host-edit-input[data-host="${state.hostEditingHost}"]`)?.focus();
+            ui.qs(`.acc-host-edit-input[data-host="${state.hostEditingHost}"]`)?.select();
+            return;
+          }
+          const editCancel = event.target.closest(".acc-host-edit-cancel");
+          if (editCancel) {
+            event.stopPropagation();
+            state.hostEditingHost = null;
+            state.hostEditingValue = "";
+            ui.renderHostSelector(getHosts());
+            return;
+          }
+          const editSave = event.target.closest(".acc-host-edit-save");
+          if (editSave) {
+            event.stopPropagation();
+            const host = editSave.dataset.saveHost;
+            core.updateSiteName(host, state.hostEditingValue);
+            state.hostEditingHost = null;
+            state.hostEditingValue = "";
+            ui.refresh();
+            ui.showToast(utils.t("toast_site_name_updated"));
+            return;
+          }
+          const openLink = event.target.closest(".acc-host-open-link");
+          if (openLink) {
+            event.stopPropagation();
+            const host = openLink.dataset.openHost;
+            if (host) {
+              window.open(`https://${host}`, "_blank", "noopener,noreferrer");
+            }
+            return;
+          }
+          const option = event.target.closest(".acc-host-option");
+          if (!option) return;
+          state.currentViewingHost = option.dataset.host;
+          state.hostSearchQuery = "";
+          $("#host-picker")?.classList.remove("open");
+          ui.refresh();
+        };
+        $("#btn-account-search-toggle").onclick = (event) => {
+          event.stopPropagation();
+          state.accountSearchActive = !state.accountSearchActive;
+          if (!state.accountSearchActive) {
+            state.accountSearchQuery = "";
+          }
+          $("#host-picker")?.classList.remove("open");
+          ui.refresh();
+          if (state.accountSearchActive) {
+            ui.qs("#account-search-input")?.focus();
+          }
+        };
+        $("#account-search-input").oninput = (event) => {
+          state.accountSearchQuery = event.target.value;
+          ui.renderSwitchView();
+        };
+        $("#account-search-input").onkeydown = (event) => {
+          if (event.key !== "Escape") return;
+          event.preventDefault();
+          event.stopPropagation();
+          state.accountSearchActive = false;
+          state.accountSearchQuery = "";
+          ui.refresh();
+          ui.qs("#account-search-input")?.blur();
+          state.panel?.focus();
+        };
+        $("#btn-open-settings").onclick = () => {
+          if (state.activePage !== "pg-set") {
+            state.settingsReturnPage = state.activePage;
+          }
+          ui.activatePage("pg-set", utils.t("nav_set"));
+        };
+        $("#btn-open-project").onclick = () => {
+          window.open(constants.META.LINKS.PROJECT, "_blank", "noopener,noreferrer");
+        };
+        $("#btn-open-webdav").onclick = () => {
+          state.settingsReturnPage = state.activePage || "pg-switch";
+          ui.activatePage("pg-webdav", utils.t("nav_webdav"));
+        };
+        $("#btn-go-current-host").onclick = () => {
+          state.currentViewingHost = constants.HOST;
+          $("#host-picker")?.classList.remove("open");
+          ui.refresh();
+        };
+        $("#btn-header-back").onclick = () => {
+          if (state.activePage === "pg-notice" || state.activePage === "pg-about") {
+            ui.activatePage("pg-set", utils.t("nav_set"));
+            return;
+          }
+          if (state.activePage === "pg-account-settings") {
+            const targetPage2 = state.accountSettingsReturnPage || "pg-switch";
+            ui.activatePage(targetPage2, ui.getPageTitle(targetPage2));
+            return;
+          }
+          const targetPage = state.settingsReturnPage || "pg-switch";
+          ui.activatePage(targetPage, ui.getPageTitle(targetPage));
+        };
+        $("#btn-open-save-modal").onclick = () => {
+          ui.showSaveAccountModal();
+        };
+        $("#btn-clean-env").onclick = async () => {
+          if (await ui.confirm(utils.t("confirm_clean"))) {
+            core.cleanEnvironment();
+          }
+        };
+        $("#btn-export-curr").onclick = () => core.exportData("current");
+        $("#btn-export-all").onclick = () => core.exportData("all");
+        $("#btn-import-trigger").onclick = () => $("#inp-import-file").click();
+        $("#btn-webdav-config").onclick = async () => {
+          await ui.showWebDavConfigModal();
+        };
+        $("#btn-webdav-sync").onclick = async () => {
+          try {
+            ui.toggleLoading(true, utils.t("webdav_syncing"));
+            const fileName = await core.uploadWebDavBackup();
+            if (fileName) {
+              state.webdavBackups = core.getCachedWebDavBackups();
+              ui.renderWebDavBackupList(state.webdavBackups);
+              ui.showToast(utils.t("webdav_sync_ok"));
+            }
+          } catch (error) {
+            await ui.alert(error.message || utils.t("webdav_sync_err"));
+          } finally {
+            ui.toggleLoading(false);
+          }
+        };
+        $("#btn-webdav-refresh").onclick = async () => {
+          await ui.loadWebDavBackups();
+        };
+        $("#btn-webdav-logout").onclick = async () => {
+          if (!core.hasWebDavConfig()) return;
+          const confirmed = await ui.confirm(utils.t("webdav_logout_confirm"));
+          if (!confirmed) return;
+          core.clearWebDavConfig();
+          state.webdavBackups = [];
+          ui.renderWebDavView();
+          ui.showToast(utils.t("webdav_logout_ok"));
+        };
+        $("#go-about").onclick = () => {
+          ui.activatePage("pg-about", utils.t("nav_about"));
+        };
+        $("#go-notice").onclick = () => {
+          ui.activatePage("pg-notice", utils.t("nav_notice"));
+        };
+        $("#btn-account-rename-save").onclick = async () => {
+          const oldKey = state.accountSettingsKey;
+          const nameInput = $("#account-settings-name");
+          if (!oldKey || !nameInput) return;
+          const newName = nameInput.value.trim();
+          const targetHost = state.accountSettingsHost || constants.HOST;
+          const originalName = utils.extractName(oldKey);
+          if (!newName) return;
+          if (newName === originalName) return;
+          const newKey = utils.makeKey(newName, targetHost);
+          if (GM_getValue(newKey)) {
+            await ui.alert(utils.t("rename_conflict"));
+            return;
+          }
+          core.renameAccount(oldKey, newName, targetHost);
+          state.accountSettingsKey = newKey;
+          ui.refresh();
+          ui.activatePage("pg-account-settings", utils.t("account_settings"));
+          ui.showToast(utils.t("toast_renamed"));
+        };
+        $("#btn-account-delete").onclick = async () => {
+          const key = state.accountSettingsKey;
+          if (!key) return;
+          if (await ui.confirm(utils.t("confirm_delete"))) {
+            core.deleteAccount(key, state.accountSettingsHost || constants.HOST);
+            state.accountSettingsKey = null;
+            ui.refresh();
+            const targetPage = state.accountSettingsReturnPage || "pg-switch";
+            ui.activatePage(targetPage, ui.getPageTitle(targetPage));
+            ui.showToast(utils.t("toast_deleted"));
+          }
+        };
+        $("#inp-import-file").onchange = (event) => {
+          if (event.target.files.length) {
+            core.importData(event.target.files[0]);
+          }
+          event.target.value = "";
+        };
+        $("#btn-clear-all").onclick = async () => {
+          if (await ui.confirm(utils.t("confirm_clear_all"))) {
+            core.clearAllData();
+            ui.refresh();
+          }
+        };
+        state.panel.addEventListener("click", (event) => {
+          if (event.target.closest("#host-picker")) return;
+          state.hostSearchQuery = "";
+          state.hostEditingHost = null;
+          state.hostEditingValue = "";
+          $("#host-picker")?.classList.remove("open");
+        });
+        $("#host-menu").addEventListener("input", (event) => {
+          const editInput = event.target.closest(".acc-host-edit-input");
+          if (!editInput) return;
+          state.hostEditingValue = editInput.value;
+        });
+        $("#host-menu").addEventListener("keydown", (event) => {
+          const editInput = event.target.closest(".acc-host-edit-input");
+          if (!editInput) return;
+          if (event.key === "Escape") {
+            event.preventDefault();
+            event.stopPropagation();
+            state.hostEditingHost = null;
+            state.hostEditingValue = "";
+            ui.renderHostSelector(getHosts());
+            ui.qs(".acc-host-edit-input")?.blur();
+            state.panel?.focus();
+            return;
+          }
+          if (event.key === "Enter") {
+            event.preventDefault();
+            event.stopPropagation();
+            core.updateSiteName(editInput.dataset.host, editInput.value);
+            state.hostEditingHost = null;
+            state.hostEditingValue = "";
+            ui.refresh();
+            ui.showToast(utils.t("toast_site_name_updated"));
+          }
+        });
+        $("#webdav-backup-list").onclick = async (event) => {
+          const actionBtn = event.target.closest("[data-action][data-file]");
+          if (!actionBtn) return;
+          event.preventDefault();
+          event.stopPropagation();
+          const fileName = actionBtn.dataset.file;
+          const action = actionBtn.dataset.action;
+          if (!fileName || !action) return;
+          if (action === "delete") {
+            const confirmed = await ui.confirm(utils.t("webdav_delete_confirm").replace("{name}", fileName));
+            if (!confirmed) return;
+            try {
+              ui.toggleLoading(true, utils.t("webdav_loading"));
+              await core.deleteWebDavBackup(fileName);
+              state.webdavBackups = core.getCachedWebDavBackups();
+              ui.renderWebDavBackupList(state.webdavBackups);
+              ui.showToast(utils.t("webdav_delete_ok"));
+            } catch (error) {
+              await ui.alert(error.message || utils.t("webdav_delete_err"));
+            } finally {
+              ui.toggleLoading(false);
+            }
+            return;
+          }
+          if (action === "restore") {
+            const confirmed = await ui.confirm(utils.t("webdav_restore_confirm").replace("{name}", fileName));
+            if (!confirmed) return;
+            try {
+              ui.toggleLoading(true, utils.t("webdav_restoring"));
+              const result = await core.restoreWebDavBackup(fileName);
+              ui.toggleLoading(false);
+              await ui.alert(utils.t(result.messageKey).replace("{count}", result.count));
+            } catch (error) {
+              ui.toggleLoading(false);
+              await ui.alert(error.message || utils.t("sync_restore_err"));
+            }
+          }
+        };
+      }
+    };
+  }
+
+  // src/app/ui/feedback.js
+  function createFeedbackMethods({ state, constants, utils, core, ui }) {
+    return {
+      async copyText(text) {
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            return true;
+          }
+        } catch {
+        }
+        const tempInput = document.createElement("textarea");
+        tempInput.value = text;
+        tempInput.setAttribute("readonly", "true");
+        tempInput.style.position = "fixed";
+        tempInput.style.top = "-9999px";
+        tempInput.style.left = "-9999px";
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        let copied = false;
+        try {
+          copied = document.execCommand("copy");
+        } catch {
+          copied = false;
+        }
+        document.body.removeChild(tempInput);
+        return copied;
+      },
+      showToast(message, duration = 1800) {
+        if (!state.panel || !message) return;
+        if (!state.toastEl) {
+          state.toastEl = document.createElement("div");
+          state.toastEl.className = "acc-toast";
+          state.toastEl.innerHTML = `
+          <span class="acc-toast-icon">${constants.ICONS.NOTICE}</span>
+          <span class="acc-toast-text"></span>
+        `;
+          state.panel.appendChild(state.toastEl);
+        }
+        const textNode = state.toastEl.querySelector(".acc-toast-text");
+        if (textNode) textNode.textContent = message;
+        state.toastEl.classList.add("show");
+        if (state.toastTimer) {
+          clearTimeout(state.toastTimer);
+        }
+        state.toastTimer = setTimeout(() => {
+          if (state.toastEl) {
+            state.toastEl.classList.remove("show");
+          }
+          state.toastTimer = null;
+        }, duration);
+      },
+      async alert(message) {
+        return ui.showDialog(message, false);
+      },
+      async confirm(message) {
+        return ui.showDialog(message, true);
+      },
+      showDialog(message, isConfirm) {
+        return new Promise((resolve) => {
+          if (!state.dialogMask) {
+            const currentPanel = ui.qs(".acc-panel");
+            state.dialogMask = document.createElement("div");
+            state.dialogMask.className = "acc-dialog-mask";
+            currentPanel.appendChild(state.dialogMask);
+          }
+          state.dialogMask.innerHTML = `
+          <div class="acc-dialog-box">
+              <div class="acc-dialog-msg">${message}</div>
+              <div class="acc-dialog-footer">
+                  ${isConfirm ? `<button class="acc-dialog-btn acc-dialog-btn-cancel" id="acc-dlg-cancel">${utils.t("dlg_cancel")}</button>` : ""}
+                  <button class="acc-dialog-btn acc-dialog-btn-ok" id="acc-dlg-ok">${utils.t("dlg_ok")}</button>
+              </div>
+          </div>
+        `;
+          state.dialogMask.style.display = "flex";
+          const okBtn = ui.qs("#acc-dlg-ok");
+          const cancelBtn = ui.qs("#acc-dlg-cancel");
+          const close = (result) => {
+            state.dialogMask.style.display = "none";
+            resolve(result);
+          };
+          okBtn.onclick = () => close(true);
+          if (cancelBtn) cancelBtn.onclick = () => close(false);
+        });
+      },
+      async showSaveAccountModal() {
+        if (!state.saveFormMask) {
+          state.saveFormMask = document.createElement("div");
+          state.saveFormMask.className = "acc-form-mask";
+          state.panel.appendChild(state.saveFormMask);
+        }
+        state.saveFormMask.innerHTML = `
+        <div class="acc-form-box">
+          <div class="acc-form-title">${utils.t("btn_save")}</div>
+          <div class="acc-chk">
+            <label class="acc-chk-label" title="Cookie"><input type="checkbox" id="form-c-ck" class="acc-custom-chk" checked> Cookie</label>
+            <label class="acc-chk-label" title="LocalStorage"><input type="checkbox" id="form-c-ls" class="acc-custom-chk"> LS</label>
+            <label class="acc-chk-label" title="SessionStorage"><input type="checkbox" id="form-c-ss" class="acc-custom-chk"> SS</label>
+            <span class="acc-help-tip" title="${utils.t("tip_help")}">${constants.ICONS.HELP}</span>
+            <span class="acc-lock-tip" title="${utils.t("tip_lock")}">${constants.ICONS.LOCK}</span>
+          </div>
+          <div class="acc-form-label">${utils.t("site_name")}</div>
+          <input type="text" id="form-site-name" class="acc-input-text" placeholder="${utils.t("placeholder_site_name")}" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false">
+          <div class="acc-form-label">${utils.t("account_name")}</div>
+          <input type="text" id="form-acc-name" class="acc-input-text" placeholder="${utils.t("placeholder_name")}" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false">
+          <div class="acc-form-footer">
+            <button class="acc-dialog-btn acc-dialog-btn-cancel" id="form-cancel-btn">${utils.t("dlg_cancel")}</button>
+            <button class="acc-dialog-btn acc-dialog-btn-ok" id="form-save-btn">${utils.t("btn_save")}</button>
+          </div>
+        </div>
+      `;
+        state.saveFormMask.style.display = "flex";
+        const nameInput = ui.qs("#form-acc-name");
+        const siteNameInput = ui.qs("#form-site-name");
+        siteNameInput.value = utils.suggestSiteName(utils.getPageTitle(), constants.HOST);
+        nameInput.value = utils.suggestAccountName(constants.HOST);
+        const toggleAvailability = (selector, available) => {
+          const input = ui.qs(selector);
+          const label = input?.closest(".acc-chk-label");
+          if (!input || !label) return;
+          input.disabled = !available;
+          input.checked = available && input.id === "form-c-ck";
+          label.classList.toggle("disabled", !available);
+        };
+        const updateState = () => {
+          const ck = ui.qs("#form-c-ck")?.checked;
+          const ls = ui.qs("#form-c-ls")?.checked;
+          const ss = ui.qs("#form-c-ss")?.checked;
+          const saveBtn = ui.qs("#form-save-btn");
+          if (!saveBtn) return;
+          const canSave = (ck || ls || ss) && nameInput.value.trim().length > 0 && siteNameInput.value.trim().length > 0;
+          saveBtn.disabled = !canSave;
+          saveBtn.style.opacity = canSave ? "1" : "0.5";
+          saveBtn.style.cursor = canSave ? "pointer" : "not-allowed";
+        };
+        ["#form-c-ck", "#form-c-ls", "#form-c-ss"].forEach((id) => {
+          ui.qs(id).addEventListener("change", updateState);
+        });
+        siteNameInput.addEventListener("input", updateState);
+        nameInput.addEventListener("input", updateState);
+        nameInput.addEventListener("keydown", async (event) => {
+          if (event.key !== "Enter") return;
+          event.preventDefault();
+          event.stopPropagation();
+          ui.qs("#form-save-btn").click();
+        });
+        ui.qs("#form-cancel-btn").onclick = () => {
+          state.saveFormMask.style.display = "none";
+        };
+        ui.qs("#form-save-btn").onclick = async () => {
+          const name = nameInput.value.trim();
+          const siteName = siteNameInput.value.trim();
+          if (!name) return;
+          if (!siteName) return;
+          const targetKey = utils.makeKey(name);
+          if (GM_getValue(targetKey)) {
+            const confirmed = await ui.confirm(utils.t("confirm_overwrite"));
+            if (!confirmed) return;
+          }
+          const saved = await core.saveAccount(name, siteName, {
+            ck: ui.qs("#form-c-ck").checked,
+            ls: ui.qs("#form-c-ls").checked,
+            ss: ui.qs("#form-c-ss").checked
+          });
+          if (!saved) return;
+          state.saveFormMask.style.display = "none";
+          ui.refresh();
+          ui.showToast(utils.t("toast_saved"));
+        };
+        const availableSources = await core.detectAvailableSnapshotSources();
+        toggleAvailability("#form-c-ck", availableSources.ck);
+        toggleAvailability("#form-c-ls", availableSources.ls);
+        toggleAvailability("#form-c-ss", availableSources.ss);
+        updateState();
+        if (utils.getSortedKeysByHost(constants.HOST).length > 0) {
+          nameInput.focus();
+          nameInput.select();
+        } else {
+          siteNameInput.focus();
+          siteNameInput.select();
+        }
+      },
+      async showWebDavConfigModal() {
+        if (!state.saveFormMask) {
+          state.saveFormMask = document.createElement("div");
+          state.saveFormMask.className = "acc-form-mask";
+          state.panel.appendChild(state.saveFormMask);
+        }
+        const config = core.getWebDavConfig();
+        state.saveFormMask.innerHTML = `
+        <div class="acc-form-box">
+          <div class="acc-form-title">${utils.t("nav_webdav")}</div>
+          <div class="acc-form-label">${utils.t("webdav_url")}</div>
+          <input type="text" id="form-webdav-url" class="acc-input-text" placeholder="${utils.t("webdav_url_placeholder")}" value="${utils.escapeHtml(config.url)}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+          <div class="acc-form-label">${utils.t("webdav_username")}</div>
+          <input type="text" id="form-webdav-username" class="acc-input-text" placeholder="${utils.t("webdav_username_placeholder")}" value="${utils.escapeHtml(config.username)}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+          <div class="acc-form-label">${utils.t("webdav_password")}</div>
+          <input type="password" id="form-webdav-password" class="acc-input-text" placeholder="${utils.t("webdav_password_placeholder")}" value="${utils.escapeHtml(config.password)}" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false">
+          <div class="acc-form-footer">
+            <button class="acc-dialog-btn acc-dialog-btn-cancel" id="form-webdav-cancel">${utils.t("dlg_cancel")}</button>
+            <button class="acc-dialog-btn acc-dialog-btn-ok" id="form-webdav-save">${utils.t("webdav_verify_save")}</button>
+          </div>
+        </div>
+      `;
+        state.saveFormMask.style.display = "flex";
+        const urlInput = ui.qs("#form-webdav-url");
+        const usernameInput = ui.qs("#form-webdav-username");
+        const passwordInput = ui.qs("#form-webdav-password");
+        const saveBtn = ui.qs("#form-webdav-save");
+        const updateState = () => {
+          const canSave = urlInput.value.trim().length > 0 && usernameInput.value.trim().length > 0 && passwordInput.value.length > 0;
+          saveBtn.disabled = !canSave;
+          saveBtn.style.opacity = canSave ? "1" : "0.5";
+          saveBtn.style.cursor = canSave ? "pointer" : "not-allowed";
+        };
+        [urlInput, usernameInput, passwordInput].forEach((input) => {
+          input.addEventListener("input", updateState);
+          input.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" && !saveBtn.disabled) {
+              event.preventDefault();
+              saveBtn.click();
+            }
+          });
+        });
+        ui.qs("#form-webdav-cancel").onclick = () => {
+          state.saveFormMask.style.display = "none";
+        };
+        saveBtn.onclick = async () => {
+          const nextConfig = {
+            url: urlInput.value.trim(),
+            username: usernameInput.value.trim(),
+            password: passwordInput.value
+          };
+          try {
+            const resolvedConfig = await core.validateWebDavConfig(nextConfig);
+            core.saveWebDavConfig(resolvedConfig);
+            state.saveFormMask.style.display = "none";
+            state.webdavBackups = core.getCachedWebDavBackups();
+            ui.renderWebDavView();
+            ui.showToast(utils.t("webdav_verified"));
+          } catch (error) {
+            await ui.alert(error.message || utils.t("webdav_verify_err"));
+          }
+        };
+        updateState();
+        if (config.username) {
+          usernameInput.focus();
+          usernameInput.select();
+        } else {
+          urlInput.focus();
+          urlInput.select();
+        }
+      }
+    };
+  }
+
+  // src/app/ui/panel.js
+  function createPanelMethods({ state, constants, utils, templates, styleCss, ui }) {
+    return {
+      updateHeaderActionsVisibility() {
+        const headerActions = ui.qs("#acc-header-actions");
+        const switchPage = ui.qs("#pg-switch");
+        const setPage = ui.qs("#pg-set");
+        const noticePage = ui.qs("#pg-notice");
+        const aboutPage = ui.qs("#pg-about");
+        const accountSettingsPage = ui.qs("#pg-account-settings");
+        const webdavPage = ui.qs("#pg-webdav");
+        if (!headerActions || !switchPage || !setPage || !noticePage || !aboutPage || !accountSettingsPage || !webdavPage) return;
+        const isSwitchActive = switchPage.classList.contains("active");
+        const isSetActive = setPage.classList.contains("active");
+        const isNoticeActive = noticePage.classList.contains("active");
+        const isAboutActive = aboutPage.classList.contains("active");
+        const isAccountSettingsActive = accountSettingsPage.classList.contains("active");
+        const isWebDavActive = webdavPage.classList.contains("active");
+        const canOperateCurrentHost = state.currentViewingHost === constants.HOST;
+        headerActions.style.display = "flex";
+        const backBtn = ui.qs("#btn-header-back");
+        const homeBtn = ui.qs("#btn-go-current-host");
+        const cleanBtn = ui.qs("#btn-clean-env");
+        const saveBtn = ui.qs("#btn-open-save-modal");
+        const settingsBtn = ui.qs("#btn-open-settings");
+        const projectBtn = ui.qs("#btn-open-project");
+        const webdavBtn = ui.qs("#btn-open-webdav");
+        if (backBtn) backBtn.style.display = isSetActive || isNoticeActive || isAboutActive || isAccountSettingsActive || isWebDavActive ? "flex" : "none";
+        if (homeBtn) homeBtn.style.display = isSwitchActive && !canOperateCurrentHost ? "flex" : "none";
+        if (settingsBtn) settingsBtn.style.display = isSwitchActive ? "flex" : "none";
+        if (projectBtn) projectBtn.style.display = isSwitchActive ? "flex" : "none";
+        if (webdavBtn) webdavBtn.style.display = isSwitchActive ? "flex" : "none";
+        if (cleanBtn) cleanBtn.style.display = isSwitchActive && canOperateCurrentHost ? "flex" : "none";
+        if (saveBtn) saveBtn.style.display = isSwitchActive && canOperateCurrentHost ? "flex" : "none";
+      },
+      activatePage(pageId, title = ui.getPageTitle(pageId)) {
+        ui.qsa(".acc-tab-content").forEach((element) => element.classList.remove("active"));
+        const page = ui.qs(`#${pageId}`);
+        if (page) page.classList.add("active");
+        const headerText = ui.qs("#acc-header-text");
+        if (headerText) headerText.innerText = title;
+        state.activePage = pageId;
+        if (pageId === "pg-account-settings") {
+          ui.renderAccountSettingsView();
+        }
+        if (pageId === "pg-webdav") {
+          ui.renderWebDavView();
+        }
+        ui.updateHeaderActionsVisibility();
+      },
+      toggleLoading(show, text = "") {
+        let loader = ui.qs(".acc-loading-mask");
+        if (!loader) {
+          loader = document.createElement("div");
+          loader.className = "acc-loading-mask";
+          loader.innerHTML = `
+          <div class="acc-spinner"></div>
+          <div class="acc-loading-text"></div>
+        `;
+          state.panel.appendChild(loader);
+        }
+        loader.querySelector(".acc-loading-text").innerText = text;
+        loader.style.display = show ? "flex" : "none";
+      },
+      refresh() {
+        if (!state.fab || !state.panel) return;
+        ui.renderSwitchView();
+        ui.renderAccountSettingsView();
+        if (state.activePage === "pg-webdav") {
+          ui.renderWebDavView();
+        }
+        const hosts = utils.listAllHosts();
+        if (!hosts.includes(constants.HOST)) hosts.push(constants.HOST);
+        if (!hosts.includes(state.currentViewingHost)) state.currentViewingHost = constants.HOST;
+        if (ui.qs("#host-trigger") && ui.qs("#host-menu")) {
+          ui.renderHostSelector(hosts);
+        }
+        ui.updateSwitchToolbar();
+        ui.updateHeaderActionsVisibility();
+        const fabMode = GM_getValue(constants.CFG.FAB_MODE, "auto");
+        const hasAccounts = utils.getSortedKeysByHost(constants.HOST).length > 0;
+        const isPanelOpen = state.panel.classList.contains("show");
+        state.panel.querySelectorAll(".fab-mode-btn").forEach((button) => button.classList.toggle("acc-btn-active", button.dataset.val === fabMode));
+        state.fab.style.display = isPanelOpen || state.isForcedShow || fabMode === "show" || fabMode === "auto" && hasAccounts ? "flex" : "none";
+        const eyes = state.fab.querySelectorAll("path:nth-of-type(1), path:nth-of-type(4)");
+        eyes.forEach((path) => {
+          path.style.fill = hasAccounts ? "#555" : "none";
+          path.style.stroke = "";
+        });
+      },
+      syncPanelPos() {
+        if (!state.fab || !state.panel) return;
+        const rect = state.fab.getBoundingClientRect();
+        state.panel.style.bottom = `${window.innerHeight - rect.top + 10}px`;
+        state.panel.style.left = `${Math.max(10, rect.left - 290)}px`;
+      },
+      closePanel() {
+        if (state.panel) state.panel.classList.remove("show");
+        state.isForcedShow = false;
+        ui.refresh();
+      },
+      createShadowHost() {
+        const existingHost = document.getElementById("anme-app-host");
+        if (existingHost) {
+          state.uiRoot = existingHost.shadowRoot;
+          return;
+        }
+        const host = document.createElement("div");
+        host.id = "anme-app-host";
+        document.body.appendChild(host);
+        state.uiRoot = host.attachShadow({ mode: "open" });
+        const styleEl = document.createElement("style");
+        styleEl.textContent = styleCss;
+        state.uiRoot.appendChild(styleEl);
+      },
+      createFab() {
+        const existingFab = ui.qs("#acc-mgr-fab");
+        if (existingFab) {
+          state.fab = existingFab;
+          return;
+        }
+        state.fab = document.createElement("div");
+        state.fab.id = "acc-mgr-fab";
+        state.fab.innerHTML = constants.ICONS.LOGO;
+        state.uiRoot.appendChild(state.fab);
+        const savedPos = GM_getValue(constants.CFG.FAB_POS);
+        if (savedPos && savedPos.left !== void 0) {
+          state.fab.style.left = `${Math.max(0, Math.min(savedPos.left, window.innerWidth - 44))}px`;
+          state.fab.style.top = `${Math.max(0, Math.min(savedPos.top, window.innerHeight - 44))}px`;
+          state.fab.style.bottom = "auto";
+          state.fab.style.right = "auto";
+        }
+        let isDrag = false;
+        const dragThreshold = 4;
+        state.fab.onmousedown = (event) => {
+          isDrag = false;
+          const startX = event.clientX;
+          const startY = event.clientY;
+          const baseX = state.fab.offsetLeft;
+          const baseY = state.fab.offsetTop;
+          const move = (moveEvent) => {
+            const deltaX = moveEvent.clientX - startX;
+            const deltaY = moveEvent.clientY - startY;
+            if (!isDrag && Math.hypot(deltaX, deltaY) < dragThreshold) {
+              return;
+            }
+            isDrag = true;
+            const newLeft = Math.max(0, Math.min(baseX + moveEvent.clientX - startX, window.innerWidth - 44));
+            const newTop = Math.max(0, Math.min(baseY + moveEvent.clientY - startY, window.innerHeight - 44));
+            state.fab.style.left = `${newLeft}px`;
+            state.fab.style.top = `${newTop}px`;
+            state.fab.style.bottom = "auto";
+            state.fab.style.right = "auto";
+            if (state.panel && state.panel.classList.contains("show")) ui.syncPanelPos();
+          };
+          const up = () => {
+            document.removeEventListener("mousemove", move);
+            document.removeEventListener("mouseup", up);
+            if (isDrag) {
+              GM_setValue(constants.CFG.FAB_POS, {
+                left: parseInt(state.fab.style.left, 10),
+                top: parseInt(state.fab.style.top, 10)
+              });
+            }
+          };
+          document.addEventListener("mousemove", move);
+          document.addEventListener("mouseup", up);
+        };
+        state.fab.onclick = (event) => {
+          if (isDrag || !state.panel) return;
+          event.stopPropagation();
+          const willOpen = !state.panel.classList.contains("show");
+          if (willOpen) {
+            ui.refresh();
+            ui.syncPanelPos();
+            state.panel.classList.add("show");
+            state.panel.focus();
+          } else {
+            state.panel.classList.remove("show");
+            state.isForcedShow = false;
+            ui.refresh();
+          }
+        };
+      },
+      createPanel() {
+        const existingPanel = ui.qs("#acc-mgr-panel");
+        if (existingPanel) {
+          state.panel = existingPanel;
+          return;
+        }
+        state.panel = document.createElement("div");
+        state.panel.id = "acc-mgr-panel";
+        state.panel.className = "acc-panel";
+        state.panel.setAttribute("tabindex", "-1");
+        state.panel.innerHTML = templates.panel();
+        state.uiRoot.appendChild(state.panel);
+        ui.bindPanelEvents();
+      }
+    };
+  }
+
+  // src/app/ui/switching.js
+  function createSwitchingMethods({ state, constants, utils, templates, core, ui }) {
+    return {
+      renderHostSelector(hosts) {
+        const hostTrigger = ui.qs("#host-trigger");
+        const hostMenu = ui.qs("#host-menu");
+        const hostSearchInput = ui.qs("#host-search-input");
+        if (!hostTrigger || !hostMenu) return;
+        const currentLabel = state.currentViewingHost === constants.HOST ? "📌" : "🌐";
+        const query = state.hostSearchQuery.trim().toLowerCase();
+        const visibleHosts = hosts.filter((host) => {
+          const siteName = utils.getSiteNameByHost(host).toLowerCase();
+          return host.toLowerCase().includes(query) || siteName.includes(query);
+        });
+        hostTrigger.textContent = `${currentLabel} ${utils.getHostDisplayName(state.currentViewingHost)}`;
+        if (hostSearchInput) {
+          hostSearchInput.value = state.hostSearchQuery;
+        }
+        hostMenu.innerHTML = `
+        <div class="acc-host-list">
+          ${visibleHosts.length ? visibleHosts.map((host) => {
+          const prefix = host === constants.HOST ? "📌" : "🌐";
+          const isActive = host === state.currentViewingHost ? " active" : "";
+          const label = utils.escapeHtml(utils.getHostDisplayName(host));
+          const isEditing = state.hostDisplayMode === "siteName" && state.hostEditingHost === host;
+          const editValue = utils.escapeHtml(state.hostEditingValue || utils.getSiteNameByHost(host));
+          return `
+                    <div class="acc-host-option-row${isActive}">
+                      <button class="acc-host-option" type="button" data-host="${host}">${prefix} ${label}</button>
+                      ${state.hostDisplayMode === "siteName" ? `<button class="acc-host-edit-link" type="button" data-edit-host="${host}" title="${utils.t("edit_site_name")}">${constants.ICONS.EDIT}</button>` : ""}
+                      <button class="acc-host-open-link" type="button" data-open-host="${host}" title="${utils.t("open_site")}">&#8599;</button>
+                      ${isEditing ? `
+                            <div class="acc-host-edit-box">
+                              <input type="text" class="acc-host-edit-input" data-host="${host}" value="${editValue}" placeholder="${utils.t("placeholder_site_name")}" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false">
+                              <button class="acc-host-edit-save" type="button" data-save-host="${host}">${utils.t("save_changes")}</button>
+                              <button class="acc-host-edit-cancel" type="button">${utils.t("dlg_cancel")}</button>
+                            </div>
+                          ` : ""}
                     </div>
-                `;
-                dialogMask.style.display = 'flex';
-                const okBtn = this.qs('#acc-dlg-ok');
-                const cancelBtn = this.qs('#acc-dlg-cancel');
-                const close = (res) => { dialogMask.style.display = 'none'; resolve(res); };
-                okBtn.onclick = () => close(true);
-                if (cancelBtn) cancelBtn.onclick = () => close(false);
-            });
-        },
+                  `;
+        }).join("") : `<div class="acc-host-empty">${utils.t("no_data")}</div>`}
+        </div>
+      `;
+      },
+      initPointerSortableList({ containerSelector, itemSelector, keySelector, orderHost, afterSort, handleSelector }) {
+        const container = ui.qs(containerSelector);
+        if (!container) return;
+        const scrollArea = container.closest(".acc-scroll-area");
+        if (container._psCleanup) {
+          container._psCleanup();
+        }
+        let dragState = null;
+        let autoScrollRaf = null;
+        let latestPointerY = 0;
+        const updateDraggedItemPosition = () => {
+          if (!dragState) return;
+          const ghostRect = dragState.ghost.getBoundingClientRect();
+          const dragMidY = ghostRect.top + ghostRect.height / 2;
+          const siblingItems = [...container.querySelectorAll(itemSelector)].filter((item) => item !== dragState.item);
+          const nextItem = siblingItems.find((item) => {
+            const box = item.getBoundingClientRect();
+            return dragMidY < box.top + box.height / 2;
+          });
+          if (nextItem) {
+            container.insertBefore(dragState.item, nextItem);
+          } else {
+            container.appendChild(dragState.item);
+          }
+        };
+        const stopAutoScroll = () => {
+          if (!autoScrollRaf) return;
+          cancelAnimationFrame(autoScrollRaf);
+          autoScrollRaf = null;
+        };
+        const runAutoScroll = () => {
+          if (!dragState || !scrollArea) {
+            stopAutoScroll();
+            return;
+          }
+          const rect = scrollArea.getBoundingClientRect();
+          const threshold = 44;
+          let delta = 0;
+          if (latestPointerY < rect.top + threshold) {
+            delta = -Math.ceil((rect.top + threshold - latestPointerY) / threshold * 14);
+          } else if (latestPointerY > rect.bottom - threshold) {
+            delta = Math.ceil((latestPointerY - (rect.bottom - threshold)) / threshold * 14);
+          }
+          if (delta !== 0) {
+            scrollArea.scrollTop += delta;
+            updateDraggedItemPosition();
+            autoScrollRaf = requestAnimationFrame(runAutoScroll);
+            return;
+          }
+          autoScrollRaf = null;
+        };
+        const cleanupDragState = () => {
+          if (!dragState) return;
+          const { ghost, container: dragContainer, item } = dragState;
+          stopAutoScroll();
+          item.classList.remove("dragging-source");
+          if (dragContainer) {
+            dragContainer.classList.remove("acc-switch-list-sorting");
+          }
+          if (ghost && ghost.parentNode) {
+            ghost.parentNode.removeChild(ghost);
+          }
+          dragState = null;
+        };
+        const syncOrder = () => {
+          const items = [...container.querySelectorAll(keySelector)];
+          const newOrder = items.map((element) => utils.extractName(element.dataset.key || element.dataset.cardKey));
+          core.updateOrder(orderHost(), newOrder);
+          if (afterSort) afterSort();
+        };
+        const onPointerMove = (event) => {
+          if (!dragState || event.pointerId !== dragState.pointerId) return;
+          event.preventDefault();
+          latestPointerY = event.clientY;
+          dragState.ghost.style.top = `${event.clientY - dragState.offsetY}px`;
+          dragState.ghost.style.left = `${dragState.left}px`;
+          updateDraggedItemPosition();
+          if (!autoScrollRaf) {
+            autoScrollRaf = requestAnimationFrame(runAutoScroll);
+          }
+        };
+        const onPointerUp = (event) => {
+          if (!dragState || event.pointerId !== dragState.pointerId) return;
+          event.preventDefault();
+          cleanupDragState();
+          syncOrder();
+        };
+        const onPointerDown = (event) => {
+          if (event.button !== 0) return;
+          const handle = event.target.closest(handleSelector);
+          if (!handle) return;
+          const item = handle.closest(itemSelector);
+          if (!item) return;
+          event.preventDefault();
+          event.stopPropagation();
+          const rect = item.getBoundingClientRect();
+          const ghost = item.cloneNode(true);
+          ghost.classList.add("acc-switch-ghost");
+          ghost.style.position = "fixed";
+          ghost.style.top = `${rect.top}px`;
+          ghost.style.left = `${rect.left}px`;
+          ghost.style.width = `${rect.width}px`;
+          ghost.style.zIndex = "1000002";
+          ghost.style.pointerEvents = "none";
+          state.uiRoot.appendChild(ghost);
+          item.classList.add("dragging-source");
+          container.classList.add("acc-switch-list-sorting");
+          dragState = {
+            container,
+            ghost,
+            item,
+            pointerId: event.pointerId,
+            offsetY: event.clientY - rect.top,
+            left: rect.left
+          };
+          latestPointerY = event.clientY;
+        };
+        container.addEventListener("pointerdown", onPointerDown);
+        document.addEventListener("pointermove", onPointerMove);
+        document.addEventListener("pointerup", onPointerUp);
+        document.addEventListener("pointercancel", onPointerUp);
+        container._psCleanup = () => {
+          container.removeEventListener("pointerdown", onPointerDown);
+          document.removeEventListener("pointermove", onPointerMove);
+          document.removeEventListener("pointerup", onPointerUp);
+          document.removeEventListener("pointercancel", onPointerUp);
+          cleanupDragState();
+        };
+      },
+      renderSwitchView() {
+        const searchQuery = state.accountSearchQuery.trim().toLowerCase();
+        const currentKeys = utils.getSortedKeysByHost(state.currentViewingHost).filter((key) => !searchQuery || utils.extractName(key).toLowerCase().includes(searchQuery));
+        const switchArea = ui.qs("#switch-area");
+        if (!switchArea) return;
+        switchArea.innerHTML = currentKeys.length === 0 ? templates.noData() : currentKeys.map((key) => templates.switchCard(key, GM_getValue(key))).join("");
+        ui.initPointerSortableList({
+          containerSelector: "#switch-area",
+          itemSelector: ".acc-switch-item",
+          keySelector: ".acc-switch-item",
+          handleSelector: ".acc-switch-handle",
+          orderHost: () => state.currentViewingHost,
+          afterSort: () => {
+            ui.renderSwitchView();
+          }
+        });
+      },
+      renderAccountSettingsView() {
+        const input = ui.qs("#account-settings-name");
+        const saveBtn = ui.qs("#btn-account-rename-save");
+        const deleteBtn = ui.qs("#btn-account-delete");
+        if (!input || !saveBtn || !deleteBtn) return;
+        const key = state.accountSettingsKey;
+        const data = key ? GM_getValue(key) : null;
+        const originalName = data ? utils.extractName(key) : "";
+        input.value = originalName;
+        input.disabled = !data;
+        deleteBtn.disabled = !data;
+        deleteBtn.style.opacity = data ? "1" : "0.5";
+        deleteBtn.style.cursor = data ? "pointer" : "not-allowed";
+        const updateSaveState = () => {
+          const canSave = Boolean(data) && input.value.trim().length > 0 && input.value.trim() !== originalName;
+          saveBtn.disabled = !canSave;
+          saveBtn.style.opacity = canSave ? "1" : "0.5";
+          saveBtn.style.cursor = canSave ? "pointer" : "not-allowed";
+        };
+        input.oninput = updateSaveState;
+        input.onkeydown = (event) => {
+          if (event.key === "Enter" && !saveBtn.disabled) {
+            event.preventDefault();
+            saveBtn.click();
+          }
+        };
+        updateSaveState();
+      },
+      updateSwitchToolbar() {
+        const hostRow = ui.qs("#acc-host-row");
+        const searchInput = ui.qs("#account-search-input");
+        const searchToggleBtn = ui.qs("#btn-account-search-toggle");
+        if (!hostRow || !searchInput || !searchToggleBtn) return;
+        hostRow.classList.toggle("searching", state.accountSearchActive);
+        searchInput.value = state.accountSearchQuery;
+        searchToggleBtn.innerHTML = state.accountSearchActive ? constants.ICONS.CLOSE : constants.ICONS.SEARCH;
+        searchToggleBtn.title = state.accountSearchActive ? utils.t("close_search_accounts") : utils.t("search_accounts");
+      },
+      openAccountSettings(key) {
+        state.accountSettingsKey = key;
+        state.accountSettingsHost = state.currentViewingHost;
+        state.accountSettingsReturnPage = state.activePage || "pg-switch";
+        ui.renderAccountSettingsView();
+        ui.activatePage("pg-account-settings", utils.t("account_settings"));
+      }
+    };
+  }
 
-        initDraggable() {
-            const container = this.qs('#mgr-list-area');
-            if (!container) return;
-            let draggingEle = null;
-            const onDragStart = (e) => { draggingEle = e.target.closest('.acc-mgr-item'); if (draggingEle) draggingEle.classList.add('dragging'); };
-            const onDragEnd = (e) => {
-                if (draggingEle) {
-                    draggingEle.classList.remove('dragging'); draggingEle = null;
-                    const items = [...container.querySelectorAll('.acc-mgr-input')];
-                    const newOrder = items.map(input => Utils.extractName(input.dataset.key));
-                    Core.updateOrder(currentViewingHost, newOrder);
-                    UI.renderSwitchView();
-                }
-            };
-            const onDragOver = (e) => {
-                e.preventDefault();
-                const afterElement = getDragAfterElement(container, e.clientY);
-                if (afterElement == null) container.appendChild(draggingEle); else container.insertBefore(draggingEle, afterElement);
-            };
-            function getDragAfterElement(container, y) {
-                const draggableElements = [...container.querySelectorAll('.acc-mgr-item:not(.dragging)')];
-                return draggableElements.reduce((closest, child) => {
-                    const box = child.getBoundingClientRect();
-                    const offset = y - box.top - box.height / 2;
-                    if (offset < 0 && offset > closest.offset) return { offset: offset, element: child }; else return closest;
-                }, { offset: Number.NEGATIVE_INFINITY }).element;
-            }
-            container.removeEventListener('dragstart', container._ds); container.removeEventListener('dragend', container._de); container.removeEventListener('dragover', container._do);
-            container._ds = onDragStart; container._de = onDragEnd; container._do = onDragOver;
-            container.addEventListener('dragstart', onDragStart); container.addEventListener('dragend', onDragEnd); container.addEventListener('dragover', onDragOver);
-        },
+  // src/app/ui/webdav.js
+  function createWebDavUiMethods({ state, constants, utils, core, ui }) {
+    return {
+      renderWebDavView() {
+        const config = core.getWebDavConfig();
+        const statusEl = ui.qs("#webdav-status");
+        const syncBtn = ui.qs("#btn-webdav-sync");
+        const logoutBtn = ui.qs("#btn-webdav-logout");
+        if (!statusEl || !syncBtn || !logoutBtn) return;
+        statusEl.textContent = core.hasWebDavConfig() ? utils.t("webdav_connected_as").replace("{user}", config.username) : utils.t("webdav_not_configured");
+        syncBtn.disabled = !core.hasWebDavConfig();
+        syncBtn.style.opacity = syncBtn.disabled ? "0.5" : "1";
+        syncBtn.style.cursor = syncBtn.disabled ? "not-allowed" : "pointer";
+        logoutBtn.disabled = !core.hasWebDavConfig();
+        logoutBtn.style.opacity = logoutBtn.disabled ? "0.5" : "1";
+        logoutBtn.style.cursor = logoutBtn.disabled ? "not-allowed" : "pointer";
+        if (core.hasWebDavConfig()) {
+          state.webdavBackups = core.getCachedWebDavBackups();
+        } else {
+          state.webdavBackups = [];
+        }
+        ui.renderWebDavBackupList(state.webdavBackups);
+      },
+      renderWebDavBackupList(backups = [], errorMessage = "") {
+        const container = ui.qs("#webdav-backup-list");
+        if (!container) return;
+        if (errorMessage) {
+          container.innerHTML = `<div class="acc-webdav-empty">${utils.escapeHtml(errorMessage)}</div>`;
+          return;
+        }
+        if (!backups.length) {
+          container.innerHTML = `<div class="acc-webdav-empty">${utils.t("webdav_no_backups")}</div>`;
+          return;
+        }
+        container.innerHTML = backups.map(
+          (backup) => `
+            <div class="acc-webdav-item">
+              <div class="acc-webdav-item-main">
+                <div class="acc-webdav-item-name" title="${utils.escapeHtml(backup.fileName)}">${utils.escapeHtml(backup.fileName)}</div>
+                <div class="acc-webdav-item-meta">
+                  <span class="acc-mini-tag acc-webdav-meta-tag">${utils.escapeHtml(utils.formatTime(backup.lastModified))}</span>
+                  <span class="acc-mini-tag acc-webdav-meta-tag">${utils.escapeHtml(utils.formatBytes(backup.size))}</span>
+                </div>
+              </div>
+              <div class="acc-webdav-item-actions">
+                <button class="acc-toolbar-btn acc-webdav-action-btn" type="button" title="${utils.t("webdav_restore")}" data-action="restore" data-file="${utils.escapeHtml(backup.fileName)}">${constants.ICONS.IMPORT}</button>
+                <button class="acc-toolbar-btn acc-webdav-action-btn danger" type="button" title="${utils.t("webdav_delete")}" data-action="delete" data-file="${utils.escapeHtml(backup.fileName)}">${constants.ICONS.DELETE}</button>
+              </div>
+            </div>
+          `
+        ).join("");
+      },
+      async loadWebDavBackups() {
+        const config = core.getWebDavConfig();
+        if (!config.url || !config.username || !config.password) {
+          state.webdavBackups = [];
+          ui.renderWebDavBackupList([], utils.t("webdav_need_config"));
+          return;
+        }
+        ui.toggleLoading(true, utils.t("webdav_loading"));
+        try {
+          state.webdavBackups = await core.listWebDavBackups();
+          ui.renderWebDavBackupList(state.webdavBackups);
+        } catch (error) {
+          state.webdavBackups = core.getCachedWebDavBackups();
+          if (state.webdavBackups.length) {
+            ui.renderWebDavBackupList(state.webdavBackups);
+            ui.showToast(error.message || utils.t("webdav_list_err"));
+          } else {
+            ui.renderWebDavBackupList([], error.message || utils.t("webdav_list_err"));
+          }
+        } finally {
+          ui.toggleLoading(false);
+        }
+      }
+    };
+  }
 
-        renderSwitchView() {
-            const currentKeys = Utils.getSortedKeysByHost(CONST.HOST);
-            const switchArea = this.qs('#switch-area');
-            if (!switchArea) return;
-            switchArea.innerHTML = currentKeys.length === 0 ? Templates.noData() : currentKeys.map(k => Templates.switchCard(k, GM_getValue(k))).join('');
-        },
-
-        renderMgrView() {
-            const mgrList = this.qs('#mgr-list-area');
-            if (!mgrList) return;
-            const viewingKeys = Utils.getSortedKeysByHost(currentViewingHost);
-            mgrList.innerHTML = viewingKeys.map(k => Templates.mgrItem(k)).join('');
-            this.initDraggable();
-
-            mgrList.querySelectorAll('.acc-mgr-input').forEach(i => {
-                const row = i.closest('.acc-mgr-item');
-
-                // --- FIX: Stop Dragging when typing ---
-                i.onmouseenter = () => {if(row) row.setAttribute('draggable', 'false');};
-                i.onmouseleave = () => {if(row && uiRoot.activeElement !== i) {row.setAttribute('draggable', 'true');}};
-                i.onfocus = () => {if(row) row.setAttribute('draggable', 'false');};
-                i.onblur = () => {
-                    if(row) row.setAttribute('draggable', 'true');
-                    const originalName = Utils.extractName(i.dataset.key);
-                    const val = i.value.trim();
-                    if (!val || val === originalName) {i.value = originalName;return;}
-                    const newKey = Utils.makeKey(val, currentViewingHost);
-                    if (GM_getValue(newKey)) {i.value = originalName;return;}
-                    Core.renameAccount(i.dataset.key, val, currentViewingHost);
-                    UI.refresh();
-                };
-
-                i.onclick = (e) => { e.stopPropagation(); }; // Prevent click triggering drag start
-                i.onkeydown = (e) => {
-                    e.stopPropagation(); // Stop event bubbling
-                    if (e.key === 'Enter') { e.preventDefault(); i.blur(); }
-                };
-                i.onkeyup = (e) => e.stopPropagation();
-                i.onkeypress = (e) => e.stopPropagation();
-            });
-        },
-
-        toggleLoading(show, text = "") {
-            let loader = this.qs('.acc-loading-mask');
-            if (!loader) {
-                loader = document.createElement('div');
-                loader.className = 'acc-loading-mask';
-                loader.innerHTML = `
-                    <div class="acc-spinner"></div>
-                    <div class="acc-loading-text"></div>
-                `;
-                panel.appendChild(loader);
-            }
-            loader.querySelector('.acc-loading-text').innerText = text;
-            loader.style.display = show ? 'flex' : 'none';
-        },
-
-        refresh() {
-            if (!fab || !panel) return;
-            this.renderSwitchView();
-            const hosts = Utils.listAllHosts();
-            if (!hosts.includes(CONST.HOST)) hosts.push(CONST.HOST);
-            if (!hosts.includes(currentViewingHost)) { currentViewingHost = CONST.HOST; }
-            const hostSel = this.qs('#host-sel');
-            if (hostSel) hostSel.innerHTML = hosts.map(h => `<option value="${h}" ${h === currentViewingHost ? 'selected' : ''}>${h === CONST.HOST ? '📌 ' : '🌐 '}${h}</option>`).join('');
-            this.renderMgrView();
-            const fixedAct = this.qs('#mgr-fixed-actions');
-            if (fixedAct) fixedAct.style.display = (currentViewingHost === CONST.HOST) ? 'block' : 'none';
-            const fabMode = GM_getValue(CONST.CFG.FAB_MODE, 'auto');
-            const hasAccounts = Utils.getSortedKeysByHost(CONST.HOST).length > 0;
-            const isPanelOpen = panel.classList.contains('show');
-            panel.querySelectorAll('.fab-mode-btn').forEach(btn => btn.classList.toggle('acc-btn-active', btn.dataset.val === fabMode));
-            fab.style.display = (isPanelOpen || isForcedShow || (fabMode === 'show') || (fabMode === 'auto' && hasAccounts)) ? 'flex' : 'none';
-
-            const eyes = fab.querySelectorAll('path:nth-of-type(1), path:nth-of-type(4)');
-            if (hasAccounts) {eyes.forEach(path => {path.style.fill = '#555';});} else {eyes.forEach(path => {path.style.fill = 'none';});}
-
-            this.updateSaveBtnState();
-        },
-
-        syncPanelPos() {
-            if (!fab || !panel) return;
-            const r = fab.getBoundingClientRect();
-            panel.style.bottom = (window.innerHeight - r.top + 10) + 'px';
-            panel.style.left = Math.max(10, r.left - 290) + 'px';
-        },
-
-        closePanel() {
-            if (panel) panel.classList.remove('show');
-            isForcedShow = false;
-            UI.refresh();
-        },
-
-        createShadowHost() {
-            if (document.getElementById('anme-app-host')) return;
-            const host = document.createElement('div');
-            host.id = 'anme-app-host';
-            document.body.appendChild(host);
-            uiRoot = host.attachShadow({ mode: 'open' });
-
-            // Inject Styles into Shadow Root
-            const styleEl = document.createElement('style');
-            styleEl.textContent = STYLE_CSS;
-            uiRoot.appendChild(styleEl);
-        },
-
-        createFab() {
-            if (this.qs('#acc-mgr-fab')) { fab = this.qs('#acc-mgr-fab'); return; }
-            fab = document.createElement('div'); fab.id = 'acc-mgr-fab';
-            fab.innerHTML = CONST.ICONS.LOGO;
-            uiRoot.appendChild(fab); // Append to Shadow Root
-
-            const savedPos = GM_getValue(CONST.CFG.FAB_POS);
-            if (savedPos && savedPos.left !== undefined) {
-                fab.style.left = Math.max(0, Math.min(savedPos.left, window.innerWidth - 44)) + 'px';
-                fab.style.top = Math.max(0, Math.min(savedPos.top, window.innerHeight - 44)) + 'px';
-                fab.style.bottom = 'auto'; fab.style.right = 'auto';
-            }
-            let isDrag = false;
-            fab.onmousedown = (e) => {
-                isDrag = false; let sx=e.clientX, sy=e.clientY, bx=fab.offsetLeft, by=fab.offsetTop;
-                const mv=(ev)=>{
-                    isDrag=true;
-                    let nl = Math.max(0, Math.min(bx + ev.clientX - sx, window.innerWidth - 44));
-                    let nt = Math.max(0, Math.min(by + ev.clientY - sy, window.innerHeight - 44));
-                    fab.style.left= nl + 'px'; fab.style.top= nt + 'px'; fab.style.bottom='auto'; fab.style.right='auto';
-                    if(panel && panel.classList.contains('show')) UI.syncPanelPos();
-                };
-                const up=()=>{ document.removeEventListener('mousemove', mv); document.removeEventListener('mouseup', up); if (isDrag) GM_setValue(CONST.CFG.FAB_POS, { left: parseInt(fab.style.left), top: parseInt(fab.style.top) }); };
-                document.addEventListener('mousemove', mv); document.addEventListener('mouseup', up);
-            };
-            fab.onclick = (e) => { if(!isDrag && panel) { e.stopPropagation(); if(panel.classList.toggle('show')) UI.syncPanelPos(); else isForcedShow = false; UI.refresh(); } };
-        },
-
-        createPanel() {
-            if (this.qs('#acc-mgr-panel')) return;
-            panel = document.createElement('div');
-            panel.id = 'acc-mgr-panel';
-            panel.className = 'acc-panel';
-            panel.setAttribute('tabindex', '-1'); // Make it focusable to capture key events
-            panel.innerHTML = Templates.panel();
-            uiRoot.appendChild(panel); // Append to Shadow Root
-            this.bindPanelEvents(); this.updateSaveBtnState();
-        },
-
-        updateSaveBtnState() {
-            const ck = UI.qs('#c-ck').checked, ls = UI.qs('#c-ls').checked, ss = UI.qs('#c-ss').checked;
-            const name = UI.qs('#acc-new-name').value.trim();
-            const saveBtn = UI.qs('#do-save');
-            const isAnyChecked = ck || ls || ss;
-            const hasName = name.length > 0;
-            const canSave = isAnyChecked && hasName;
-            saveBtn.disabled = !canSave;
-            saveBtn.style.opacity = canSave ? "1" : "0.5";
-            saveBtn.style.cursor = canSave ? "pointer" : "not-allowed";
-        },
-
-        bindPanelEvents() {
-            // Helper for scoped events
-            const $ = (s) => this.qs(s);
-            const $$ = (s) => this.qsa(s);
-
-            // --- IMPORTANT: Global Panel Event Isolation ---
-            // Stop keyboard and input events from leaking out of the panel to the main page
-            ['keydown', 'keyup', 'keypress', 'input', 'contextmenu', 'wheel'].forEach(evt => {
-                panel.addEventListener(evt, (e) => {
-                    e.stopPropagation();
-                       if (evt === 'wheel') {
-                           const scrollArea = e.target.closest('.acc-scroll-area');
-                           if (!scrollArea || scrollArea.scrollHeight <= scrollArea.clientHeight) {e.preventDefault();}
-                       }
-                   }, { passive: false });
-            });
-
-            // Tab switching
-           $$('.acc-tab-btn').forEach(b => {
-               b.onclick = () => {
-                   $$('.acc-tab-btn, .acc-tab-content').forEach(el => el.classList.remove('active'));
-                   b.classList.add('active');
-                   $('#' + b.dataset.pg).classList.add('active');
-                   $('#acc-header-text').innerText = b.dataset.title;
-               };
-           });
-            // --- 新增：响应底部导航栏滚动切换标签 ---
-            const footer = $('.acc-tabs-footer');
-            const tabBtns = Array.from($$('.acc-tab-btn'));
-            footer.onwheel = (e) => {
-                e.preventDefault();
-                const currentIndex = tabBtns.findIndex(btn => btn.classList.contains('active'));
-                const nextIndex = e.deltaY > 0 ?
-                    (currentIndex + 1) % tabBtns.length :
-                    (currentIndex - 1 + tabBtns.length) % tabBtns.length;
-                tabBtns[nextIndex].click();
-            };
-
-            // Close
-            $('#acc-close-btn').onclick = this.closePanel;
-            panel.onclick = (e) => {
-                e.stopPropagation();
-                // If clicked on empty space, focus the panel to capture keyboard events
-                if (document.activeElement !== panel && !panel.contains(uiRoot.activeElement)) {
-                    panel.focus();
-                }
-            };
-
-            // Settings: Fab Mode & Language
-            $$('.fab-mode-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    GM_setValue(CONST.CFG.FAB_MODE, btn.dataset.val);
-                    this.refresh();
-                });
-            });
-            $('#lang-sel').onchange = (e) => {
-                currentLang = e.target.value; GM_setValue(CONST.CFG.LANG, currentLang);
-                document.body.removeChild(document.getElementById('anme-app-host')); // Remove old host
-
-                // --- FIX: Reset ALL references to avoid ghost elements ---
-                uiRoot = null; panel = null; fab = null; dialogMask = null;
-
-                UI.init();
-                // Re-open if was open (hacky but works)
-               const newPanel = this.qs('#acc-mgr-panel');
-                if (newPanel) {
-                    newPanel.classList.add('show');
-                    UI.syncPanelPos();
-                    const setBtn = Array.from(this.qsa('.acc-tab-btn')).find(b => b.dataset.pg === 'pg-set');
-                    if (setBtn) {
-                        this.qsa('.acc-tab-btn, .acc-tab-content').forEach(el => el.classList.remove('active'));
-                        setBtn.classList.add('active');
-                        this.qs('#pg-set').classList.add('active');
-                        this.qs('#acc-header-text').innerText = setBtn.dataset.title;
-                    }
-                }
-            };
-
-            // Switch View Logic
-            $('#switch-area').onclick = (e) => {
-                const tag = e.target.closest('.acc-click-tag');
-                if (tag) { e.stopPropagation(); const card = tag.closest('.acc-switch-card'); Core.inspectData(card.dataset.key, tag.dataset.type); return; }
-                const card = e.target.closest('.acc-switch-card');
-                if (card) Core.loadAccount(card.dataset.key);
-            };
-
-            // Manager View Logic
-            $('#mgr-list-area').onclick = async (e) => {
-                if (e.target.classList.contains('acc-btn-del')) {
-                    e.stopPropagation();
-                    const key = e.target.dataset.key;
-                    if (await UI.confirm(Utils.t('confirm_delete'))) {
-                        Core.deleteAccount(key, currentViewingHost);
-                        this.refresh();
-                    }
-                }
-            };
-            $('#host-sel').onchange = (e) => { currentViewingHost = e.target.value; this.refresh(); };
-            $('#btn-goto-host').onclick = () => {
-                const host = $('#host-sel').value;
-                if (host) {
-                    window.open('https://' + host, '_blank','noopener,noreferrer');
-                }
-            };
-
-            // Save & Clean Logic
-            ['#c-ck', '#c-ls', '#c-ss'].forEach(id => $(id).addEventListener('change', this.updateSaveBtnState));
-            // 监听输入框打字事件，实时更新保存按钮状态
-            const newNameInput = $('#acc-new-name');
-            newNameInput.addEventListener('input', () => this.updateSaveBtnState());
-            
-            // 回车保存功能 (事件冒泡已由 Panel 全局拦截)
-            newNameInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    e.stopPropagation(); // 双重保险
-                    $('#do-save').click();
-                }
-            });
-            $('#do-save').onclick = async () => {
-                const nameInp = $('#acc-new-name');
-                const name = nameInp.value.trim();
-                if (!name) return;
-                const targetKey = Utils.makeKey(name);
-                // overwrite
-                if (GM_getValue(targetKey)) {if (!(await UI.confirm(Utils.t('confirm_overwrite')))) {return;}}
-                await Core.saveAccount(name, { ck: $('#c-ck').checked, ls: $('#c-ls').checked, ss: $('#c-ss').checked });
-                nameInp.value = ""; this.refresh();
-            };
-            $('#do-clean').onclick = async () => { if(await UI.confirm(Utils.t('confirm_clean'))) Core.cleanEnvironment(); };
-
-            // Backup & Restore Actions
-            $('#btn-export-curr').onclick = () => Core.exportData('current');
-            $('#btn-export-all').onclick = () => Core.exportData('all');
-            $('#btn-import-trigger').onclick = () => $('#inp-import-file').click();
-            $('#inp-import-file').onchange = (e) => { if(e.target.files.length) Core.importData(e.target.files[0]); e.target.value = ''; };
-            $('#btn-clear-all').onclick = async () => {
-                if (await UI.confirm(Utils.t('confirm_clear_all'))) { Core.clearAllData(); this.refresh(); }
-            };
-
-            // Sub-pages Navigation
-            const showSubPage = (pageId, titleKey) => {
-                $$('.acc-tab-content').forEach(el => el.classList.remove('active'));
-                $( '#' + pageId ).classList.add('active');
-                $('#acc-header-text').innerText = Utils.t(titleKey);
-            };
-            const backToSet = () => {
-                $$('.acc-tab-content').forEach(el => el.classList.remove('active'));
-                $('#pg-set').classList.add('active');
-                $('#acc-header-text').innerText = Utils.t('nav_set');
-            };
-
-            $('#go-notice').onclick = () => showSubPage('pg-notice', 'nav_notice');
-            $('#go-about').onclick = () => showSubPage('pg-about', 'nav_about');
-            $$('.back-to-set-btn').forEach(btn => btn.addEventListener('click', backToSet));
-        },
-
+  // src/app/ui.js
+  function createUI({ state, constants, utils, templates, core, styleCss }) {
+    const ui = {
+      getPageTitle(pageId) {
+        if (pageId === "pg-set") return utils.t("nav_set");
+        if (pageId === "pg-notice") return utils.t("nav_notice");
+        if (pageId === "pg-about") return utils.t("nav_about");
+        if (pageId === "pg-account-settings") return utils.t("account_settings");
+        if (pageId === "pg-webdav") return utils.t("nav_webdav");
+        return "";
+      },
+      qs(selector) {
+        return state.uiRoot ? state.uiRoot.querySelector(selector) : null;
+      },
+      qsa(selector) {
+        return state.uiRoot ? state.uiRoot.querySelectorAll(selector) : [];
+      }
+    };
+    Object.assign(
+      ui,
+      createFeedbackMethods({ state, constants, utils, core, ui }),
+      createSwitchingMethods({ state, constants, utils, templates, core, ui }),
+      createWebDavUiMethods({ state, constants, utils, core, ui }),
+      createPanelMethods({ state, constants, utils, templates, styleCss, ui }),
+      createEventMethods({ state, constants, utils, core, ui }),
+      {
         init() {
-            this.createShadowHost();
-            this.createFab();
-            this.createPanel();
-            this.refresh();
+          ui.createShadowHost();
+          ui.createFab();
+          ui.createPanel();
+          ui.refresh();
         }
-    };
+      }
+    );
+    return ui;
+  }
 
-    // ========================================================================
-    // 5. Initialization
-    // ========================================================================
-
+  // src/main.js
+  (() => {
+    "use strict";
+    if (window.self !== window.top) return;
+    const state = createState({ constants: CONST, i18nData: I18N_DATA });
+    const utils = createUtils({ state, constants: CONST, i18nData: I18N_DATA });
+    const templates = createTemplates({ state, constants: CONST, i18nData: I18N_DATA, utils });
+    const core = createCore({ constants: CONST, utils });
+    const ui = createUI({ state, constants: CONST, utils, templates, core, styleCss: STYLE_CSS });
+    core.setUI(ui);
     const start = () => {
-        if (document.body) {
-            UI.init();
-            new MutationObserver(() => { if (!document.getElementById('anme-app-host')) UI.init(); }).observe(document.body, { childList: true });
-        } else { setTimeout(start, 200); }
+      if (!document.body) {
+        setTimeout(start, 200);
+        return;
+      }
+      ui.init();
+      new MutationObserver(() => {
+        if (!document.getElementById("anme-app-host")) {
+          ui.init();
+        }
+      }).observe(document.body, { childList: true });
     };
-
-    window.addEventListener('resize', () => {
-        if (fab && fab.style.left) {
-            fab.style.left = Math.min(Math.max(0, parseFloat(fab.style.left)), window.innerWidth - 44) + 'px';
-            fab.style.top = Math.min(Math.max(0, parseFloat(fab.style.top)), window.innerHeight - 44) + 'px';
-            if (panel && panel.classList.contains('show')) UI.syncPanelPos();
-        }
+    window.addEventListener("resize", () => {
+      if (!state.fab || !state.fab.style.left) return;
+      state.fab.style.left = `${Math.min(Math.max(0, parseFloat(state.fab.style.left)), window.innerWidth - 44)}px`;
+      state.fab.style.top = `${Math.min(Math.max(0, parseFloat(state.fab.style.top)), window.innerHeight - 44)}px`;
+      if (state.panel && state.panel.classList.contains("show")) {
+        ui.syncPanelPos();
+      }
     });
-
-    // Close panel when clicking outside (Handles Shadow DOM boundary)
-    document.addEventListener('click', (e) => {
-        if (!panel || !panel.classList.contains('show')) return;
-        // e.composedPath() includes the shadow roots and elements clicked
-        const path = e.composedPath();
-        if (!path.includes(panel) && !path.includes(fab) && !path.includes(dialogMask)) {
-            UI.closePanel();
-        }
+    document.addEventListener("click", (event) => {
+      if (!state.panel || !state.panel.classList.contains("show")) return;
+      const path = event.composedPath();
+      if (!path.includes(state.panel) && !path.includes(state.fab) && !path.includes(state.dialogMask)) {
+        ui.closePanel();
+      }
     });
-
-    GM_registerMenuCommand(Utils.t('menu_open'), () => {
-        isForcedShow = true; UI.init();
-        if (fab) fab.style.display = 'flex';
-        if (panel && !panel.classList.contains('show')) { panel.classList.add('show'); UI.syncPanelPos(); }
-        UI.refresh();
+    GM_registerMenuCommand(utils.t("menu_open"), () => {
+      state.isForcedShow = true;
+      ui.init();
+      if (state.fab) state.fab.style.display = "flex";
+      if (state.panel && !state.panel.classList.contains("show")) {
+        state.panel.classList.add("show");
+        ui.syncPanelPos();
+      }
+      ui.refresh();
     });
-
-    if (document.readyState === 'complete' || document.readyState === 'interactive') start();
-    else window.addEventListener('DOMContentLoaded', start);
-
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+      start();
+    } else {
+      window.addEventListener("DOMContentLoaded", start);
+    }
+  })();
 })();
