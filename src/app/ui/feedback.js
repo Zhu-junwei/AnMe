@@ -55,6 +55,63 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
         state.toastTimer = null;
       }, duration);
     },
+    setButtonLoading(button, loading, idleText = '', spinnerClassName = 'acc-inline-spinner') {
+      if (!button) return;
+      if (loading) {
+        button.style.minWidth = `${button.offsetWidth}px`;
+        button.style.minHeight = `${button.offsetHeight}px`;
+      }
+      button.disabled = loading;
+      button.classList.toggle('is-loading', loading);
+      button.innerHTML = loading ? `<span class="${spinnerClassName}" aria-hidden="true"></span>` : idleText;
+      if (!loading) {
+        button.style.minWidth = '';
+        button.style.minHeight = '';
+      }
+    },
+    async runUiAction({
+      button = null,
+      idleText = '',
+      loadingText = '',
+      errorKey = '',
+      successMessage = '',
+      successDuration = 1800,
+      action,
+      onSuccess,
+      onError
+    }) {
+      try {
+        if (button) {
+          ui.setButtonLoading(button, true, idleText);
+        } else if (loadingText) {
+          ui.toggleLoading(true, loadingText);
+        }
+
+        const result = await action();
+        if (onSuccess) {
+          await onSuccess(result);
+        }
+        if (successMessage) {
+          ui.showToast(successMessage, successDuration);
+        }
+        return result;
+      } catch (error) {
+        if (onError) {
+          const handled = await onError(error);
+          if (handled === false) {
+            return null;
+          }
+        }
+        ui.showToast(utils.getWebDavErrorMessage(error, errorKey));
+        return null;
+      } finally {
+        if (button) {
+          ui.setButtonLoading(button, false, idleText);
+        } else if (loadingText) {
+          ui.toggleLoading(false);
+        }
+      }
+    },
     async alert(message) {
       return ui.showDialog(message, false);
     },
@@ -92,16 +149,62 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
         if (cancelBtn) cancelBtn.onclick = () => close(false);
       });
     },
-    async showSaveAccountModal() {
-      if (!state.saveFormMask) {
-        state.saveFormMask = document.createElement('div');
-        state.saveFormMask.className = 'acc-form-mask';
-        state.panel.appendChild(state.saveFormMask);
+    ensureFormMask() {
+      if (state.saveFormMask) return state.saveFormMask;
+      state.saveFormMask = document.createElement('div');
+      state.saveFormMask.className = 'acc-form-mask';
+      state.panel.appendChild(state.saveFormMask);
+      return state.saveFormMask;
+    },
+    hideFormModal() {
+      if (state.saveFormMask) {
+        state.saveFormMask.style.display = 'none';
+      }
+    },
+    async showFormModal({ title, contentHtml, submitText, onOpen }) {
+      const mask = ui.ensureFormMask();
+      mask.innerHTML = `
+        <div class="acc-form-box">
+          <div class="acc-form-title">${title}</div>
+          ${contentHtml}
+          <div class="acc-form-footer">
+            <button class="acc-dialog-btn acc-dialog-btn-cancel" id="acc-form-cancel">${utils.t('dlg_cancel')}</button>
+            <button class="acc-dialog-btn acc-dialog-btn-ok" id="acc-form-submit">${submitText}</button>
+          </div>
+        </div>
+      `;
+      mask.style.display = 'flex';
+
+      const context = {
+        mask,
+        qs: (selector) => mask.querySelector(selector),
+        qsa: (selector) => [...mask.querySelectorAll(selector)],
+        cancelBtn: mask.querySelector('#acc-form-cancel'),
+        submitBtn: mask.querySelector('#acc-form-submit'),
+        close: () => ui.hideFormModal(),
+        setSubmitting: (loading, idleText = submitText) => {
+          if (context.cancelBtn) {
+            context.cancelBtn.disabled = loading;
+          }
+          ui.setButtonLoading(context.submitBtn, loading, idleText);
+        }
+      };
+
+      if (context.cancelBtn) {
+        context.cancelBtn.onclick = context.close;
       }
 
-      state.saveFormMask.innerHTML = `
-        <div class="acc-form-box">
-          <div class="acc-form-title">${utils.t('btn_save')}</div>
+      if (onOpen) {
+        await onOpen(context);
+      }
+
+      return context;
+    },
+    async showSaveAccountModal() {
+      await ui.showFormModal({
+        title: utils.t('btn_save'),
+        submitText: utils.t('btn_save'),
+        contentHtml: `
           <div class="acc-chk">
             <label class="acc-chk-label" title="Cookie"><input type="checkbox" id="form-c-ck" class="acc-custom-chk" checked> Cookie</label>
             <label class="acc-chk-label" title="LocalStorage"><input type="checkbox" id="form-c-ls" class="acc-custom-chk"> LS</label>
@@ -113,179 +216,163 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
           <input type="text" id="form-site-name" class="acc-input-text" placeholder="${utils.t('placeholder_site_name')}" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false">
           <div class="acc-form-label">${utils.t('account_name')}</div>
           <input type="text" id="form-acc-name" class="acc-input-text" placeholder="${utils.t('placeholder_name')}" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false">
-          <div class="acc-form-footer">
-            <button class="acc-dialog-btn acc-dialog-btn-cancel" id="form-cancel-btn">${utils.t('dlg_cancel')}</button>
-            <button class="acc-dialog-btn acc-dialog-btn-ok" id="form-save-btn">${utils.t('btn_save')}</button>
-          </div>
-        </div>
-      `;
+        `,
+        onOpen: async ({ qs, submitBtn, close }) => {
+          const nameInput = qs('#form-acc-name');
+          const siteNameInput = qs('#form-site-name');
+          siteNameInput.value = utils.suggestSiteName(utils.getPageTitle(), constants.HOST);
+          nameInput.value = utils.suggestAccountName(constants.HOST);
 
-      state.saveFormMask.style.display = 'flex';
+          const toggleAvailability = (selector, available) => {
+            const input = qs(selector);
+            const label = input?.closest('.acc-chk-label');
+            if (!input || !label) return;
 
-      const nameInput = ui.qs('#form-acc-name');
-      const siteNameInput = ui.qs('#form-site-name');
-      siteNameInput.value = utils.suggestSiteName(utils.getPageTitle(), constants.HOST);
-      nameInput.value = utils.suggestAccountName(constants.HOST);
-      const toggleAvailability = (selector, available) => {
-        const input = ui.qs(selector);
-        const label = input?.closest('.acc-chk-label');
-        if (!input || !label) return;
+            input.disabled = !available;
+            input.checked = available && input.id === 'form-c-ck';
+            label.classList.toggle('disabled', !available);
+          };
 
-        input.disabled = !available;
-        input.checked = available && input.id === 'form-c-ck';
-        label.classList.toggle('disabled', !available);
-      };
-      const updateState = () => {
-        const ck = ui.qs('#form-c-ck')?.checked;
-        const ls = ui.qs('#form-c-ls')?.checked;
-        const ss = ui.qs('#form-c-ss')?.checked;
-        const saveBtn = ui.qs('#form-save-btn');
-        if (!saveBtn) return;
+          const updateState = () => {
+            const ck = qs('#form-c-ck')?.checked;
+            const ls = qs('#form-c-ls')?.checked;
+            const ss = qs('#form-c-ss')?.checked;
+            const canSave =
+              (ck || ls || ss) && nameInput.value.trim().length > 0 && siteNameInput.value.trim().length > 0;
+            submitBtn.disabled = !canSave;
+          };
 
-        const canSave =
-          (ck || ls || ss) && nameInput.value.trim().length > 0 && siteNameInput.value.trim().length > 0;
-        saveBtn.disabled = !canSave;
-        saveBtn.style.opacity = canSave ? '1' : '0.5';
-        saveBtn.style.cursor = canSave ? 'pointer' : 'not-allowed';
-      };
+          ['#form-c-ck', '#form-c-ls', '#form-c-ss'].forEach((selector) => {
+            qs(selector)?.addEventListener('change', updateState);
+          });
 
-      ['#form-c-ck', '#form-c-ls', '#form-c-ss'].forEach((id) => {
-        ui.qs(id).addEventListener('change', updateState);
-      });
+          siteNameInput.addEventListener('input', updateState);
+          nameInput.addEventListener('input', updateState);
+          nameInput.addEventListener('keydown', (event) => {
+            if (event.key !== 'Enter' || submitBtn.disabled) return;
+            event.preventDefault();
+            event.stopPropagation();
+            submitBtn.click();
+          });
 
-      siteNameInput.addEventListener('input', updateState);
-      nameInput.addEventListener('input', updateState);
-      nameInput.addEventListener('keydown', async (event) => {
-        if (event.key !== 'Enter') return;
-        event.preventDefault();
-        event.stopPropagation();
-        ui.qs('#form-save-btn').click();
-      });
+          submitBtn.onclick = async () => {
+            const name = nameInput.value.trim();
+            const siteName = siteNameInput.value.trim();
+            if (!name || !siteName) return;
 
-      ui.qs('#form-cancel-btn').onclick = () => {
-        state.saveFormMask.style.display = 'none';
-      };
+            const targetKey = utils.makeKey(name);
+            if (GM_getValue(targetKey)) {
+              const confirmed = await ui.confirm(utils.t('confirm_overwrite'));
+              if (!confirmed) return;
+            }
 
-      ui.qs('#form-save-btn').onclick = async () => {
-        const name = nameInput.value.trim();
-        const siteName = siteNameInput.value.trim();
-        if (!name) return;
-        if (!siteName) return;
+            const saved = await core.saveAccount(name, siteName, {
+              ck: qs('#form-c-ck').checked,
+              ls: qs('#form-c-ls').checked,
+              ss: qs('#form-c-ss').checked
+            });
+            if (!saved) return;
 
-        const targetKey = utils.makeKey(name);
-        if (GM_getValue(targetKey)) {
-          const confirmed = await ui.confirm(utils.t('confirm_overwrite'));
-          if (!confirmed) return;
+            close();
+            ui.refresh();
+            ui.showToast(utils.t('toast_saved'));
+          };
+
+          const availableSources = await core.detectAvailableSnapshotSources();
+          toggleAvailability('#form-c-ck', availableSources.ck);
+          toggleAvailability('#form-c-ls', availableSources.ls);
+          toggleAvailability('#form-c-ss', availableSources.ss);
+          updateState();
+
+          if (utils.getSortedKeysByHost(constants.HOST).length > 0) {
+            nameInput.focus();
+            nameInput.select();
+          } else {
+            siteNameInput.focus();
+            siteNameInput.select();
+          }
         }
-
-        const saved = await core.saveAccount(name, siteName, {
-          ck: ui.qs('#form-c-ck').checked,
-          ls: ui.qs('#form-c-ls').checked,
-          ss: ui.qs('#form-c-ss').checked
-        });
-
-        if (!saved) return;
-
-        state.saveFormMask.style.display = 'none';
-        ui.refresh();
-        ui.showToast(utils.t('toast_saved'));
-      };
-
-      const availableSources = await core.detectAvailableSnapshotSources();
-      toggleAvailability('#form-c-ck', availableSources.ck);
-      toggleAvailability('#form-c-ls', availableSources.ls);
-      toggleAvailability('#form-c-ss', availableSources.ss);
-
-      updateState();
-      if (utils.getSortedKeysByHost(constants.HOST).length > 0) {
-        nameInput.focus();
-        nameInput.select();
-      } else {
-        siteNameInput.focus();
-        siteNameInput.select();
-      }
-    }
-    ,
+      });
+    },
     async showWebDavConfigModal() {
-      if (!state.saveFormMask) {
-        state.saveFormMask = document.createElement('div');
-        state.saveFormMask.className = 'acc-form-mask';
-        state.panel.appendChild(state.saveFormMask);
-      }
-
       const config = core.getWebDavConfig();
-      state.saveFormMask.innerHTML = `
-        <div class="acc-form-box">
-          <div class="acc-form-title">${utils.t('nav_webdav')}</div>
+      await ui.showFormModal({
+        title: utils.t('nav_webdav'),
+        submitText: utils.t('webdav_verify_save'),
+        contentHtml: `
           <div class="acc-form-label">${utils.t('webdav_url')}</div>
           <input type="text" id="form-webdav-url" class="acc-input-text" placeholder="${utils.t('webdav_url_placeholder')}" value="${utils.escapeHtml(config.url)}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
           <div class="acc-form-label">${utils.t('webdav_username')}</div>
           <input type="text" id="form-webdav-username" class="acc-input-text" placeholder="${utils.t('webdav_username_placeholder')}" value="${utils.escapeHtml(config.username)}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
           <div class="acc-form-label">${utils.t('webdav_password')}</div>
           <input type="password" id="form-webdav-password" class="acc-input-text" placeholder="${utils.t('webdav_password_placeholder')}" value="${utils.escapeHtml(config.password)}" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false">
-          <div class="acc-form-footer">
-            <button class="acc-dialog-btn acc-dialog-btn-cancel" id="form-webdav-cancel">${utils.t('dlg_cancel')}</button>
-            <button class="acc-dialog-btn acc-dialog-btn-ok" id="form-webdav-save">${utils.t('webdav_verify_save')}</button>
-          </div>
-        </div>
-      `;
-      state.saveFormMask.style.display = 'flex';
+        `,
+        onOpen: async ({ qs, submitBtn, setSubmitting, close }) => {
+          const urlInput = qs('#form-webdav-url');
+          const usernameInput = qs('#form-webdav-username');
+          const passwordInput = qs('#form-webdav-password');
+          let isSaving = false;
 
-      const urlInput = ui.qs('#form-webdav-url');
-      const usernameInput = ui.qs('#form-webdav-username');
-      const passwordInput = ui.qs('#form-webdav-password');
-      const saveBtn = ui.qs('#form-webdav-save');
+          const updateState = () => {
+            const canSave =
+              urlInput.value.trim().length > 0 &&
+              usernameInput.value.trim().length > 0 &&
+              passwordInput.value.length > 0;
+            [urlInput, usernameInput, passwordInput].forEach((input) => {
+              input.disabled = isSaving;
+            });
+            setSubmitting(isSaving, utils.t('webdav_verify_save'));
+            if (!isSaving) {
+              submitBtn.disabled = !canSave;
+            }
+          };
+          const setSavingState = (saving) => {
+            isSaving = saving;
+            updateState();
+          };
 
-      const updateState = () => {
-        const canSave =
-          urlInput.value.trim().length > 0 &&
-          usernameInput.value.trim().length > 0 &&
-          passwordInput.value.length > 0;
-        saveBtn.disabled = !canSave;
-        saveBtn.style.opacity = canSave ? '1' : '0.5';
-        saveBtn.style.cursor = canSave ? 'pointer' : 'not-allowed';
-      };
+          [urlInput, usernameInput, passwordInput].forEach((input) => {
+            input.addEventListener('input', updateState);
+            input.addEventListener('keydown', (event) => {
+              if (event.key === 'Enter' && !submitBtn.disabled) {
+                event.preventDefault();
+                submitBtn.click();
+              }
+            });
+          });
 
-      [urlInput, usernameInput, passwordInput].forEach((input) => {
-        input.addEventListener('input', updateState);
-        input.addEventListener('keydown', (event) => {
-          if (event.key === 'Enter' && !saveBtn.disabled) {
-            event.preventDefault();
-            saveBtn.click();
+          submitBtn.onclick = async () => {
+            const nextConfig = {
+              url: urlInput.value.trim(),
+              username: usernameInput.value.trim(),
+              password: passwordInput.value
+            };
+            try {
+              setSavingState(true);
+              const validatedConfig = await core.validateWebDavConfig(nextConfig);
+              core.saveWebDavConfig(validatedConfig);
+              close();
+              state.webdavBackups = core.getCachedWebDavBackups();
+              ui.renderWebDavView();
+              ui.showToast(utils.t('webdav_verified'));
+            } catch (error) {
+              setSavingState(false);
+              ui.showToast(utils.getWebDavErrorMessage(error, 'webdav_verify_err'));
+              return;
+            }
+            setSavingState(false);
+          };
+
+          updateState();
+          if (config.username) {
+            usernameInput.focus();
+            usernameInput.select();
+          } else {
+            urlInput.focus();
+            urlInput.select();
           }
-        });
-      });
-
-      ui.qs('#form-webdav-cancel').onclick = () => {
-        state.saveFormMask.style.display = 'none';
-      };
-
-      saveBtn.onclick = async () => {
-        const nextConfig = {
-          url: urlInput.value.trim(),
-          username: usernameInput.value.trim(),
-          password: passwordInput.value
-        };
-        try {
-          const resolvedConfig = await core.validateWebDavConfig(nextConfig);
-          core.saveWebDavConfig(resolvedConfig);
-          state.saveFormMask.style.display = 'none';
-          state.webdavBackups = core.getCachedWebDavBackups();
-          ui.renderWebDavView();
-          ui.showToast(utils.t('webdav_verified'));
-        } catch (error) {
-          await ui.alert(error.message || utils.t('webdav_verify_err'));
         }
-      };
-
-      updateState();
-      if (config.username) {
-        usernameInput.focus();
-        usernameInput.select();
-      } else {
-        urlInput.focus();
-        urlInput.select();
-      }
+      });
     }
   };
 }

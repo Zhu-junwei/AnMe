@@ -7,7 +7,9 @@
             FAB_MODE: 'cfg_fab_mode',
             FAB_POS: 'cfg_fab_pos',
             HOST_DISPLAY_MODE: 'cfg_host_display_mode',
+            HOST_ICON_CACHE: 'cfg_host_icon_cache',
             WEBDAV_CONFIG: 'cfg_webdav_config',
+            WEBDAV_SECRET: 'cfg_webdav_secret',
             WEBDAV_BACKUPS_CACHE: 'cfg_webdav_backups_cache'
         },
         HOST: location.hostname,
@@ -40,18 +42,19 @@
             CLEAN: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 7V5.5C10 4.11929 11.1193 3 12.5 3H17.5C18.8807 3 20 4.11929 20 5.5V18.5C20 19.8807 18.8807 21 17.5 21H12.5C11.1193 21 10 19.8807 10 18.5V17" stroke="currentColor" stroke-width="1.5"/><path d="M14 12H4M4 12L7 9M4 12L7 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
             BACK: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 12H4M4 12L10 6M4 12L10 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
             HOME: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 10.75L10.4697 4.72557C11.3788 3.99241 12.6212 3.99241 13.5303 4.72557L21 10.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.75 9.5V18C5.75 19.2426 6.75736 20.25 8 20.25H16C17.2426 20.25 18.25 19.2426 18.25 18V9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10 20.25V15.5C10 14.8096 10.5596 14.25 11.25 14.25H12.75C13.4404 14.25 14 14.8096 14 15.5V20.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
-            NOTICE: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 3.75H14.7574C15.753 3.75 16.7078 4.14509 17.4118 4.84835L19.1517 6.58691C19.8561 7.29054 20.2522 8.24559 20.2527 9.24102L20.2571 18C20.2571 19.7949 18.802 21.25 17.0071 21.25H7C5.20507 21.25 3.75 19.7949 3.75 18V7C3.75 5.20507 5.20507 3.75 7 3.75Z" stroke="currentColor" stroke-width="1.5"/><path d="M8 9H16M8 13H16M8 17H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+            NOTICE: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3.75C8.27208 3.75 5.25 6.77208 5.25 10.5V11.2143C5.25 12.1418 4.93935 13.0426 4.36716 13.7727L3.73289 14.5818C3.06791 15.4302 3.67234 16.6754 4.75031 16.6754H19.2497C20.3277 16.6754 20.9321 15.4302 20.2671 14.5818L19.6328 13.7727C19.0607 13.0426 18.75 12.1418 18.75 11.2143V10.5C18.75 6.77208 15.7279 3.75 12 3.75Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9.75 19C10.2373 19.7252 11.0642 20.25 12 20.25C12.9358 20.25 13.7627 19.7252 14.25 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M12 7.75V10.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="13.25" r="1" fill="currentColor"/></svg>`,
         }
     };
 
 export const I18N_DATA = {
-      zh: {_name:"简体中文",nav_set:"高级设置",nav_notice:"使用声明",nav_about:"关于脚本",back_current_host:"返回当前网站账号",open_site:"打开网站",edit_site_name:"编辑站点名字",search_site:"搜索网站...",search_accounts:"搜索账号",close_search_accounts:"关闭搜索",search_accounts_placeholder:"搜索当前网站账号...",account_settings:"账号设置",site_name:"站点名称",account_name:"账号名称",save_changes:"保存修改",btn_delete_account:"删除该账号",danger_zone:"危险操作",rename_conflict:"该名称已存在，请换一个名称。",confirm_delete: "确定要删除该账号记录吗？",placeholder_site_name:"给当前网站命名...",placeholder_name:"给新账号命名...",tip_help:"切换登录失败？尝试勾选 LocalStorage 和 SessionStorage。",tip_lock:"为保证正常读取Cookie，请在篡改猴高级模式下，设置允许脚本访问 Cookie: ALL",btn_save:"保存当前账号",confirm_overwrite: "⚠️ 该名称已存在，确定要覆盖原有记录吗？",btn_clean:"切换新环境 (清空本站痕迹)",save_empty_err:"⚠️ 没有检测到可保存的数据",copy_account_name:"复制账号名",copy_failed:"复制失败，请手动复制。",toast_saved:"账号已保存",toast_renamed:"账号名称已更新",toast_deleted:"账号已删除",toast_copied:"账号名已复制",toast_site_name_updated:"站点名称已更新",set_fab_mode:"悬浮球显示模式",fab_auto:"智能",fab_show:"常驻",fab_hide:"隐藏",fab_auto_title:"有账号记录时自动显示，无记录时隐藏",fab_show_title:"始终显示悬浮球",fab_hide_title:"平时不显示，仅能通过菜单唤起",set_lang:"语言设置 / Language",set_host_display_mode:"站点列表显示模式",host_display_mode_site_name:"站点名字",host_display_mode_domain:"域名",set_backup:"数据备份与还原",btn_exp_curr:"导出当前网站数据",btn_exp_all:"导出脚本全部数据",btn_imp:"导入备份文件",donate:"支持作者",btn_clear_all:"清空脚本所有数据 (慎用)",notice_title:"《使用声明与免责条款》",back:"← 返回上一级",no_data:"🍃 暂无账号记录",confirm_clean:"确定清空当前网站所有痕迹并开启新环境？",confirm_clear_all:"⚠️ 警告：这将删除本脚本保存的所有网站的所有账号数据！且无法恢复！",import_ok:"✅ 成功导入/更新 {count} 个账号！",import_err:"❌ 导入失败：文件格式错误",export_err:"⚠️ 没有可导出的数据",menu_open:"🚀 开启账号管理",dlg_ok:"确定",dlg_cancel:"取消",about_desc:"通用多网站多账号切换器",notice_content:`<h4>1. 脚本功能说明</h4><p>本脚本通过篡改猴插件提供的存储API，将当前网站的 Cookie、LocalStorage 和 SessionStorage 进行快照保存。当您点击切换时，脚本会清空当前痕迹并还原选中的快照数据，从而实现多账号快速登录。</p><h4>2. 数据存储与联网说明</h4><p>账号数据默认存储在您浏览器的篡改猴插件内部管理器中（GM_setValue）。脚本默认不会主动联网或上传数据；只有在您手动配置并使用 WebDAV 云同步功能时，脚本才会按您的操作访问您指定的远程服务并上传或下载备份文件。</p><h4>3. 风险提示</h4><p>由于浏览器环境的开放性，本脚本无法阻止同域名下的其他恶意脚本通过篡改猴 API 或存储机制尝试获取这些数据。请勿在公共电脑或不可信的设备环境中使用本脚本保存重要账号。</p><h4>4. 免责声明</h4><p>本脚本仅供学习交流使用。因使用本脚本导致的账号被封禁、数据泄露或任何形式的损失，作者不承担任何法律责任。</p>`},
-      en: {_name:"English",nav_set:"Settings",nav_notice:"Disclaimer",nav_about:"About",back_current_host:"Back to current site",open_site:"Open site",edit_site_name:"Edit site name",search_site:"Search sites...",search_accounts:"Search accounts",close_search_accounts:"Close search",search_accounts_placeholder:"Search accounts on this site...",account_settings:"Account Settings",site_name:"Site Name",account_name:"Account Name",save_changes:"Save Changes",btn_delete_account:"Delete Account",danger_zone:"Danger Zone",rename_conflict:"This name already exists. Please choose another one.",confirm_delete: "Are you sure you want to delete this account?",placeholder_site_name:"Name this site...",placeholder_name:"Name this account...",tip_help:"Switch failed? Try checking LocalStorage/SessionStorage.",tip_lock:"To ensure cookies can be read correctly, open Tampermonkey’s Advanced Settings and change “Allow scripts to access cookies” to “ALL”.",btn_save:"Save Current",confirm_overwrite: "⚠️ Name already exists. Do you want to overwrite it?",btn_clean:"Switch to a new environment (clear all data for this site)",save_empty_err:"⚠️ No data detected to save",copy_account_name:"Copy account name",copy_failed:"Copy failed. Please copy it manually.",toast_saved:"Account saved",toast_renamed:"Account name updated",toast_deleted:"Account deleted",toast_copied:"Account name copied",toast_site_name_updated:"Site name updated",set_fab_mode:"Float Button Mode",fab_auto:"Auto",fab_show:"Show",fab_hide:"Hide",fab_auto_title:"Automatically show when accounts exist, hide when none",fab_show_title:"Always show the floating button",fab_hide_title:"Hidden by default, can only be activated via the menu",set_lang:"语言设置 / Language",set_host_display_mode:"Site List Display",host_display_mode_site_name:"Site Name",host_display_mode_domain:"Domain",set_backup:"Backup & Restore",btn_exp_curr:"Export Current Site",btn_exp_all:"Export All Data",btn_imp:"Import Backup",donate:"Buy me a coffee",btn_clear_all:"Clear all script data (use with caution)",notice_title:"Disclaimer & Terms",back:"← Back",no_data:"🍃 No accounts",confirm_clean:"Are you sure you want to clear all traces of the current website and start a new environment?",confirm_clear_all:"⚠️ Warning: This will delete all account data for all websites saved by this script, and cannot be undone!",import_ok:"✅ Successfully imported/updated {count} account(s)!",import_err:"❌ Invalid format",export_err:"⚠️ No data",menu_open:"🚀 Open Manager",dlg_ok:"OK",dlg_cancel:"Cancel",about_desc:"Universal Multi-Site Account Switcher",notice_content:`<h4>1. Script Functionality</h4><p>This script utilizes the storage API provided by Tampermonkey to take snapshots of the current website's Cookies, LocalStorage, and SessionStorage. When switching accounts, the script clears current session data and restores the selected snapshot, enabling rapid multi-account login.</p><h4>2. Data Storage & Network Access</h4><p>Account data is stored locally in your browser's Tampermonkey extension manager (via GM_setValue) by default. The script does not proactively upload data or access remote services unless you explicitly configure and use the WebDAV sync feature; only then will it connect to the WebDAV server you specified to upload or download backup files.</p><h4>3. Risk Warning</h4><p>Due to the open nature of browser environments, this script cannot prevent other malicious scripts on the same domain from attempting to access data via storage mechanisms. Please avoid using this script to save sensitive accounts on public or untrusted devices.</p><h4>4. Disclaimer</h4><p>This script is intended for educational and exchange purposes only. The author shall not be held legally responsible for any account bans, data breaches, or any form of loss resulting from the use of this script.</p>`},
-      es: {_name:"Español",nav_set:"Configuración",nav_notice:"Aviso legal",nav_about:"Acerca de",back_current_host:"Volver al sitio actual",open_site:"Abrir sitio",edit_site_name:"Editar nombre del sitio",search_site:"Buscar sitios...",search_accounts:"Buscar cuentas",close_search_accounts:"Cerrar búsqueda",search_accounts_placeholder:"Buscar cuentas en este sitio...",account_settings:"Configuración de la cuenta",site_name:"Nombre del sitio",account_name:"Nombre de la cuenta",save_changes:"Guardar cambios",btn_delete_account:"Eliminar cuenta",danger_zone:"Zona peligrosa",rename_conflict:"Ese nombre ya existe. Usa otro nombre.",confirm_delete: "¿Estás seguro de que deseas eliminar esta cuenta?",placeholder_site_name:"Nombre para este sitio...",placeholder_name:"Nombre para esta cuenta...",tip_help:"¿Falló el cambio de cuenta? Intenta marcar LocalStorage y SessionStorage.",tip_lock:"Para garantizar la correcta lectura de cookies, abre la configuración avanzada de Tampermonkey y establece “Permitir que los scripts accedan a cookies” en “ALL”.",btn_save:"Guardar cuenta actual",confirm_overwrite: "⚠️ El nombre ya existe. ¿Deseas sobrescribirlo?",btn_clean:"Cambiar a un nuevo entorno (borrar datos del sitio)",save_empty_err:"⚠️ No se detectaron datos para guardar",copy_account_name:"Copiar nombre de la cuenta",copy_failed:"No se pudo copiar. Cópialo manualmente.",toast_saved:"Cuenta guardada",toast_renamed:"Nombre de cuenta actualizado",toast_deleted:"Cuenta eliminada",toast_copied:"Nombre de cuenta copiado",toast_site_name_updated:"Nombre del sitio actualizado",set_fab_mode:"Modo del botón flotante",fab_auto:"Automático",fab_show:"Siempre visible",fab_hide:"Oculto",fab_auto_title:"Se muestra automáticamente cuando hay cuentas guardadas; se oculta si no hay ninguna",fab_show_title:"El botón flotante se muestra siempre",fab_hide_title:"Oculto por defecto, solo accesible desde el menú",set_lang:"Idioma / Language",set_host_display_mode:"Modo de lista de sitios",host_display_mode_site_name:"Nombre del sitio",host_display_mode_domain:"Dominio",set_backup:"Copia de seguridad y restauración",btn_exp_curr:"Exportar datos del sitio actual",btn_exp_all:"Exportar todos los datos del script",btn_imp:"Importar archivo de respaldo",donate:"Apoyar al autor",btn_clear_all:"Borrar todos los datos del script (usar con precaución)",notice_title:"Términos de uso y descargo de responsabilidad",back:"← Volver",no_data:"🍃 No hay cuentas",confirm_clean:"¿Seguro que deseas borrar todos los rastros del sitio actual y comenzar un nuevo entorno?",confirm_clear_all:"⚠️ Advertencia: Esto eliminará todos los datos de cuentas de todos los sitios guardados por este script. ¡Esta acción no se puede deshacer!",import_ok:"✅ Se importaron/actualizaron correctamente {count} cuenta(s)",import_err:"❌ Error de importación: formato de archivo inválido",export_err:"⚠️ No hay datos para exportar",menu_open:"🚀 Abrir gestor de cuentas",dlg_ok:"Aceptar",dlg_cancel:"Cancelar",about_desc:"Conmutador universal de múltiples cuentas para múltiples sitios",notice_content:`<h4>1. Funcionalidad del script</h4><p>Este script utiliza la API de almacenamiento proporcionada por Tampermonkey para guardar instantáneas de las Cookies, LocalStorage y SessionStorage del sitio web actual. Al cambiar de cuenta, el script borra los datos actuales y restaura la instantánea seleccionada, permitiendo un inicio de sesión rápido con múltiples cuentas.</p><h4>2. Almacenamiento y acceso de red</h4><p>Los datos de las cuentas se almacenan localmente en el administrador interno de Tampermonkey (mediante GM_setValue) de forma predeterminada. El script no sube datos ni accede a servicios remotos por iniciativa propia; solo se conectará al servidor WebDAV que configures cuando habilites y utilices explícitamente la función de sincronización para subir o descargar copias de seguridad.</p><h4>3. Advertencia de riesgo</h4><p>Debido a la naturaleza abierta del entorno del navegador, este script no puede impedir que otros scripts maliciosos bajo el mismo dominio intenten acceder a estos datos mediante mecanismos de almacenamiento. Evita guardar cuentas sensibles en equipos públicos o no confiables.</p><h4>4. Descargo de responsabilidad</h4><p>Este script se proporciona únicamente con fines educativos y de intercambio. El autor no asume ninguna responsabilidad legal por bloqueos de cuentas, fugas de datos o cualquier tipo de pérdida derivada del uso de este script.</p>`}
+      zh: {_name:"简体中文",nav_set:"高级设置",nav_notice:"使用声明",nav_about:"关于脚本",back_current_host:"返回当前网站账号",open_site:"打开网站",edit_site_name:"编辑站点名字",search_site:"搜索网站...",search_accounts:"搜索账号",close_search_accounts:"关闭搜索",search_accounts_placeholder:"搜索当前网站账号...",account_settings:"账号设置",site_name:"站点名称",account_name:"账号名称",save_changes:"保存修改",btn_delete_account:"删除该账号",danger_zone:"危险操作",rename_conflict:"该名称已存在，请换一个名称。",confirm_delete: "确定要删除该账号记录吗？",placeholder_site_name:"给当前网站命名...",placeholder_name:"给新账号命名...",tip_help:"切换登录失败？尝试勾选 LocalStorage 和 SessionStorage。",tip_lock:"为保证正常读取Cookie，请在篡改猴高级模式下，设置允许脚本访问 Cookie: ALL",btn_save:"保存当前账号",confirm_overwrite: "⚠️ 该名称已存在，确定要覆盖原有记录吗？",btn_clean:"切换新环境 (清空本站痕迹)",save_empty_err:"⚠️ 没有检测到可保存的数据",copy_account_name:"复制账号名",copy_failed:"复制失败，请手动复制。",toast_saved:"账号已保存",toast_renamed:"账号名称已更新",toast_deleted:"账号已删除",toast_copied:"账号名已复制",toast_site_name_updated:"站点名称已更新",set_fab_mode:"悬浮球显示模式",fab_auto:"智能",fab_show:"常驻",fab_hide:"隐藏",fab_auto_title:"有账号记录时自动显示，无记录时隐藏",fab_show_title:"始终显示悬浮球",fab_hide_title:"平时不显示，仅能通过菜单唤起",set_lang:"语言设置 / Language",set_host_display_mode:"站点列表显示模式",host_display_mode_site_name:"站点名字",host_display_mode_domain:"域名",set_backup:"数据备份与还原",btn_exp_curr:"导出当前网站数据",btn_exp_all:"导出全部网站数据",btn_imp:"导入备份文件",donate:"支持作者",btn_clear_all:"清空脚本所有数据 (慎用)",notice_title:"《使用声明与免责条款》",back:"← 返回上一级",no_data:"🍃 暂无账号记录",confirm_clean:"确定清空当前网站所有痕迹并开启新环境？",confirm_clear_all:"⚠️ 警告：这将删除本脚本保存的所有网站的所有账号数据！且无法恢复！",import_ok:"✅ 成功导入/更新 {count} 个账号！",import_err:"❌ 导入失败：文件格式错误",export_err:"⚠️ 没有可导出的数据",menu_open:"🚀 开启账号管理",dlg_ok:"确定",dlg_cancel:"取消",about_desc:"通用多网站多账号切换器",notice_content:`<h4>1. 脚本功能说明</h4><p>本脚本通过篡改猴插件提供的存储API，将当前网站的 Cookie、LocalStorage 和 SessionStorage 进行快照保存。当您点击切换时，脚本会清空当前痕迹并还原选中的快照数据，从而实现多账号快速登录。</p><h4>2. 数据存储与联网说明</h4><p>账号数据默认存储在您浏览器的篡改猴插件内部管理器中（GM_setValue）。脚本默认不会主动联网或上传数据；只有在您手动配置并使用 WebDAV 云同步功能时，脚本才会按您的操作访问您指定的远程服务并上传或下载备份文件。</p><h4>3. 风险提示</h4><p>由于浏览器环境的开放性，本脚本无法阻止同域名下的其他恶意脚本通过篡改猴 API 或存储机制尝试获取这些数据。请勿在公共电脑或不可信的设备环境中使用本脚本保存重要账号。</p><h4>4. 免责声明</h4><p>本脚本仅供学习交流使用。因使用本脚本导致的账号被封禁、数据泄露或任何形式的损失，作者不承担任何法律责任。</p>`},
+      en: {_name:"English",nav_set:"Settings",nav_notice:"Disclaimer",nav_about:"About",back_current_host:"Back to current site",open_site:"Open site",edit_site_name:"Edit site name",search_site:"Search sites...",search_accounts:"Search accounts",close_search_accounts:"Close search",search_accounts_placeholder:"Search accounts on this site...",account_settings:"Account Settings",site_name:"Site Name",account_name:"Account Name",save_changes:"Save Changes",btn_delete_account:"Delete Account",danger_zone:"Danger Zone",rename_conflict:"This name already exists. Please choose another one.",confirm_delete: "Are you sure you want to delete this account?",placeholder_site_name:"Name this site...",placeholder_name:"Name this account...",tip_help:"Switch failed? Try checking LocalStorage/SessionStorage.",tip_lock:"To ensure cookies can be read correctly, open Tampermonkey’s Advanced Settings and change “Allow scripts to access cookies” to “ALL”.",btn_save:"Save Current",confirm_overwrite: "⚠️ Name already exists. Do you want to overwrite it?",btn_clean:"Switch to a new environment (clear all data for this site)",save_empty_err:"⚠️ No data detected to save",copy_account_name:"Copy account name",copy_failed:"Copy failed. Please copy it manually.",toast_saved:"Account saved",toast_renamed:"Account name updated",toast_deleted:"Account deleted",toast_copied:"Account name copied",toast_site_name_updated:"Site name updated",set_fab_mode:"Float Button Mode",fab_auto:"Auto",fab_show:"Show",fab_hide:"Hide",fab_auto_title:"Automatically show when accounts exist, hide when none",fab_show_title:"Always show the floating button",fab_hide_title:"Hidden by default, can only be activated via the menu",set_lang:"语言设置 / Language",set_host_display_mode:"Site List Display",host_display_mode_site_name:"Site Name",host_display_mode_domain:"Domain",set_backup:"Backup & Restore",btn_exp_curr:"Export Current Site",btn_exp_all:"Export All Sites Data",btn_imp:"Import Backup",donate:"Buy me a coffee",btn_clear_all:"Clear all script data (use with caution)",notice_title:"Disclaimer & Terms",back:"← Back",no_data:"🍃 No accounts",confirm_clean:"Are you sure you want to clear all traces of the current website and start a new environment?",confirm_clear_all:"⚠️ Warning: This will delete all account data for all websites saved by this script, and cannot be undone!",import_ok:"✅ Successfully imported/updated {count} account(s)!",import_err:"❌ Invalid format",export_err:"⚠️ No data",menu_open:"🚀 Open Manager",dlg_ok:"OK",dlg_cancel:"Cancel",about_desc:"Universal Multi-Site Account Switcher",notice_content:`<h4>1. Script Functionality</h4><p>This script utilizes the storage API provided by Tampermonkey to take snapshots of the current website's Cookies, LocalStorage, and SessionStorage. When switching accounts, the script clears current session data and restores the selected snapshot, enabling rapid multi-account login.</p><h4>2. Data Storage & Network Access</h4><p>Account data is stored locally in your browser's Tampermonkey extension manager (via GM_setValue) by default. The script does not proactively upload data or access remote services unless you explicitly configure and use the WebDAV sync feature; only then will it connect to the WebDAV server you specified to upload or download backup files.</p><h4>3. Risk Warning</h4><p>Due to the open nature of browser environments, this script cannot prevent other malicious scripts on the same domain from attempting to access data via storage mechanisms. Please avoid using this script to save sensitive accounts on public or untrusted devices.</p><h4>4. Disclaimer</h4><p>This script is intended for educational and exchange purposes only. The author shall not be held legally responsible for any account bans, data breaches, or any form of loss resulting from the use of this script.</p>`},
+      es: {_name:"Español",nav_set:"Configuración",nav_notice:"Aviso legal",nav_about:"Acerca de",back_current_host:"Volver al sitio actual",open_site:"Abrir sitio",edit_site_name:"Editar nombre del sitio",search_site:"Buscar sitios...",search_accounts:"Buscar cuentas",close_search_accounts:"Cerrar búsqueda",search_accounts_placeholder:"Buscar cuentas en este sitio...",account_settings:"Configuración de la cuenta",site_name:"Nombre del sitio",account_name:"Nombre de la cuenta",save_changes:"Guardar cambios",btn_delete_account:"Eliminar cuenta",danger_zone:"Zona peligrosa",rename_conflict:"Ese nombre ya existe. Usa otro nombre.",confirm_delete: "¿Estás seguro de que deseas eliminar esta cuenta?",placeholder_site_name:"Nombre para este sitio...",placeholder_name:"Nombre para esta cuenta...",tip_help:"¿Falló el cambio de cuenta? Intenta marcar LocalStorage y SessionStorage.",tip_lock:"Para garantizar la correcta lectura de cookies, abre la configuración avanzada de Tampermonkey y establece “Permitir que los scripts accedan a cookies” en “ALL”.",btn_save:"Guardar cuenta actual",confirm_overwrite: "⚠️ El nombre ya existe. ¿Deseas sobrescribirlo?",btn_clean:"Cambiar a un nuevo entorno (borrar datos del sitio)",save_empty_err:"⚠️ No se detectaron datos para guardar",copy_account_name:"Copiar nombre de la cuenta",copy_failed:"No se pudo copiar. Cópialo manualmente.",toast_saved:"Cuenta guardada",toast_renamed:"Nombre de cuenta actualizado",toast_deleted:"Cuenta eliminada",toast_copied:"Nombre de cuenta copiado",toast_site_name_updated:"Nombre del sitio actualizado",set_fab_mode:"Modo del botón flotante",fab_auto:"Automático",fab_show:"Siempre visible",fab_hide:"Oculto",fab_auto_title:"Se muestra automáticamente cuando hay cuentas guardadas; se oculta si no hay ninguna",fab_show_title:"El botón flotante se muestra siempre",fab_hide_title:"Oculto por defecto, solo accesible desde el menú",set_lang:"Idioma / Language",set_host_display_mode:"Modo de lista de sitios",host_display_mode_site_name:"Nombre del sitio",host_display_mode_domain:"Dominio",set_backup:"Copia de seguridad y restauración",btn_exp_curr:"Exportar datos del sitio actual",btn_exp_all:"Exportar todos los datos de los sitios",btn_imp:"Importar archivo de respaldo",donate:"Apoyar al autor",btn_clear_all:"Borrar todos los datos del script (usar con precaución)",notice_title:"Términos de uso y descargo de responsabilidad",back:"← Volver",no_data:"🍃 No hay cuentas",confirm_clean:"¿Seguro que deseas borrar todos los rastros del sitio actual y comenzar un nuevo entorno?",confirm_clear_all:"⚠️ Advertencia: Esto eliminará todos los datos de cuentas de todos los sitios guardados por este script. ¡Esta acción no se puede deshacer!",import_ok:"✅ Se importaron/actualizaron correctamente {count} cuenta(s)",import_err:"❌ Error de importación: formato de archivo inválido",export_err:"⚠️ No hay datos para exportar",menu_open:"🚀 Abrir gestor de cuentas",dlg_ok:"Aceptar",dlg_cancel:"Cancelar",about_desc:"Conmutador universal de múltiples cuentas para múltiples sitios",notice_content:`<h4>1. Funcionalidad del script</h4><p>Este script utiliza la API de almacenamiento proporcionada por Tampermonkey para guardar instantáneas de las Cookies, LocalStorage y SessionStorage del sitio web actual. Al cambiar de cuenta, el script borra los datos actuales y restaura la instantánea seleccionada, permitiendo un inicio de sesión rápido con múltiples cuentas.</p><h4>2. Almacenamiento y acceso de red</h4><p>Los datos de las cuentas se almacenan localmente en el administrador interno de Tampermonkey (mediante GM_setValue) de forma predeterminada. El script no sube datos ni accede a servicios remotos por iniciativa propia; solo se conectará al servidor WebDAV que configures cuando habilites y utilices explícitamente la función de sincronización para subir o descargar copias de seguridad.</p><h4>3. Advertencia de riesgo</h4><p>Debido a la naturaleza abierta del entorno del navegador, este script no puede impedir que otros scripts maliciosos bajo el mismo dominio intenten acceder a estos datos mediante mecanismos de almacenamiento. Evita guardar cuentas sensibles en equipos públicos o no confiables.</p><h4>4. Descargo de responsabilidad</h4><p>Este script se proporciona únicamente con fines educativos y de intercambio. El autor no asume ninguna responsabilidad legal por bloqueos de cuentas, fugas de datos o cualquier tipo de pérdida derivada del uso de este script.</p>`}
     };
 
 Object.assign(I18N_DATA.zh, {
     nav_webdav: "WebDAV 同步",
+    default_account_prefix: "账号",
     webdav_account: "WebDAV 账号",
     webdav_config: "设置",
     webdav_not_configured: "尚未配置 WebDAV",
@@ -66,6 +69,7 @@ Object.assign(I18N_DATA.zh, {
     webdav_sync: "云同步",
     webdav_sync_now: "备份",
     webdav_refresh: "刷新列表",
+    webdav_refresh_ok: "刷新成功",
     webdav_backup_list: "云端备份列表",
     webdav_restore: "恢复",
     webdav_delete: "删除",
@@ -89,12 +93,14 @@ Object.assign(I18N_DATA.zh, {
     webdav_logout_confirm: "确定退出 WebDAV 并删除本地保存的账号信息吗？",
     webdav_logout_ok: "已退出 WebDAV",
     webdav_timeout: "WebDAV 请求超时，请检查网络或服务状态。",
+    webdav_timeout_check_settings: "已超时，请检查 WebDAV 设置。",
     sync_restore_ok: "✅ 已从云端同步恢复 {count} 个账号！",
     sync_restore_err: "云端恢复失败，压缩包或数据文件无效。"
 });
 
 Object.assign(I18N_DATA.en, {
     nav_webdav: "WebDAV Sync",
+    default_account_prefix: "Account",
     webdav_account: "WebDAV Account",
     webdav_config: "Settings",
     webdav_not_configured: "WebDAV is not configured yet",
@@ -109,6 +115,7 @@ Object.assign(I18N_DATA.en, {
     webdav_sync: "Cloud Sync",
     webdav_sync_now: "Backup",
     webdav_refresh: "Refresh List",
+    webdav_refresh_ok: "List refreshed",
     webdav_backup_list: "Cloud Backup List",
     webdav_restore: "Restore",
     webdav_delete: "Delete",
@@ -132,12 +139,14 @@ Object.assign(I18N_DATA.en, {
     webdav_logout_confirm: "Sign out of WebDAV and remove the saved local account info?",
     webdav_logout_ok: "Signed out of WebDAV",
     webdav_timeout: "WebDAV request timed out. Check the network or server status.",
+    webdav_timeout_check_settings: "Request timed out. Please check your WebDAV settings.",
     sync_restore_ok: "✅ Restored {count} account(s) from cloud sync!",
     sync_restore_err: "Cloud restore failed. The archive or data file is invalid."
 });
 
 Object.assign(I18N_DATA.es, {
     nav_webdav: "Sincronización WebDAV",
+    default_account_prefix: "Cuenta",
     webdav_account: "Cuenta WebDAV",
     webdav_config: "Configurar",
     webdav_not_configured: "WebDAV aún no está configurado",
@@ -152,6 +161,7 @@ Object.assign(I18N_DATA.es, {
     webdav_sync: "Sincronización en la nube",
     webdav_sync_now: "Respaldar",
     webdav_refresh: "Actualizar lista",
+    webdav_refresh_ok: "Lista actualizada",
     webdav_backup_list: "Lista de copias en la nube",
     webdav_restore: "Restaurar",
     webdav_delete: "Eliminar",
@@ -175,6 +185,7 @@ Object.assign(I18N_DATA.es, {
     webdav_logout_confirm: "¿Cerrar sesión de WebDAV y eliminar la información guardada localmente?",
     webdav_logout_ok: "WebDAV desconectado",
     webdav_timeout: "La solicitud de WebDAV agotó el tiempo de espera. Revisa la red o el servidor.",
+    webdav_timeout_check_settings: "Se agotó el tiempo de espera. Revisa la configuración de WebDAV.",
     sync_restore_ok: "✅ Se restauraron {count} cuenta(s) desde la sincronización en la nube.",
     sync_restore_err: "La restauración en la nube falló. El archivo comprimido o los datos no son válidos."
 });
@@ -200,28 +211,34 @@ export const STYLE_CSS = `
         .acc-header-actions { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); display: none; gap: 6px; align-items: center; }
         .acc-header-right-actions { position:absolute; right:15px; top:50%; transform:translateY(-50%); display:flex; gap:6px; align-items:center; }
         .acc-header-title { font-size: 14px; font-weight: bold; color: #333; text-align: center; }
-        #acc-close-btn { cursor: pointer; color: #ccc; font-size: 16px; padding: 5px; transition: color 0.2s; line-height:1; }
-        #acc-close-btn:hover { color: #666; }
-
         .acc-tab-content { flex: 1; display: none; padding: 15px 15px 0 15px; overflow: hidden; flex-direction: column; background: #fff; }
         .acc-tab-content.active { display: flex; }
         .acc-mgr-toolbar { display:flex; gap:8px; margin-bottom:10px; align-items:center; min-height:30px; }
         .acc-mgr-host-row { display:flex; gap:5px; align-items:center; flex:1; min-width:0; position:relative; min-height:30px; }
         .acc-host-picker { position:relative; flex:1; min-width:0; min-height:30px; }
-        .acc-host-search-input { display:none; width:100%; height:30px; box-sizing:border-box; border:1px solid #e4e8ee; border-radius:6px; padding:7px 10px; font-size:12px; outline:none; color:#333; background:#fff; }
+        .acc-host-search-input { display:none; width:100%; height:30px; box-sizing:border-box; border:1px solid #d0d5dd; border-radius:6px; padding:7px 10px; font-size:12px; outline:none; color:#333; background:#fff; }
         .acc-host-search-input:focus { border-color:#2196F3; box-shadow:0 0 0 2px rgba(33, 150, 243, 0.12); }
         .acc-host-picker.open .acc-host-trigger { display:none; }
         .acc-host-picker.open .acc-host-search-input { display:block; }
         .acc-account-search-box { display:none; flex:1; min-width:0; min-height:30px; }
         .acc-mgr-host-row.searching .acc-host-picker { display:none; }
         .acc-mgr-host-row.searching .acc-account-search-box { display:block; }
-        .acc-host-trigger { width:100%; min-width:0; height:30px; box-sizing:border-box; padding:6px 28px 6px 10px; font-size:12px; border:1px solid #eee; border-radius:4px; outline:none; cursor:pointer; background:#fff; color:#333; text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; position:relative; }
+        .acc-host-trigger { width:100%; min-width:0; height:30px; box-sizing:border-box; padding:6px 28px 6px 10px; font-size:12px; border:1px solid #d0d5dd; border-radius:4px; outline:none; cursor:pointer; background:#fff; color:#333; text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; position:relative; }
+        .acc-host-trigger-content,
+        .acc-host-option-content { display:flex; align-items:center; gap:8px; min-width:0; width:100%; }
+        .acc-host-trigger-label,
+        .acc-host-option-label { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .acc-host-icon { width:16px; height:16px; min-width:16px; border-radius:4px; overflow:hidden; border:none; background:transparent; display:inline-flex; align-items:center; justify-content:center; position:relative; flex-shrink:0; box-sizing:border-box; }
+        .acc-host-favicon { width:100%; height:100%; display:block; object-fit:cover; background:transparent; }
+        .acc-host-icon-fallback { position:absolute; inset:0; display:none; align-items:center; justify-content:center; font-size:9px; font-weight:700; color:#667085; text-transform:uppercase; background:#eef2f6; border-radius:4px; }
+        .acc-host-icon.is-fallback .acc-host-favicon { display:none; }
+        .acc-host-icon.is-fallback .acc-host-icon-fallback { display:flex; }
         .acc-host-trigger::after { content:""; position:absolute; right:10px; top:50%; width:7px; height:7px; border-right:1.5px solid currentColor; border-bottom:1.5px solid currentColor; transform:translateY(-65%) rotate(45deg); opacity:0.7; transition:transform 0.15s ease; }
         .acc-host-picker.open .acc-host-trigger { border-color:#2196F3; box-shadow:0 0 0 2px rgba(33, 150, 243, 0.12); }
         .acc-host-picker.open .acc-host-trigger::after { transform:translateY(-30%) rotate(225deg); }
-        .acc-host-menu { position:absolute; top:calc(100% + 4px); left:0; right:0; background:#fff; border:1px solid #e4e8ee; border-radius:8px; box-shadow:0 10px 24px rgba(15, 23, 42, 0.12); padding:6px; display:none; max-height:320px; overflow:hidden; z-index:20; overscroll-behavior:contain; }
+        .acc-host-menu { position:absolute; top:calc(100% + 4px); left:0; right:0; background:#fff; border:1px solid #d0d5dd; border-radius:8px; box-shadow:0 10px 24px rgba(15, 23, 42, 0.12); padding:6px; display:none; max-height:320px; overflow:hidden; z-index:20; overscroll-behavior:contain; }
         .acc-host-picker.open .acc-host-menu { display:block; }
-        .acc-account-search-input { width:100%; height:30px; box-sizing:border-box; border:1px solid #e4e8ee; border-radius:6px; padding:7px 10px; font-size:12px; outline:none; color:#333; background:#fff; }
+        .acc-account-search-input { width:100%; height:30px; box-sizing:border-box; border:1px solid #d0d5dd; border-radius:6px; padding:7px 10px; font-size:12px; outline:none; color:#333; background:#fff; }
         .acc-account-search-input:focus { border-color:#2196F3; box-shadow:0 0 0 2px rgba(33, 150, 243, 0.12); }
         .acc-host-list { max-height:266px; overflow-y:auto; overscroll-behavior:contain; }
         .acc-host-list::-webkit-scrollbar { width:6px; }
@@ -253,10 +270,12 @@ export const STYLE_CSS = `
         .acc-host-edit-cancel:hover { border-color:#2196F3; color:#2196F3; background:#f5fbff; }
         .acc-host-empty { padding:10px; font-size:12px; color:#8a94a3; text-align:center; }
         .acc-toolbar-btn { width:30px; height:30px; border:1px solid #ddd; background:#fff; border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#555; padding:0; transition:0.2s; }
+        .acc-toolbar-btn:disabled { opacity:.5; cursor:not-allowed; }
         .acc-toolbar-btn svg { font-size:16px; }
         .acc-toolbar-btn:hover { background:#e3f2fd; border-color:#2196F3; color:#2196F3; }
 
         .acc-scroll-area { flex: 1; overflow-y: auto; padding-right: 4px; margin-top: 2px; overscroll-behavior: contain;}
+        #switch-area { padding-left:12px; padding-right:12px; margin-left:-12px; margin-right:-12px; }
         .acc-scroll-area::-webkit-scrollbar { width: 4px; }
         .acc-scroll-area::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; }
 
@@ -281,8 +300,11 @@ export const STYLE_CSS = `
         .acc-dialog-msg { font-size: 14px; color: #333; margin-bottom: 20px; line-height: 1.5; text-align: center; white-space: pre-wrap; font-weight: 500; }
         .acc-dialog-footer { display: flex; gap: 10px; }
         .acc-dialog-btn { flex: 1; padding: 8px 0; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.1s; }
+        .acc-dialog-btn:disabled { opacity:.5; cursor:not-allowed; }
         .acc-dialog-btn-ok { background: #2196F3; color: white; }
         .acc-dialog-btn-ok:hover { background: #1976D2; }
+        .acc-dialog-btn-ok.is-loading { display:flex; align-items:center; justify-content:center; }
+        .acc-inline-spinner { width:14px; height:14px; border:2px solid rgba(255,255,255,.35); border-top-color:#fff; border-radius:50%; animation:acc-spin .8s linear infinite; }
         .acc-dialog-btn-cancel { background: #f5f5f5; color: #666; }
         .acc-dialog-btn-cancel:hover { background: #e0e0e0; }
         .acc-form-mask { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 2000006; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
@@ -297,18 +319,19 @@ export const STYLE_CSS = `
         .acc-toast-text { overflow:hidden; text-overflow:ellipsis; }
 
         /* Others ... */
-        .acc-switch-item { display:flex; align-items:stretch; gap:2px; margin-bottom:8px; position:relative; }
-        .acc-switch-card { flex:1; min-width:0; padding: 12px; padding-right: 40px; border: 1px solid #eee; border-radius: 8px; cursor: pointer; transition: 0.2s; position: relative; background: #fff; }
+        .acc-switch-item { display:flex; align-items:stretch; margin-bottom:8px; position:relative; }
+        .acc-switch-item::before { content:""; position:absolute; left:-12px; top:0; bottom:0; width:16px; }
+        .acc-switch-card { flex:1; min-width:0; padding: 12px; padding-right: 40px; border: 1px solid #d0d5dd; border-radius: 8px; cursor: pointer; transition: 0.2s; position: relative; background: #fff; }
         .acc-switch-card:hover { border-color: #2196F3; }
         .acc-switch-card:hover .acc-card-name svg {fill: #2196F3 !important;stroke: #2196F3 !important;transition: all 0.2s ease;}
         .acc-switch-card-static { cursor: default; }
-        .acc-switch-handle { width:6px; flex-shrink:0; align-self:stretch; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; color:#c4c4c4; font-size:9px; font-weight:700; user-select:none; cursor:grab; line-height:1; border-radius:4px; padding:0; opacity:0; visibility:hidden; pointer-events:none; transition:opacity 0.15s ease, color 0.15s ease, background 0.15s ease; }
+        .acc-switch-handle { position:absolute; left:-8px; top:0; bottom:0; width:6px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; color:#c4c4c4; font-size:9px; font-weight:700; user-select:none; cursor:grab; line-height:1; border-radius:4px; padding:0; opacity:0; visibility:hidden; pointer-events:none; transition:opacity 0.15s ease, color 0.15s ease, background 0.15s ease; z-index:2; }
         .acc-switch-handle span { display:block; letter-spacing:0; }
         .acc-switch-item:hover .acc-switch-handle,
         .acc-switch-item.dragging-source .acc-switch-handle { color:#2196F3; background:#f2f8fd; opacity:1; visibility:visible; pointer-events:auto; }
         .acc-switch-ghost { box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18); opacity: 0.96; }
         .acc-switch-item.dragging-source .acc-switch-card { border:1px dashed #2196F3; opacity:0.45; background:#fff; }
-        .acc-switch-list-sorting .acc-switch-card:hover { border-color:#eee; background:#fff; }
+        .acc-switch-list-sorting .acc-switch-card:hover { border-color:#d0d5dd; background:#fff; }
         .acc-switch-list-sorting .acc-switch-card:hover .acc-card-name svg { fill: currentColor !important; stroke: currentColor !important; }
         .acc-switch-settings-btn { position:absolute; right:8px; bottom:8px; width:24px; height:24px; border:1px solid #ddd; border-radius:6px; background:transparent; color:#7d93a8; display:flex; align-items:center; justify-content:center; padding:0; cursor:pointer; opacity:0; visibility:hidden; transition:all 0.15s ease; }
         .acc-switch-settings-btn svg { font-size:14px; }
@@ -332,7 +355,11 @@ export const STYLE_CSS = `
         .acc-input-text { flex: 1; width:100%; padding: 8px; margin-bottom:8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; box-sizing: border-box; background: #fff; color: #333; outline: none; transition: all 0.2s; }
         .acc-input-text:focus { border-color: #2196F3; box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2); }
         .acc-btn { border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 5px; transition: 0.2s; }
+        .acc-btn:disabled { opacity:.5; cursor:not-allowed; }
+        .acc-btn.is-loading { pointer-events:none; }
         .acc-btn-blue { flex: 1; background: #2196F3; color: white; }
+        .acc-btn.is-loading .acc-inline-spinner { border-color: rgba(255,255,255,.35); border-top-color:#fff; }
+        .acc-btn-light.is-loading .acc-inline-spinner { border-color: rgba(102,102,102,.2); border-top-color:#666; }
         .acc-btn-danger { width:100%; background:#ffebee; color:#c62828; border:1px solid #ffcdd2; }
         .acc-btn-danger:hover { background:#ffcdd2; border-color:#ef9a9a; }
         .acc-help-tip, .acc-lock-tip { display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; cursor: help; font-size: 16px; }

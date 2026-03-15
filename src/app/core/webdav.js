@@ -4,6 +4,58 @@ function encodeBasicAuth(username, password) {
 
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder();
+const WEBDAV_PASSWORD_PREFIX = 'enc:v2:';
+
+function createRandomHex(length = 32) {
+  const bytes = new Uint8Array(Math.ceil(length / 2));
+  if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+    crypto.getRandomValues(bytes);
+  } else {
+    for (let index = 0; index < bytes.length; index += 1) {
+      bytes[index] = Math.floor(Math.random() * 256);
+    }
+  }
+  return [...bytes].map((byte) => byte.toString(16).padStart(2, '0')).join('').slice(0, length);
+}
+
+function toBinaryText(value) {
+  return unescape(encodeURIComponent(String(value || '')));
+}
+
+function fromBinaryText(value) {
+  try {
+    return decodeURIComponent(escape(value));
+  } catch {
+    return '';
+  }
+}
+
+function xorBinaryText(sourceText, secret) {
+  const source = String(sourceText || '');
+  const key = toBinaryText(secret || 'anme-webdav') || 'anme-webdav';
+  let masked = '';
+  for (let index = 0; index < source.length; index += 1) {
+    masked += String.fromCharCode(source.charCodeAt(index) ^ key.charCodeAt(index % key.length));
+  }
+  return masked;
+}
+
+function encryptWebDavPassword(password, secret) {
+  const plainText = String(password || '');
+  if (!plainText) return '';
+  return `${WEBDAV_PASSWORD_PREFIX}${btoa(xorBinaryText(toBinaryText(plainText), secret))}`;
+}
+
+function decryptWebDavPassword(passwordCipher, secret) {
+  const cipherText = String(passwordCipher || '');
+  if (!cipherText) return '';
+  if (!cipherText.startsWith(WEBDAV_PASSWORD_PREFIX)) return '';
+  try {
+    return fromBinaryText(xorBinaryText(atob(cipherText.slice(WEBDAV_PASSWORD_PREFIX.length)), secret));
+  } catch {
+    return '';
+  }
+}
 
 function normalizeBaseUrl(url) {
   return String(url || '').trim().replace(/\/+$/, '');
@@ -31,16 +83,7 @@ function getBackupExtension(constants) {
 function withManagedDirectory(config, constants) {
   return {
     ...config,
-    directory: getManagedDirectory(constants),
-    storageMode: 'directory'
-  };
-}
-
-function withFlatNamespace(config) {
-  return {
-    ...config,
-    directory: '',
-    storageMode: 'flat'
+    directory: getManagedDirectory(constants)
   };
 }
 
@@ -48,26 +91,12 @@ function joinRemoteUrl(remoteUrl, fileName) {
   return `${remoteUrl.replace(/\/+$/, '')}/${encodeURIComponent(fileName)}`;
 }
 
-function getNamespacePrefix(constants) {
-  return `${String(constants.META.NAME || 'anme')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')}-webdav`;
+function getManifestName() {
+  return '.anme-index.json';
 }
 
-function normalizeStorageMode(storageMode) {
-  return storageMode === 'flat' ? 'flat' : 'directory';
-}
-
-function getManifestName(config, constants) {
-  return normalizeStorageMode(config.storageMode) === 'flat'
-    ? `${getNamespacePrefix(constants)}.index.json`
-    : '.anme-index.json';
-}
-
-function getRemoteBackupName(config, constants, displayName) {
-  return normalizeStorageMode(config.storageMode) === 'flat'
-    ? `${getNamespacePrefix(constants)}__${displayName}`
-    : displayName;
+function getRemoteBackupName(_config, _constants, displayName) {
+  return displayName;
 }
 
 function toRemoteUrl(config) {
@@ -162,9 +191,20 @@ function parseWebDavList(xmlText, baseUrl, constants) {
 }
 
 export function createWebDavMethods({ constants, utils, getUI, getCore }) {
+  const getOrCreateWebDavSecret = () => {
+    const existingSecret = String(GM_getValue(constants.CFG.WEBDAV_SECRET, '') || '');
+    if (existingSecret) {
+      return existingSecret;
+    }
+    const nextSecret = createRandomHex(32);
+    GM_setValue(constants.CFG.WEBDAV_SECRET, nextSecret);
+    return nextSecret;
+  };
+
   const request = (config, { method = 'GET', url, headers = {}, data, responseType = 'text', fetch = false }) =>
     new Promise((resolve, reject) => {
       let settled = false;
+      let timedOut = false;
       let timeoutTimer = null;
       const finish = (handler) => (payload) => {
         if (settled) return;
@@ -191,18 +231,21 @@ export function createWebDavMethods({ constants, utils, getUI, getCore }) {
           }
           reject(new Error(`${method} ${url} failed with ${response.status}`));
         }),
-        onerror: finish(() => reject(new Error(`${method} ${url} failed`)))
+        onerror: finish(() =>
+          reject(new Error(timedOut ? utils.t('webdav_timeout') : `${method} ${url} failed`))
+        )
       };
       if (data !== undefined && data !== null) {
         requestOptions.data = data;
       }
       const xhr = GM_xmlhttpRequest(requestOptions);
       timeoutTimer = setTimeout(() => {
+        timedOut = true;
         try {
           xhr?.abort?.();
         } catch {}
         finish(() => reject(new Error(utils.t('webdav_timeout'))))();
-      }, 10000);
+      }, 5000);
     });
 
   return {
@@ -224,33 +267,27 @@ export function createWebDavMethods({ constants, utils, getUI, getCore }) {
     },
     getWebDavConfig() {
       const config = GM_getValue(constants.CFG.WEBDAV_CONFIG, {});
+      const secret = getOrCreateWebDavSecret();
+      const password = decryptWebDavPassword(String(config.passwordCipher || ''), secret);
       return {
         url: String(config.url || ''),
         username: String(config.username || ''),
-        password: String(config.password || ''),
-        directory:
-          normalizeStorageMode(config.storageMode) === 'flat'
-            ? ''
-            : typeof config.directory === 'string'
-              ? config.directory
-              : getManagedDirectory(constants),
-        storageMode: normalizeStorageMode(config.storageMode)
+        password,
+        directory: getManagedDirectory(constants)
       };
     },
     saveWebDavConfig(config) {
-      const normalizedConfig =
-        normalizeStorageMode(config.storageMode) === 'flat'
-          ? withFlatNamespace(config)
-          : withManagedDirectory(config, constants);
+      const normalizedConfig = withManagedDirectory(config, constants);
+      const password = String(normalizedConfig.password || '');
       GM_setValue(constants.CFG.WEBDAV_CONFIG, {
         url: normalizeBaseUrl(normalizedConfig.url),
         username: String(normalizedConfig.username || '').trim(),
-        password: String(normalizedConfig.password || ''),
-        storageMode: normalizedConfig.storageMode
+        passwordCipher: encryptWebDavPassword(password, getOrCreateWebDavSecret())
       });
     },
     clearWebDavConfig() {
       GM_deleteValue(constants.CFG.WEBDAV_CONFIG);
+      GM_deleteValue(constants.CFG.WEBDAV_SECRET);
       GM_deleteValue(constants.CFG.WEBDAV_BACKUPS_CACHE);
     },
     hasWebDavConfig() {
@@ -316,10 +353,7 @@ export function createWebDavMethods({ constants, utils, getUI, getCore }) {
         }
       });
       return parseWebDavList(response.responseText || '', remoteUrl, constants).map((item) => ({
-        fileName:
-          normalizeStorageMode(config.storageMode) === 'flat'
-            ? item.fileName.replace(new RegExp(`^${getNamespacePrefix(constants)}__`), '')
-            : item.fileName,
+        fileName: item.fileName,
         remoteFileName: item.fileName,
         lastModified: item.lastModified ? new Date(item.lastModified).toISOString() : '',
         size: item.size
@@ -327,7 +361,7 @@ export function createWebDavMethods({ constants, utils, getUI, getCore }) {
     },
     async readWebDavIndex(config) {
       const remoteUrl = toRemoteUrl(config);
-      const manifestName = getManifestName(config, constants);
+      const manifestName = getManifestName();
       try {
         const response = await request(config, {
           method: 'GET',
@@ -345,7 +379,7 @@ export function createWebDavMethods({ constants, utils, getUI, getCore }) {
     },
     async writeWebDavIndex(config, backups) {
       const remoteUrl = toRemoteUrl(config);
-      const manifestName = getManifestName(config, constants);
+      const manifestName = getManifestName();
       await request(config, {
         method: 'PUT',
         url: joinRemoteUrl(remoteUrl, manifestName),
@@ -355,37 +389,28 @@ export function createWebDavMethods({ constants, utils, getUI, getCore }) {
         }
       });
     },
-    async validateWebDavConfig(config) {
-      const baseConfig = {
+    normalizeWebDavConfig(config) {
+      return withManagedDirectory({
         url: normalizeBaseUrl(config.url),
         username: String(config.username || '').trim(),
-        password: String(config.password || ''),
-        storageMode: normalizeStorageMode(config.storageMode)
-      };
-      if (!baseConfig.url || !baseConfig.username || !baseConfig.password) {
+        password: String(config.password || '')
+      }, constants);
+    },
+    async validateWebDavConfig(config) {
+      const normalizedConfig = this.normalizeWebDavConfig(config);
+      if (!normalizedConfig.url || !normalizedConfig.username || !normalizedConfig.password) {
         throw new Error(utils.t('webdav_missing_config'));
       }
 
-      const candidateConfigs = [withManagedDirectory(baseConfig, constants), withFlatNamespace(baseConfig)];
-      let firstError = null;
-
-      for (const candidate of candidateConfigs) {
-        try {
-          await this.verifyWriteAccess(candidate);
-          await this.readWebDavIndex(candidate);
-          this.saveWebDavConfig(candidate);
-          return candidate;
-        } catch (error) {
-          if (!firstError) {
-            firstError = error;
-          }
-        }
-      }
-
-      throw firstError || new Error(utils.t('webdav_verify_err'));
+      await this.verifyWriteAccess(normalizedConfig);
+      await this.readWebDavIndex(normalizedConfig);
+      return normalizedConfig;
+    },
+    async getValidatedWebDavConfig() {
+      return this.validateWebDavConfig(this.getWebDavConfig());
     },
     async listWebDavBackups() {
-      const config = await this.validateWebDavConfig(this.getWebDavConfig());
+      const config = await this.getValidatedWebDavConfig();
       let backups = await this.readWebDavIndex(config);
       if (!backups.length) {
         backups = await this.readWebDavDirectory(config);
@@ -394,7 +419,7 @@ export function createWebDavMethods({ constants, utils, getUI, getCore }) {
       return this.saveCachedWebDavBackups(backups);
     },
     async uploadWebDavBackup() {
-      const config = await this.validateWebDavConfig(this.getWebDavConfig());
+      const config = await this.getValidatedWebDavConfig();
       const core = getCore();
       const exportObj = core.buildExportObject('all');
       if (!exportObj) {
@@ -429,7 +454,7 @@ export function createWebDavMethods({ constants, utils, getUI, getCore }) {
       return fileName;
     },
     async restoreWebDavBackup(fileName) {
-      const config = await this.validateWebDavConfig(this.getWebDavConfig());
+      const config = await this.getValidatedWebDavConfig();
       const remoteUrl = toRemoteUrl(config);
       let backups = await this.readWebDavIndex(config);
       if (!backups.length) {
@@ -454,7 +479,7 @@ export function createWebDavMethods({ constants, utils, getUI, getCore }) {
       return result;
     },
     async deleteWebDavBackup(fileName) {
-      const config = await this.validateWebDavConfig(this.getWebDavConfig());
+      const config = await this.getValidatedWebDavConfig();
       const remoteUrl = toRemoteUrl(config);
       let backups = await this.readWebDavIndex(config);
       if (!backups.length) {

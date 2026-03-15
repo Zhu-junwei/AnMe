@@ -13,17 +13,17 @@ export function createTemplates({ state, constants, i18nData, utils }) {
           <div class="acc-header-actions" id="acc-header-actions">
               <button class="acc-toolbar-btn" id="btn-header-back" title="${utils.t('back')}">${constants.ICONS.BACK}</button>
               <button class="acc-toolbar-btn" id="btn-go-current-host" title="${utils.t('back_current_host')}">${constants.ICONS.HOME}</button>
-              <button class="acc-toolbar-btn" id="btn-clean-env" title="${utils.t('btn_clean')}">${constants.ICONS.CLEAN}</button>
               <button class="acc-toolbar-btn" id="btn-open-save-modal" title="${utils.t('btn_save')}">${constants.ICONS.SAVE}</button>
+              <button class="acc-toolbar-btn" id="btn-clean-env" title="${utils.t('btn_clean')}">${constants.ICONS.CLEAN}</button>
           </div>
           <div class="acc-header-title" id="acc-header-text"></div>
           <div class="acc-header-right-actions">
               <button class="acc-toolbar-btn" id="btn-open-project" title="GitHub">${constants.ICONS.GITHUB}</button>
               <button class="acc-toolbar-btn" id="btn-open-webdav" title="${utils.t('nav_webdav')}">${constants.ICONS.CLOUD}</button>
               <button class="acc-toolbar-btn" id="btn-open-settings" title="${utils.t('nav_set')}">${constants.ICONS.SETTINGS}</button>
-              <div id="acc-close-btn">&times;</div>
-          </div>
-      </div>
+              <button class="acc-toolbar-btn" id="acc-close-btn" title="${utils.t('dlg_cancel')}" type="button">${constants.ICONS.CLOSE}</button>
+            </div>
+        </div>
 
       <div class="acc-tab-content active" id="pg-switch">
           <div class="acc-mgr-toolbar">

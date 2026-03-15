@@ -6,13 +6,29 @@ export function createSwitchingMethods({ state, constants, utils, templates, cor
       const hostSearchInput = ui.qs('#host-search-input');
       if (!hostTrigger || !hostMenu) return;
 
-      const currentLabel = state.currentViewingHost === constants.HOST ? '\u{1F4CC}' : '\u{1F310}';
+      const buildHostIcon = (host, label, className = '') => {
+        const fallbackText = utils.escapeHtml(utils.getHostIconFallbackText(host, label));
+        const cachedIconUrl = utils.escapeHtml(utils.getCachedHostIcon(host));
+        const hasCachedIcon = Boolean(cachedIconUrl);
+        return `
+          <span class="acc-host-icon${className ? ` ${className}` : ''}${hasCachedIcon ? '' : ' is-fallback'}" aria-hidden="true">
+            <img class="acc-host-favicon" ${hasCachedIcon ? `src="${cachedIconUrl}"` : ''} alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">
+            <span class="acc-host-icon-fallback">${fallbackText}</span>
+          </span>
+        `;
+      };
       const query = state.hostSearchQuery.trim().toLowerCase();
       const visibleHosts = hosts.filter((host) => {
         const siteName = utils.getSiteNameByHost(host).toLowerCase();
         return host.toLowerCase().includes(query) || siteName.includes(query);
       });
-      hostTrigger.textContent = `${currentLabel} ${utils.getHostDisplayName(state.currentViewingHost)}`;
+      const currentDisplayName = utils.getHostDisplayName(state.currentViewingHost);
+      hostTrigger.innerHTML = `
+        <span class="acc-host-trigger-content">
+          ${buildHostIcon(state.currentViewingHost, currentDisplayName)}
+          <span class="acc-host-trigger-label">${utils.escapeHtml(currentDisplayName)}</span>
+        </span>
+      `;
       if (hostSearchInput) {
         hostSearchInput.value = state.hostSearchQuery;
       }
@@ -21,14 +37,19 @@ export function createSwitchingMethods({ state, constants, utils, templates, cor
           ${visibleHosts.length
             ? visibleHosts
                 .map((host) => {
-                  const prefix = host === constants.HOST ? '\u{1F4CC}' : '\u{1F310}';
                   const isActive = host === state.currentViewingHost ? ' active' : '';
-                  const label = utils.escapeHtml(utils.getHostDisplayName(host));
+                  const displayName = utils.getHostDisplayName(host);
+                  const label = utils.escapeHtml(displayName);
                   const isEditing = state.hostDisplayMode === 'siteName' && state.hostEditingHost === host;
                   const editValue = utils.escapeHtml(state.hostEditingValue || utils.getSiteNameByHost(host));
                   return `
                     <div class="acc-host-option-row${isActive}">
-                      <button class="acc-host-option" type="button" data-host="${host}">${prefix} ${label}</button>
+                      <button class="acc-host-option" type="button" data-host="${host}">
+                        <span class="acc-host-option-content">
+                          ${buildHostIcon(host, displayName)}
+                          <span class="acc-host-option-label">${label}</span>
+                        </span>
+                      </button>
                       ${
                         state.hostDisplayMode === 'siteName'
                           ? `<button class="acc-host-edit-link" type="button" data-edit-host="${host}" title="${utils.t('edit_site_name')}">${constants.ICONS.EDIT}</button>`
@@ -53,6 +74,7 @@ export function createSwitchingMethods({ state, constants, utils, templates, cor
             : `<div class="acc-host-empty">${utils.t('no_data')}</div>`}
         </div>
       `;
+      core.ensureHostIcon(constants.HOST).catch(() => {});
     },
     initPointerSortableList({ containerSelector, itemSelector, keySelector, orderHost, afterSort, handleSelector }) {
       const container = ui.qs(containerSelector);
@@ -244,8 +266,6 @@ export function createSwitchingMethods({ state, constants, utils, templates, cor
       input.value = originalName;
       input.disabled = !data;
       deleteBtn.disabled = !data;
-      deleteBtn.style.opacity = data ? '1' : '0.5';
-      deleteBtn.style.cursor = data ? 'pointer' : 'not-allowed';
 
       const updateSaveState = () => {
         const canSave =
@@ -253,8 +273,6 @@ export function createSwitchingMethods({ state, constants, utils, templates, cor
           input.value.trim().length > 0 &&
           input.value.trim() !== originalName;
         saveBtn.disabled = !canSave;
-        saveBtn.style.opacity = canSave ? '1' : '0.5';
-        saveBtn.style.cursor = canSave ? 'pointer' : 'not-allowed';
       };
 
       input.oninput = updateSaveState;

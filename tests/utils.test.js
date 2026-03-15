@@ -14,7 +14,7 @@ function createStore(entries = {}) {
   return new Map(Object.entries(entries));
 }
 
-function createTestUtils(storeEntries = {}) {
+function createTestUtils(storeEntries = {}, { lang = 'en' } = {}) {
   const store = createStore(storeEntries);
 
   globalThis.GM_listValues = () => [...store.keys()];
@@ -22,9 +22,13 @@ function createTestUtils(storeEntries = {}) {
   globalThis.document = { title: 'Current Portal' };
 
   return createUtils({
-    state: { currentLang: 'en', hostDisplayMode: 'siteName' },
+    state: { currentLang: lang, hostDisplayMode: 'siteName' },
     constants,
-    i18nData: { en: {} }
+    i18nData: {
+      en: { default_account_prefix: 'Account' },
+      zh: { default_account_prefix: '\u8d26\u53f7' },
+      es: { default_account_prefix: 'Cuenta' }
+    }
   });
 }
 
@@ -53,24 +57,30 @@ test('listAllHosts and getSortedKeysByHost respect saved order before timestamp 
   ]);
 });
 
-test('suggestAccountName starts from host account count and skips collisions', () => {
-  const utils = createTestUtils({
-    'acc_stable_current.test::账号-01': { time: 100 },
+test('suggestAccountName follows the active language and skips exact collisions', () => {
+  const zhPrefix = '\u8d26\u53f7';
+  const storeEntries = {
+    [`acc_stable_current.test::${zhPrefix}-01`]: { time: 100 },
     'acc_stable_current.test::Other Name': { time: 90 },
-    'acc_stable_current.test::账号-04': { time: 80 },
-    'acc_order_current.test': ['账号-01', 'Other Name', '账号-04']
-  });
+    [`acc_stable_current.test::${zhPrefix}-04`]: { time: 80 },
+    'acc_order_current.test': [`${zhPrefix}-01`, 'Other Name', `${zhPrefix}-04`]
+  };
+  const englishUtils = createTestUtils(storeEntries);
+  const chineseUtils = createTestUtils(storeEntries, { lang: 'zh' });
 
-  assert.equal(utils.suggestAccountName('current.test'), '账号-05');
+  assert.equal(englishUtils.suggestAccountName('current.test'), 'Account-04');
+  assert.equal(chineseUtils.suggestAccountName('current.test'), `${zhPrefix}-05`);
 });
 
 test('getSiteNameByHost prefers stored site name and falls back to current document title', () => {
+  const siteName = '\u5df2\u4fdd\u5b58\u7ad9\u70b9\u540d';
+  const accountName = '\u8d26\u53f7-01';
   const utils = createTestUtils({
-    'acc_stable_current.test::账号-01': { time: 100, siteName: '已保存站点名' },
-    'acc_stable_other.test::账号-01': { time: 90 }
+    [`acc_stable_current.test::${accountName}`]: { time: 100, siteName },
+    [`acc_stable_other.test::${accountName}`]: { time: 90 }
   });
 
-  assert.equal(utils.getSiteNameByHost('current.test'), '已保存站点名');
+  assert.equal(utils.getSiteNameByHost('current.test'), siteName);
   assert.equal(utils.getSiteNameByHost('other.test'), 'other.test');
 });
 
@@ -82,10 +92,12 @@ test('getSiteNameByHost falls back to domain when no site name has been saved ye
 });
 
 test('getHostDisplayName switches between site name and domain mode', () => {
+  const siteName = '\u5f53\u524d\u7ad9\u70b9';
+  const accountName = '\u8d26\u53f7-01';
   const utils = createTestUtils({
-    'acc_stable_current.test::账号-01': { time: 100, siteName: '当前站点' }
+    [`acc_stable_current.test::${accountName}`]: { time: 100, siteName }
   });
 
-  assert.equal(utils.getHostDisplayName('current.test', 'siteName'), '当前站点');
+  assert.equal(utils.getHostDisplayName('current.test', 'siteName'), siteName);
   assert.equal(utils.getHostDisplayName('current.test', 'domain'), 'current.test');
 });

@@ -1,4 +1,4 @@
-export function createAccountMethods({ constants, utils, getUI, shared }) {
+export function createAccountMethods({ constants, utils, getUI, getCore, shared }) {
   return {
     async detectAvailableSnapshotSources() {
       const cookies = await shared.listCookies();
@@ -39,6 +39,8 @@ export function createAccountMethods({ constants, utils, getUI, shared }) {
         GM_setValue(constants.ORDER_PREFIX + constants.HOST, currentOrder);
       }
 
+      getCore()?.syncHostIconCache?.();
+
       return true;
     },
     renameAccount(oldKey, newName, host) {
@@ -75,6 +77,7 @@ export function createAccountMethods({ constants, utils, getUI, shared }) {
       const newOrder = order.filter((item) => item !== name);
       if (newOrder.length === 0) {
         GM_deleteValue(orderKey);
+        getCore()?.removeHostIconCache?.(host);
       } else {
         GM_setValue(orderKey, newOrder);
       }
