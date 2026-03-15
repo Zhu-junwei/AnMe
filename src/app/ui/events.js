@@ -1,29 +1,34 @@
 export function createEventMethods({ state, constants, utils, core, ui }) {
   return {
-    bindPanelEvents() {
-      const $ = (selector) => ui.qs(selector);
-      const $$ = (selector) => ui.qsa(selector);
-      const shouldPreventWheelLeak = (scrollArea, deltaY) => {
-        if (!scrollArea || scrollArea.scrollHeight <= scrollArea.clientHeight) {
-          return true;
-        }
+    shouldPreventWheelLeak(scrollArea, deltaY) {
+      if (!scrollArea || scrollArea.scrollHeight <= scrollArea.clientHeight) {
+        return true;
+      }
 
-        if (deltaY < 0 && scrollArea.scrollTop <= 0) {
-          return true;
-        }
+      if (deltaY < 0 && scrollArea.scrollTop <= 0) {
+        return true;
+      }
 
-        if (deltaY > 0 && scrollArea.scrollTop + scrollArea.clientHeight >= scrollArea.scrollHeight - 1) {
-          return true;
-        }
+      if (deltaY > 0 && scrollArea.scrollTop + scrollArea.clientHeight >= scrollArea.scrollHeight - 1) {
+        return true;
+      }
 
-        return false;
-      };
-      const getHosts = () => {
-        const hosts = utils.listAllHosts();
-        if (!hosts.includes(constants.HOST)) hosts.push(constants.HOST);
-        return hosts;
-      };
-
+      return false;
+    },
+    getHosts() {
+      const hosts = utils.listAllHosts();
+      if (!hosts.includes(constants.HOST)) hosts.push(constants.HOST);
+      return hosts;
+    },
+    resetHostPicker($, closePicker = true) {
+      state.hostSearchQuery = '';
+      state.hostEditingHost = null;
+      state.hostEditingValue = '';
+      if (closePicker) {
+        $('#host-picker')?.classList.remove('open');
+      }
+    },
+    bindPanelShellEvents({ $, $$ }) {
       ['keydown', 'keyup', 'keypress', 'input', 'contextmenu', 'wheel'].forEach((eventName) => {
         state.panel.addEventListener(
           eventName,
@@ -31,7 +36,7 @@ export function createEventMethods({ state, constants, utils, core, ui }) {
             event.stopPropagation();
             if (eventName === 'wheel') {
               const scrollArea = event.target.closest('.acc-scroll-area, .acc-host-menu, .acc-host-list');
-              if (shouldPreventWheelLeak(scrollArea, event.deltaY)) {
+              if (ui.shouldPreventWheelLeak(scrollArea, event.deltaY)) {
                 event.preventDefault();
               }
             }
@@ -82,7 +87,8 @@ export function createEventMethods({ state, constants, utils, core, ui }) {
         }
         ui.activatePage(activePageBeforeRebuild, ui.getPageTitle(activePageBeforeRebuild));
       };
-
+    },
+    bindSwitchEvents({ $, getHosts, resetHostPicker }) {
       $('#host-display-mode-sel').onchange = (event) => {
         state.hostDisplayMode = event.target.value || 'siteName';
         if (state.hostDisplayMode !== 'siteName') {
@@ -145,9 +151,7 @@ export function createEventMethods({ state, constants, utils, core, ui }) {
         const willOpen = !picker.classList.contains('open');
         picker.classList.toggle('open', willOpen);
         if (willOpen) {
-          state.hostSearchQuery = '';
-          state.hostEditingHost = null;
-          state.hostEditingValue = '';
+          resetHostPicker(false);
           ui.renderHostSelector(getHosts());
           ui.qs('#host-search-input')?.focus();
         }
@@ -164,10 +168,7 @@ export function createEventMethods({ state, constants, utils, core, ui }) {
         if (event.key !== 'Escape') return;
         event.preventDefault();
         event.stopPropagation();
-        state.hostSearchQuery = '';
-        state.hostEditingHost = null;
-        state.hostEditingValue = '';
-        $('#host-picker')?.classList.remove('open');
+        resetHostPicker();
         ui.renderHostSelector(getHosts());
         ui.qs('#host-search-input')?.blur();
         state.panel?.focus();
@@ -220,10 +221,41 @@ export function createEventMethods({ state, constants, utils, core, ui }) {
         if (!option) return;
 
         state.currentViewingHost = option.dataset.host;
-        state.hostSearchQuery = '';
-        $('#host-picker')?.classList.remove('open');
+        resetHostPicker();
         ui.refresh();
       };
+
+      $('#host-menu').addEventListener('input', (event) => {
+        const editInput = event.target.closest('.acc-host-edit-input');
+        if (!editInput) return;
+        state.hostEditingValue = editInput.value;
+      });
+
+      $('#host-menu').addEventListener('keydown', (event) => {
+        const editInput = event.target.closest('.acc-host-edit-input');
+        if (!editInput) return;
+
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          event.stopPropagation();
+          state.hostEditingHost = null;
+          state.hostEditingValue = '';
+          ui.renderHostSelector(getHosts());
+          ui.qs('.acc-host-edit-input')?.blur();
+          state.panel?.focus();
+          return;
+        }
+
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          event.stopPropagation();
+          core.updateSiteName(editInput.dataset.host, editInput.value);
+          state.hostEditingHost = null;
+          state.hostEditingValue = '';
+          ui.refresh();
+          ui.showToast(utils.t('toast_site_name_updated'));
+        }
+      });
 
       $('#btn-account-search-toggle').onclick = (event) => {
         event.stopPropagation();
@@ -231,7 +263,7 @@ export function createEventMethods({ state, constants, utils, core, ui }) {
         if (!state.accountSearchActive) {
           state.accountSearchQuery = '';
         }
-        $('#host-picker')?.classList.remove('open');
+        resetHostPicker();
         ui.refresh();
         if (state.accountSearchActive) {
           ui.qs('#account-search-input')?.focus();
@@ -254,6 +286,12 @@ export function createEventMethods({ state, constants, utils, core, ui }) {
         state.panel?.focus();
       };
 
+      state.panel.addEventListener('click', (event) => {
+        if (event.target.closest('#host-picker')) return;
+        resetHostPicker();
+      });
+    },
+    bindNavigationEvents({ $, resetHostPicker }) {
       $('#btn-open-settings').onclick = () => {
         if (state.activePage !== 'pg-set') {
           state.settingsReturnPage = state.activePage;
@@ -272,7 +310,7 @@ export function createEventMethods({ state, constants, utils, core, ui }) {
 
       $('#btn-go-current-host').onclick = () => {
         state.currentViewingHost = constants.HOST;
-        $('#host-picker')?.classList.remove('open');
+        resetHostPicker();
         ui.refresh();
       };
 
@@ -292,6 +330,15 @@ export function createEventMethods({ state, constants, utils, core, ui }) {
         ui.activatePage(targetPage, ui.getPageTitle(targetPage));
       };
 
+      $('#go-about').onclick = () => {
+        ui.activatePage('pg-about', utils.t('nav_about'));
+      };
+
+      $('#go-notice').onclick = () => {
+        ui.activatePage('pg-notice', utils.t('nav_notice'));
+      };
+    },
+    bindAccountSettingsEvents({ $ }) {
       $('#btn-open-save-modal').onclick = () => {
         ui.showSaveAccountModal();
       };
@@ -305,42 +352,6 @@ export function createEventMethods({ state, constants, utils, core, ui }) {
       $('#btn-export-curr').onclick = () => core.exportData('current');
       $('#btn-export-all').onclick = () => core.exportData('all');
       $('#btn-import-trigger').onclick = () => $('#inp-import-file').click();
-      $('#btn-webdav-config').onclick = async () => {
-        await ui.showWebDavConfigModal();
-      };
-      $('#btn-webdav-sync').onclick = async () => {
-        try {
-          ui.toggleLoading(true, utils.t('webdav_syncing'));
-          const fileName = await core.uploadWebDavBackup();
-          if (fileName) {
-            state.webdavBackups = core.getCachedWebDavBackups();
-            ui.renderWebDavBackupList(state.webdavBackups);
-            ui.showToast(utils.t('webdav_sync_ok'));
-          }
-        } catch (error) {
-          await ui.alert(error.message || utils.t('webdav_sync_err'));
-        } finally {
-          ui.toggleLoading(false);
-        }
-      };
-      $('#btn-webdav-refresh').onclick = async () => {
-        await ui.loadWebDavBackups();
-      };
-      $('#btn-webdav-logout').onclick = async () => {
-        if (!core.hasWebDavConfig()) return;
-        const confirmed = await ui.confirm(utils.t('webdav_logout_confirm'));
-        if (!confirmed) return;
-        core.clearWebDavConfig();
-        state.webdavBackups = [];
-        ui.renderWebDavView();
-        ui.showToast(utils.t('webdav_logout_ok'));
-      };
-      $('#go-about').onclick = () => {
-        ui.activatePage('pg-about', utils.t('nav_about'));
-      };
-      $('#go-notice').onclick = () => {
-        ui.activatePage('pg-notice', utils.t('nav_notice'));
-      };
 
       $('#btn-account-rename-save').onclick = async () => {
         const oldKey = state.accountSettingsKey;
@@ -350,8 +361,7 @@ export function createEventMethods({ state, constants, utils, core, ui }) {
         const newName = nameInput.value.trim();
         const targetHost = state.accountSettingsHost || constants.HOST;
         const originalName = utils.extractName(oldKey);
-        if (!newName) return;
-        if (newName === originalName) return;
+        if (!newName || newName === originalName) return;
 
         const newKey = utils.makeKey(newName, targetHost);
         if (GM_getValue(newKey)) {
@@ -393,46 +403,42 @@ export function createEventMethods({ state, constants, utils, core, ui }) {
           ui.refresh();
         }
       };
+    },
+    bindWebDavEvents({ $ }) {
+      $('#btn-webdav-config').onclick = async () => {
+        await ui.showWebDavConfigModal();
+      };
 
-      state.panel.addEventListener('click', (event) => {
-        if (event.target.closest('#host-picker')) return;
-        state.hostSearchQuery = '';
-        state.hostEditingHost = null;
-        state.hostEditingValue = '';
-        $('#host-picker')?.classList.remove('open');
-      });
+      $('#btn-webdav-sync').onclick = async () => {
+        const syncBtn = $('#btn-webdav-sync');
+        await ui.runUiAction({
+          button: syncBtn,
+          idleText: utils.t('webdav_sync_now'),
+          errorKey: 'webdav_sync_err',
+          successMessage: utils.t('webdav_sync_ok'),
+          action: () => core.uploadWebDavBackup(),
+          onSuccess: (fileName) => {
+            if (fileName) {
+              state.webdavBackups = core.getCachedWebDavBackups();
+              ui.renderWebDavBackupList(state.webdavBackups);
+            }
+          }
+        });
+      };
 
-      $('#host-menu').addEventListener('input', (event) => {
-        const editInput = event.target.closest('.acc-host-edit-input');
-        if (!editInput) return;
-        state.hostEditingValue = editInput.value;
-      });
+      $('#btn-webdav-refresh').onclick = async () => {
+        await ui.loadWebDavBackups();
+      };
 
-      $('#host-menu').addEventListener('keydown', (event) => {
-        const editInput = event.target.closest('.acc-host-edit-input');
-        if (!editInput) return;
-
-        if (event.key === 'Escape') {
-          event.preventDefault();
-          event.stopPropagation();
-          state.hostEditingHost = null;
-          state.hostEditingValue = '';
-          ui.renderHostSelector(getHosts());
-          ui.qs('.acc-host-edit-input')?.blur();
-          state.panel?.focus();
-          return;
-        }
-
-        if (event.key === 'Enter') {
-          event.preventDefault();
-          event.stopPropagation();
-          core.updateSiteName(editInput.dataset.host, editInput.value);
-          state.hostEditingHost = null;
-          state.hostEditingValue = '';
-          ui.refresh();
-          ui.showToast(utils.t('toast_site_name_updated'));
-        }
-      });
+      $('#btn-webdav-logout').onclick = async () => {
+        if (!core.hasWebDavConfig()) return;
+        const confirmed = await ui.confirm(utils.t('webdav_logout_confirm'));
+        if (!confirmed) return;
+        core.clearWebDavConfig();
+        state.webdavBackups = [];
+        ui.renderWebDavView();
+        ui.showToast(utils.t('webdav_logout_ok'));
+      };
 
       $('#webdav-backup-list').onclick = async (event) => {
         const actionBtn = event.target.closest('[data-action][data-file]');
@@ -447,34 +453,46 @@ export function createEventMethods({ state, constants, utils, core, ui }) {
         if (action === 'delete') {
           const confirmed = await ui.confirm(utils.t('webdav_delete_confirm').replace('{name}', fileName));
           if (!confirmed) return;
-          try {
-            ui.toggleLoading(true, utils.t('webdav_loading'));
-            await core.deleteWebDavBackup(fileName);
-            state.webdavBackups = core.getCachedWebDavBackups();
-            ui.renderWebDavBackupList(state.webdavBackups);
-            ui.showToast(utils.t('webdav_delete_ok'));
-          } catch (error) {
-            await ui.alert(error.message || utils.t('webdav_delete_err'));
-          } finally {
-            ui.toggleLoading(false);
-          }
+          await ui.runUiAction({
+            loadingText: utils.t('webdav_loading'),
+            errorKey: 'webdav_delete_err',
+            successMessage: utils.t('webdav_delete_ok'),
+            action: () => core.deleteWebDavBackup(fileName),
+            onSuccess: () => {
+              state.webdavBackups = core.getCachedWebDavBackups();
+              ui.renderWebDavBackupList(state.webdavBackups);
+            }
+          });
           return;
         }
 
         if (action === 'restore') {
           const confirmed = await ui.confirm(utils.t('webdav_restore_confirm').replace('{name}', fileName));
           if (!confirmed) return;
-          try {
-            ui.toggleLoading(true, utils.t('webdav_restoring'));
-            const result = await core.restoreWebDavBackup(fileName);
-            ui.toggleLoading(false);
-            await ui.alert(utils.t(result.messageKey).replace('{count}', result.count));
-          } catch (error) {
-            ui.toggleLoading(false);
-            await ui.alert(error.message || utils.t('sync_restore_err'));
-          }
+          await ui.runUiAction({
+            loadingText: utils.t('webdav_restoring'),
+            errorKey: 'sync_restore_err',
+            action: () => core.restoreWebDavBackup(fileName),
+            onSuccess: (result) => {
+              ui.showToast(utils.t(result.messageKey).replace('{count}', result.count), 2400);
+            }
+          });
         }
       };
+    },
+    bindPanelEvents() {
+      const $ = (selector) => ui.qs(selector);
+      const $$ = (selector) => ui.qsa(selector);
+      const getHosts = () => ui.getHosts();
+      const resetHostPicker = (closePicker = true) => {
+        ui.resetHostPicker($, closePicker);
+      };
+
+      ui.bindPanelShellEvents({ $, $$ });
+      ui.bindSwitchEvents({ $, getHosts, resetHostPicker });
+      ui.bindNavigationEvents({ $, resetHostPicker });
+      ui.bindAccountSettingsEvents({ $ });
+      ui.bindWebDavEvents({ $ });
     }
   };
 }

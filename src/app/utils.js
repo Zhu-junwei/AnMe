@@ -1,4 +1,6 @@
 export function createUtils({ state, constants, i18nData }) {
+  let trustedHtmlPolicy;
+
   return {
     normalizeText(value) {
       return String(value || '')
@@ -8,6 +10,21 @@ export function createUtils({ state, constants, i18nData }) {
     t(key) {
       return i18nData[state.currentLang][key] || key;
     },
+    isWebDavTimeoutError(error) {
+      const message = String(error?.message || error || '').trim();
+      return message === this.t('webdav_timeout');
+    },
+    isWebDavRequestError(error) {
+      const message = String(error?.message || error || '').trim();
+      return /^(GET|PUT|POST|DELETE|PROPFIND|MKCOL|HEAD|OPTIONS|PATCH)\s+/i.test(message);
+    },
+    getWebDavErrorMessage(error, fallbackKey = '') {
+      const message = String(error?.message || error || '').trim();
+      if (this.isWebDavTimeoutError(error) || this.isWebDavRequestError(error)) {
+        return this.t('webdav_timeout_check_settings');
+      }
+      return message || (fallbackKey ? this.t(fallbackKey) : '');
+    },
     escapeHtml(value) {
       return String(value || '')
         .replace(/&/g, '&amp;')
@@ -15,6 +32,27 @@ export function createUtils({ state, constants, i18nData }) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
+    },
+    toTrustedHtml(html) {
+      const normalized = String(html || '');
+      if (trustedHtmlPolicy === undefined) {
+        try {
+          trustedHtmlPolicy =
+            typeof trustedTypes !== 'undefined' && typeof trustedTypes.createPolicy === 'function'
+              ? trustedTypes.getPolicy?.('anme-html') ||
+                trustedTypes.createPolicy('anme-html', {
+                  createHTML: (value) => String(value || '')
+                })
+              : null;
+        } catch {
+          trustedHtmlPolicy = null;
+        }
+      }
+      return trustedHtmlPolicy ? trustedHtmlPolicy.createHTML(normalized) : normalized;
+    },
+    setHTML(element, html) {
+      if (!element) return;
+      element.innerHTML = this.toTrustedHtml(html);
     },
     extractName(key) {
       return key.split('::')[1] || key;
@@ -97,6 +135,16 @@ export function createUtils({ state, constants, i18nData }) {
     getHostDisplayName(host, mode = state.hostDisplayMode || 'siteName') {
       return mode === 'domain' ? host : this.getSiteNameByHost(host);
     },
+    getCachedHostIcon(host) {
+      const cacheEntry = state.hostIconCache?.[host];
+      if (!cacheEntry || typeof cacheEntry !== 'object') return '';
+      return typeof cacheEntry.dataUrl === 'string' ? cacheEntry.dataUrl : '';
+    },
+    getHostIconFallbackText(host, label = '') {
+      const normalized = this.normalizeText(label || host).replace(/^www\./i, '');
+      const firstChar = Array.from(normalized).find((char) => /[A-Za-z0-9\u4E00-\u9FFF]/.test(char));
+      return (firstChar || '#').toUpperCase();
+    },
     suggestSiteName(pageTitle = this.getPageTitle(), host = constants.HOST) {
       const storedSiteName = this.findStoredSiteName(host);
       if (storedSiteName) {
@@ -107,10 +155,22 @@ export function createUtils({ state, constants, i18nData }) {
     },
     suggestAccountName(host = constants.HOST) {
       const existingNames = this.getSortedKeysByHost(host).map((key) => this.extractName(key));
+      const translatedPrefix = this.t('default_account_prefix');
+      const fallbackPrefixes = {
+        zh: '账号',
+        en: 'Account',
+        es: 'Cuenta'
+      };
+      const prefix =
+        this.normalizeText(
+          translatedPrefix && translatedPrefix !== 'default_account_prefix'
+            ? translatedPrefix
+            : fallbackPrefixes[state.currentLang]
+        ) || 'Account';
       let index = existingNames.length + 1;
       let candidate = '';
       do {
-        candidate = `账号-${String(index).padStart(2, '0')}`;
+        candidate = `${prefix}-${String(index).padStart(2, '0')}`;
         index += 1;
       } while (existingNames.includes(candidate));
 

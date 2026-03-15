@@ -1,15 +1,22 @@
 export function createState({ constants, i18nData }) {
   const navLang = navigator.language.split('-')[0];
   let currentLang = GM_getValue(constants.CFG.LANG, i18nData[navLang] ? navLang : 'en');
+  const storedHostIconCache = GM_getValue(constants.CFG.HOST_ICON_CACHE, {});
 
   if (!i18nData[currentLang]) {
     currentLang = 'en';
   }
 
+  const hostIconCache =
+    storedHostIconCache && typeof storedHostIconCache === 'object' && !Array.isArray(storedHostIconCache)
+      ? storedHostIconCache
+      : {};
+
   return {
     currentLang,
     currentViewingHost: constants.HOST,
     hostDisplayMode: GM_getValue(constants.CFG.HOST_DISPLAY_MODE, 'siteName'),
+    hostIconCache,
     hostEditingHost: null,
     hostEditingValue: '',
     isForcedShow: false,

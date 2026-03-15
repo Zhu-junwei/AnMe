@@ -2,22 +2,19 @@ export function createWebDavUiMethods({ state, constants, utils, core, ui }) {
   return {
     renderWebDavView() {
       const config = core.getWebDavConfig();
+      const hasConfig = core.hasWebDavConfig();
       const statusEl = ui.qs('#webdav-status');
       const syncBtn = ui.qs('#btn-webdav-sync');
       const logoutBtn = ui.qs('#btn-webdav-logout');
       if (!statusEl || !syncBtn || !logoutBtn) return;
 
-      statusEl.textContent = core.hasWebDavConfig()
+      statusEl.textContent = hasConfig
         ? utils.t('webdav_connected_as').replace('{user}', config.username)
         : utils.t('webdav_not_configured');
-      syncBtn.disabled = !core.hasWebDavConfig();
-      syncBtn.style.opacity = syncBtn.disabled ? '0.5' : '1';
-      syncBtn.style.cursor = syncBtn.disabled ? 'not-allowed' : 'pointer';
-      logoutBtn.disabled = !core.hasWebDavConfig();
-      logoutBtn.style.opacity = logoutBtn.disabled ? '0.5' : '1';
-      logoutBtn.style.cursor = logoutBtn.disabled ? 'not-allowed' : 'pointer';
+      syncBtn.disabled = !hasConfig;
+      logoutBtn.disabled = !hasConfig;
 
-      if (core.hasWebDavConfig()) {
+      if (hasConfig) {
         state.webdavBackups = core.getCachedWebDavBackups();
       } else {
         state.webdavBackups = [];
@@ -29,18 +26,20 @@ export function createWebDavUiMethods({ state, constants, utils, core, ui }) {
       if (!container) return;
 
       if (errorMessage) {
-        container.innerHTML = `<div class="acc-webdav-empty">${utils.escapeHtml(errorMessage)}</div>`;
+        utils.setHTML(container, `<div class="acc-webdav-empty">${utils.escapeHtml(errorMessage)}</div>`);
         return;
       }
 
       if (!backups.length) {
-        container.innerHTML = `<div class="acc-webdav-empty">${utils.t('webdav_no_backups')}</div>`;
+        utils.setHTML(container, `<div class="acc-webdav-empty">${utils.t('webdav_no_backups')}</div>`);
         return;
       }
 
-      container.innerHTML = backups
-        .map(
-          (backup) => `
+      utils.setHTML(
+        container,
+        backups
+          .map(
+            (backup) => `
             <div class="acc-webdav-item">
               <div class="acc-webdav-item-main">
                 <div class="acc-webdav-item-name" title="${utils.escapeHtml(backup.fileName)}">${utils.escapeHtml(backup.fileName)}</div>
@@ -55,32 +54,41 @@ export function createWebDavUiMethods({ state, constants, utils, core, ui }) {
               </div>
             </div>
           `
-        )
-        .join('');
+          )
+          .join('')
+      );
     },
     async loadWebDavBackups() {
       const config = core.getWebDavConfig();
+      const refreshBtn = ui.qs('#btn-webdav-refresh');
       if (!config.url || !config.username || !config.password) {
         state.webdavBackups = [];
         ui.renderWebDavBackupList([], utils.t('webdav_need_config'));
         return;
       }
 
-      ui.toggleLoading(true, utils.t('webdav_loading'));
-      try {
-        state.webdavBackups = await core.listWebDavBackups();
-        ui.renderWebDavBackupList(state.webdavBackups);
-      } catch (error) {
-        state.webdavBackups = core.getCachedWebDavBackups();
-        if (state.webdavBackups.length) {
-          ui.renderWebDavBackupList(state.webdavBackups);
-          ui.showToast(error.message || utils.t('webdav_list_err'));
-        } else {
-          ui.renderWebDavBackupList([], error.message || utils.t('webdav_list_err'));
+      await ui.runUiAction({
+        button: refreshBtn,
+        idleText: utils.t('webdav_refresh'),
+        errorKey: 'webdav_list_err',
+        successMessage: utils.t('webdav_refresh_ok'),
+        action: async () => {
+          state.webdavBackups = await core.listWebDavBackups();
+          return state.webdavBackups;
+        },
+        onSuccess: (backups) => {
+          ui.renderWebDavBackupList(backups);
+        },
+        onError: (error) => {
+          const toastMessage = utils.getWebDavErrorMessage(error, 'webdav_list_err');
+          state.webdavBackups = core.getCachedWebDavBackups();
+          if (state.webdavBackups.length) {
+            ui.renderWebDavBackupList(state.webdavBackups);
+          } else {
+            ui.renderWebDavBackupList([], toastMessage);
+          }
         }
-      } finally {
-        ui.toggleLoading(false);
-      }
+      });
     }
   };
 }

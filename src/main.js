@@ -13,7 +13,7 @@ import { createUI } from './app/ui.js';
   const state = createState({ constants: CONST, i18nData: I18N_DATA });
   const utils = createUtils({ state, constants: CONST, i18nData: I18N_DATA });
   const templates = createTemplates({ state, constants: CONST, i18nData: I18N_DATA, utils });
-  const core = createCore({ constants: CONST, utils });
+  const core = createCore({ state, constants: CONST, utils });
   const ui = createUI({ state, constants: CONST, utils, templates, core, styleCss: STYLE_CSS });
   core.setUI(ui);
 

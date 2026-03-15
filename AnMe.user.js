@@ -34,7 +34,9 @@
       FAB_MODE: "cfg_fab_mode",
       FAB_POS: "cfg_fab_pos",
       HOST_DISPLAY_MODE: "cfg_host_display_mode",
+      HOST_ICON_CACHE: "cfg_host_icon_cache",
       WEBDAV_CONFIG: "cfg_webdav_config",
+      WEBDAV_SECRET: "cfg_webdav_secret",
       WEBDAV_BACKUPS_CACHE: "cfg_webdav_backups_cache"
     },
     HOST: location.hostname,
@@ -67,16 +69,17 @@
       CLEAN: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 7V5.5C10 4.11929 11.1193 3 12.5 3H17.5C18.8807 3 20 4.11929 20 5.5V18.5C20 19.8807 18.8807 21 17.5 21H12.5C11.1193 21 10 19.8807 10 18.5V17" stroke="currentColor" stroke-width="1.5"/><path d="M14 12H4M4 12L7 9M4 12L7 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
       BACK: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 12H4M4 12L10 6M4 12L10 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
       HOME: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 10.75L10.4697 4.72557C11.3788 3.99241 12.6212 3.99241 13.5303 4.72557L21 10.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.75 9.5V18C5.75 19.2426 6.75736 20.25 8 20.25H16C17.2426 20.25 18.25 19.2426 18.25 18V9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10 20.25V15.5C10 14.8096 10.5596 14.25 11.25 14.25H12.75C13.4404 14.25 14 14.8096 14 15.5V20.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
-      NOTICE: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 3.75H14.7574C15.753 3.75 16.7078 4.14509 17.4118 4.84835L19.1517 6.58691C19.8561 7.29054 20.2522 8.24559 20.2527 9.24102L20.2571 18C20.2571 19.7949 18.802 21.25 17.0071 21.25H7C5.20507 21.25 3.75 19.7949 3.75 18V7C3.75 5.20507 5.20507 3.75 7 3.75Z" stroke="currentColor" stroke-width="1.5"/><path d="M8 9H16M8 13H16M8 17H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`
+      NOTICE: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3.75C8.27208 3.75 5.25 6.77208 5.25 10.5V11.2143C5.25 12.1418 4.93935 13.0426 4.36716 13.7727L3.73289 14.5818C3.06791 15.4302 3.67234 16.6754 4.75031 16.6754H19.2497C20.3277 16.6754 20.9321 15.4302 20.2671 14.5818L19.6328 13.7727C19.0607 13.0426 18.75 12.1418 18.75 11.2143V10.5C18.75 6.77208 15.7279 3.75 12 3.75Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9.75 19C10.2373 19.7252 11.0642 20.25 12 20.25C12.9358 20.25 13.7627 19.7252 14.25 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M12 7.75V10.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="13.25" r="1" fill="currentColor"/></svg>`
     }
   };
   var I18N_DATA = {
-    zh: { _name: "简体中文", nav_set: "高级设置", nav_notice: "使用声明", nav_about: "关于脚本", back_current_host: "返回当前网站账号", open_site: "打开网站", edit_site_name: "编辑站点名字", search_site: "搜索网站...", search_accounts: "搜索账号", close_search_accounts: "关闭搜索", search_accounts_placeholder: "搜索当前网站账号...", account_settings: "账号设置", site_name: "站点名称", account_name: "账号名称", save_changes: "保存修改", btn_delete_account: "删除该账号", danger_zone: "危险操作", rename_conflict: "该名称已存在，请换一个名称。", confirm_delete: "确定要删除该账号记录吗？", placeholder_site_name: "给当前网站命名...", placeholder_name: "给新账号命名...", tip_help: "切换登录失败？尝试勾选 LocalStorage 和 SessionStorage。", tip_lock: "为保证正常读取Cookie，请在篡改猴高级模式下，设置允许脚本访问 Cookie: ALL", btn_save: "保存当前账号", confirm_overwrite: "⚠️ 该名称已存在，确定要覆盖原有记录吗？", btn_clean: "切换新环境 (清空本站痕迹)", save_empty_err: "⚠️ 没有检测到可保存的数据", copy_account_name: "复制账号名", copy_failed: "复制失败，请手动复制。", toast_saved: "账号已保存", toast_renamed: "账号名称已更新", toast_deleted: "账号已删除", toast_copied: "账号名已复制", toast_site_name_updated: "站点名称已更新", set_fab_mode: "悬浮球显示模式", fab_auto: "智能", fab_show: "常驻", fab_hide: "隐藏", fab_auto_title: "有账号记录时自动显示，无记录时隐藏", fab_show_title: "始终显示悬浮球", fab_hide_title: "平时不显示，仅能通过菜单唤起", set_lang: "语言设置 / Language", set_host_display_mode: "站点列表显示模式", host_display_mode_site_name: "站点名字", host_display_mode_domain: "域名", set_backup: "数据备份与还原", btn_exp_curr: "导出当前网站数据", btn_exp_all: "导出脚本全部数据", btn_imp: "导入备份文件", donate: "支持作者", btn_clear_all: "清空脚本所有数据 (慎用)", notice_title: "《使用声明与免责条款》", back: "← 返回上一级", no_data: "🍃 暂无账号记录", confirm_clean: "确定清空当前网站所有痕迹并开启新环境？", confirm_clear_all: "⚠️ 警告：这将删除本脚本保存的所有网站的所有账号数据！且无法恢复！", import_ok: "✅ 成功导入/更新 {count} 个账号！", import_err: "❌ 导入失败：文件格式错误", export_err: "⚠️ 没有可导出的数据", menu_open: "🚀 开启账号管理", dlg_ok: "确定", dlg_cancel: "取消", about_desc: "通用多网站多账号切换器", notice_content: `<h4>1. 脚本功能说明</h4><p>本脚本通过篡改猴插件提供的存储API，将当前网站的 Cookie、LocalStorage 和 SessionStorage 进行快照保存。当您点击切换时，脚本会清空当前痕迹并还原选中的快照数据，从而实现多账号快速登录。</p><h4>2. 数据存储与联网说明</h4><p>账号数据默认存储在您浏览器的篡改猴插件内部管理器中（GM_setValue）。脚本默认不会主动联网或上传数据；只有在您手动配置并使用 WebDAV 云同步功能时，脚本才会按您的操作访问您指定的远程服务并上传或下载备份文件。</p><h4>3. 风险提示</h4><p>由于浏览器环境的开放性，本脚本无法阻止同域名下的其他恶意脚本通过篡改猴 API 或存储机制尝试获取这些数据。请勿在公共电脑或不可信的设备环境中使用本脚本保存重要账号。</p><h4>4. 免责声明</h4><p>本脚本仅供学习交流使用。因使用本脚本导致的账号被封禁、数据泄露或任何形式的损失，作者不承担任何法律责任。</p>` },
-    en: { _name: "English", nav_set: "Settings", nav_notice: "Disclaimer", nav_about: "About", back_current_host: "Back to current site", open_site: "Open site", edit_site_name: "Edit site name", search_site: "Search sites...", search_accounts: "Search accounts", close_search_accounts: "Close search", search_accounts_placeholder: "Search accounts on this site...", account_settings: "Account Settings", site_name: "Site Name", account_name: "Account Name", save_changes: "Save Changes", btn_delete_account: "Delete Account", danger_zone: "Danger Zone", rename_conflict: "This name already exists. Please choose another one.", confirm_delete: "Are you sure you want to delete this account?", placeholder_site_name: "Name this site...", placeholder_name: "Name this account...", tip_help: "Switch failed? Try checking LocalStorage/SessionStorage.", tip_lock: "To ensure cookies can be read correctly, open Tampermonkey’s Advanced Settings and change “Allow scripts to access cookies” to “ALL”.", btn_save: "Save Current", confirm_overwrite: "⚠️ Name already exists. Do you want to overwrite it?", btn_clean: "Switch to a new environment (clear all data for this site)", save_empty_err: "⚠️ No data detected to save", copy_account_name: "Copy account name", copy_failed: "Copy failed. Please copy it manually.", toast_saved: "Account saved", toast_renamed: "Account name updated", toast_deleted: "Account deleted", toast_copied: "Account name copied", toast_site_name_updated: "Site name updated", set_fab_mode: "Float Button Mode", fab_auto: "Auto", fab_show: "Show", fab_hide: "Hide", fab_auto_title: "Automatically show when accounts exist, hide when none", fab_show_title: "Always show the floating button", fab_hide_title: "Hidden by default, can only be activated via the menu", set_lang: "语言设置 / Language", set_host_display_mode: "Site List Display", host_display_mode_site_name: "Site Name", host_display_mode_domain: "Domain", set_backup: "Backup & Restore", btn_exp_curr: "Export Current Site", btn_exp_all: "Export All Data", btn_imp: "Import Backup", donate: "Buy me a coffee", btn_clear_all: "Clear all script data (use with caution)", notice_title: "Disclaimer & Terms", back: "← Back", no_data: "🍃 No accounts", confirm_clean: "Are you sure you want to clear all traces of the current website and start a new environment?", confirm_clear_all: "⚠️ Warning: This will delete all account data for all websites saved by this script, and cannot be undone!", import_ok: "✅ Successfully imported/updated {count} account(s)!", import_err: "❌ Invalid format", export_err: "⚠️ No data", menu_open: "🚀 Open Manager", dlg_ok: "OK", dlg_cancel: "Cancel", about_desc: "Universal Multi-Site Account Switcher", notice_content: `<h4>1. Script Functionality</h4><p>This script utilizes the storage API provided by Tampermonkey to take snapshots of the current website's Cookies, LocalStorage, and SessionStorage. When switching accounts, the script clears current session data and restores the selected snapshot, enabling rapid multi-account login.</p><h4>2. Data Storage & Network Access</h4><p>Account data is stored locally in your browser's Tampermonkey extension manager (via GM_setValue) by default. The script does not proactively upload data or access remote services unless you explicitly configure and use the WebDAV sync feature; only then will it connect to the WebDAV server you specified to upload or download backup files.</p><h4>3. Risk Warning</h4><p>Due to the open nature of browser environments, this script cannot prevent other malicious scripts on the same domain from attempting to access data via storage mechanisms. Please avoid using this script to save sensitive accounts on public or untrusted devices.</p><h4>4. Disclaimer</h4><p>This script is intended for educational and exchange purposes only. The author shall not be held legally responsible for any account bans, data breaches, or any form of loss resulting from the use of this script.</p>` },
-    es: { _name: "Español", nav_set: "Configuración", nav_notice: "Aviso legal", nav_about: "Acerca de", back_current_host: "Volver al sitio actual", open_site: "Abrir sitio", edit_site_name: "Editar nombre del sitio", search_site: "Buscar sitios...", search_accounts: "Buscar cuentas", close_search_accounts: "Cerrar búsqueda", search_accounts_placeholder: "Buscar cuentas en este sitio...", account_settings: "Configuración de la cuenta", site_name: "Nombre del sitio", account_name: "Nombre de la cuenta", save_changes: "Guardar cambios", btn_delete_account: "Eliminar cuenta", danger_zone: "Zona peligrosa", rename_conflict: "Ese nombre ya existe. Usa otro nombre.", confirm_delete: "¿Estás seguro de que deseas eliminar esta cuenta?", placeholder_site_name: "Nombre para este sitio...", placeholder_name: "Nombre para esta cuenta...", tip_help: "¿Falló el cambio de cuenta? Intenta marcar LocalStorage y SessionStorage.", tip_lock: "Para garantizar la correcta lectura de cookies, abre la configuración avanzada de Tampermonkey y establece “Permitir que los scripts accedan a cookies” en “ALL”.", btn_save: "Guardar cuenta actual", confirm_overwrite: "⚠️ El nombre ya existe. ¿Deseas sobrescribirlo?", btn_clean: "Cambiar a un nuevo entorno (borrar datos del sitio)", save_empty_err: "⚠️ No se detectaron datos para guardar", copy_account_name: "Copiar nombre de la cuenta", copy_failed: "No se pudo copiar. Cópialo manualmente.", toast_saved: "Cuenta guardada", toast_renamed: "Nombre de cuenta actualizado", toast_deleted: "Cuenta eliminada", toast_copied: "Nombre de cuenta copiado", toast_site_name_updated: "Nombre del sitio actualizado", set_fab_mode: "Modo del botón flotante", fab_auto: "Automático", fab_show: "Siempre visible", fab_hide: "Oculto", fab_auto_title: "Se muestra automáticamente cuando hay cuentas guardadas; se oculta si no hay ninguna", fab_show_title: "El botón flotante se muestra siempre", fab_hide_title: "Oculto por defecto, solo accesible desde el menú", set_lang: "Idioma / Language", set_host_display_mode: "Modo de lista de sitios", host_display_mode_site_name: "Nombre del sitio", host_display_mode_domain: "Dominio", set_backup: "Copia de seguridad y restauración", btn_exp_curr: "Exportar datos del sitio actual", btn_exp_all: "Exportar todos los datos del script", btn_imp: "Importar archivo de respaldo", donate: "Apoyar al autor", btn_clear_all: "Borrar todos los datos del script (usar con precaución)", notice_title: "Términos de uso y descargo de responsabilidad", back: "← Volver", no_data: "🍃 No hay cuentas", confirm_clean: "¿Seguro que deseas borrar todos los rastros del sitio actual y comenzar un nuevo entorno?", confirm_clear_all: "⚠️ Advertencia: Esto eliminará todos los datos de cuentas de todos los sitios guardados por este script. ¡Esta acción no se puede deshacer!", import_ok: "✅ Se importaron/actualizaron correctamente {count} cuenta(s)", import_err: "❌ Error de importación: formato de archivo inválido", export_err: "⚠️ No hay datos para exportar", menu_open: "🚀 Abrir gestor de cuentas", dlg_ok: "Aceptar", dlg_cancel: "Cancelar", about_desc: "Conmutador universal de múltiples cuentas para múltiples sitios", notice_content: `<h4>1. Funcionalidad del script</h4><p>Este script utiliza la API de almacenamiento proporcionada por Tampermonkey para guardar instantáneas de las Cookies, LocalStorage y SessionStorage del sitio web actual. Al cambiar de cuenta, el script borra los datos actuales y restaura la instantánea seleccionada, permitiendo un inicio de sesión rápido con múltiples cuentas.</p><h4>2. Almacenamiento y acceso de red</h4><p>Los datos de las cuentas se almacenan localmente en el administrador interno de Tampermonkey (mediante GM_setValue) de forma predeterminada. El script no sube datos ni accede a servicios remotos por iniciativa propia; solo se conectará al servidor WebDAV que configures cuando habilites y utilices explícitamente la función de sincronización para subir o descargar copias de seguridad.</p><h4>3. Advertencia de riesgo</h4><p>Debido a la naturaleza abierta del entorno del navegador, este script no puede impedir que otros scripts maliciosos bajo el mismo dominio intenten acceder a estos datos mediante mecanismos de almacenamiento. Evita guardar cuentas sensibles en equipos públicos o no confiables.</p><h4>4. Descargo de responsabilidad</h4><p>Este script se proporciona únicamente con fines educativos y de intercambio. El autor no asume ninguna responsabilidad legal por bloqueos de cuentas, fugas de datos o cualquier tipo de pérdida derivada del uso de este script.</p>` }
+    zh: { _name: "简体中文", nav_set: "高级设置", nav_notice: "使用声明", nav_about: "关于脚本", back_current_host: "返回当前网站账号", open_site: "打开网站", edit_site_name: "编辑站点名字", search_site: "搜索网站...", search_accounts: "搜索账号", close_search_accounts: "关闭搜索", search_accounts_placeholder: "搜索当前网站账号...", account_settings: "账号设置", site_name: "站点名称", account_name: "账号名称", save_changes: "保存修改", btn_delete_account: "删除该账号", danger_zone: "危险操作", rename_conflict: "该名称已存在，请换一个名称。", confirm_delete: "确定要删除该账号记录吗？", placeholder_site_name: "给当前网站命名...", placeholder_name: "给新账号命名...", tip_help: "切换登录失败？尝试勾选 LocalStorage 和 SessionStorage。", tip_lock: "为保证正常读取Cookie，请在篡改猴高级模式下，设置允许脚本访问 Cookie: ALL", btn_save: "保存当前账号", confirm_overwrite: "⚠️ 该名称已存在，确定要覆盖原有记录吗？", btn_clean: "切换新环境 (清空本站痕迹)", save_empty_err: "⚠️ 没有检测到可保存的数据", copy_account_name: "复制账号名", copy_failed: "复制失败，请手动复制。", toast_saved: "账号已保存", toast_renamed: "账号名称已更新", toast_deleted: "账号已删除", toast_copied: "账号名已复制", toast_site_name_updated: "站点名称已更新", set_fab_mode: "悬浮球显示模式", fab_auto: "智能", fab_show: "常驻", fab_hide: "隐藏", fab_auto_title: "有账号记录时自动显示，无记录时隐藏", fab_show_title: "始终显示悬浮球", fab_hide_title: "平时不显示，仅能通过菜单唤起", set_lang: "语言设置 / Language", set_host_display_mode: "站点列表显示模式", host_display_mode_site_name: "站点名字", host_display_mode_domain: "域名", set_backup: "数据备份与还原", btn_exp_curr: "导出当前网站数据", btn_exp_all: "导出全部网站数据", btn_imp: "导入备份文件", donate: "支持作者", btn_clear_all: "清空脚本所有数据 (慎用)", notice_title: "《使用声明与免责条款》", back: "← 返回上一级", no_data: "🍃 暂无账号记录", confirm_clean: "确定清空当前网站所有痕迹并开启新环境？", confirm_clear_all: "⚠️ 警告：这将删除本脚本保存的所有网站的所有账号数据！且无法恢复！", import_ok: "✅ 成功导入/更新 {count} 个账号！", import_err: "❌ 导入失败：文件格式错误", export_err: "⚠️ 没有可导出的数据", menu_open: "🚀 开启账号管理", dlg_ok: "确定", dlg_cancel: "取消", about_desc: "通用多网站多账号切换器", notice_content: `<h4>1. 脚本功能说明</h4><p>本脚本通过篡改猴插件提供的存储API，将当前网站的 Cookie、LocalStorage 和 SessionStorage 进行快照保存。当您点击切换时，脚本会清空当前痕迹并还原选中的快照数据，从而实现多账号快速登录。</p><h4>2. 数据存储与联网说明</h4><p>账号数据默认存储在您浏览器的篡改猴插件内部管理器中（GM_setValue）。脚本默认不会主动联网或上传数据；只有在您手动配置并使用 WebDAV 云同步功能时，脚本才会按您的操作访问您指定的远程服务并上传或下载备份文件。</p><h4>3. 风险提示</h4><p>由于浏览器环境的开放性，本脚本无法阻止同域名下的其他恶意脚本通过篡改猴 API 或存储机制尝试获取这些数据。请勿在公共电脑或不可信的设备环境中使用本脚本保存重要账号。</p><h4>4. 免责声明</h4><p>本脚本仅供学习交流使用。因使用本脚本导致的账号被封禁、数据泄露或任何形式的损失，作者不承担任何法律责任。</p>` },
+    en: { _name: "English", nav_set: "Settings", nav_notice: "Disclaimer", nav_about: "About", back_current_host: "Back to current site", open_site: "Open site", edit_site_name: "Edit site name", search_site: "Search sites...", search_accounts: "Search accounts", close_search_accounts: "Close search", search_accounts_placeholder: "Search accounts on this site...", account_settings: "Account Settings", site_name: "Site Name", account_name: "Account Name", save_changes: "Save Changes", btn_delete_account: "Delete Account", danger_zone: "Danger Zone", rename_conflict: "This name already exists. Please choose another one.", confirm_delete: "Are you sure you want to delete this account?", placeholder_site_name: "Name this site...", placeholder_name: "Name this account...", tip_help: "Switch failed? Try checking LocalStorage/SessionStorage.", tip_lock: "To ensure cookies can be read correctly, open Tampermonkey’s Advanced Settings and change “Allow scripts to access cookies” to “ALL”.", btn_save: "Save Current", confirm_overwrite: "⚠️ Name already exists. Do you want to overwrite it?", btn_clean: "Switch to a new environment (clear all data for this site)", save_empty_err: "⚠️ No data detected to save", copy_account_name: "Copy account name", copy_failed: "Copy failed. Please copy it manually.", toast_saved: "Account saved", toast_renamed: "Account name updated", toast_deleted: "Account deleted", toast_copied: "Account name copied", toast_site_name_updated: "Site name updated", set_fab_mode: "Float Button Mode", fab_auto: "Auto", fab_show: "Show", fab_hide: "Hide", fab_auto_title: "Automatically show when accounts exist, hide when none", fab_show_title: "Always show the floating button", fab_hide_title: "Hidden by default, can only be activated via the menu", set_lang: "语言设置 / Language", set_host_display_mode: "Site List Display", host_display_mode_site_name: "Site Name", host_display_mode_domain: "Domain", set_backup: "Backup & Restore", btn_exp_curr: "Export Current Site", btn_exp_all: "Export All Sites Data", btn_imp: "Import Backup", donate: "Buy me a coffee", btn_clear_all: "Clear all script data (use with caution)", notice_title: "Disclaimer & Terms", back: "← Back", no_data: "🍃 No accounts", confirm_clean: "Are you sure you want to clear all traces of the current website and start a new environment?", confirm_clear_all: "⚠️ Warning: This will delete all account data for all websites saved by this script, and cannot be undone!", import_ok: "✅ Successfully imported/updated {count} account(s)!", import_err: "❌ Invalid format", export_err: "⚠️ No data", menu_open: "🚀 Open Manager", dlg_ok: "OK", dlg_cancel: "Cancel", about_desc: "Universal Multi-Site Account Switcher", notice_content: `<h4>1. Script Functionality</h4><p>This script utilizes the storage API provided by Tampermonkey to take snapshots of the current website's Cookies, LocalStorage, and SessionStorage. When switching accounts, the script clears current session data and restores the selected snapshot, enabling rapid multi-account login.</p><h4>2. Data Storage & Network Access</h4><p>Account data is stored locally in your browser's Tampermonkey extension manager (via GM_setValue) by default. The script does not proactively upload data or access remote services unless you explicitly configure and use the WebDAV sync feature; only then will it connect to the WebDAV server you specified to upload or download backup files.</p><h4>3. Risk Warning</h4><p>Due to the open nature of browser environments, this script cannot prevent other malicious scripts on the same domain from attempting to access data via storage mechanisms. Please avoid using this script to save sensitive accounts on public or untrusted devices.</p><h4>4. Disclaimer</h4><p>This script is intended for educational and exchange purposes only. The author shall not be held legally responsible for any account bans, data breaches, or any form of loss resulting from the use of this script.</p>` },
+    es: { _name: "Español", nav_set: "Configuración", nav_notice: "Aviso legal", nav_about: "Acerca de", back_current_host: "Volver al sitio actual", open_site: "Abrir sitio", edit_site_name: "Editar nombre del sitio", search_site: "Buscar sitios...", search_accounts: "Buscar cuentas", close_search_accounts: "Cerrar búsqueda", search_accounts_placeholder: "Buscar cuentas en este sitio...", account_settings: "Configuración de la cuenta", site_name: "Nombre del sitio", account_name: "Nombre de la cuenta", save_changes: "Guardar cambios", btn_delete_account: "Eliminar cuenta", danger_zone: "Zona peligrosa", rename_conflict: "Ese nombre ya existe. Usa otro nombre.", confirm_delete: "¿Estás seguro de que deseas eliminar esta cuenta?", placeholder_site_name: "Nombre para este sitio...", placeholder_name: "Nombre para esta cuenta...", tip_help: "¿Falló el cambio de cuenta? Intenta marcar LocalStorage y SessionStorage.", tip_lock: "Para garantizar la correcta lectura de cookies, abre la configuración avanzada de Tampermonkey y establece “Permitir que los scripts accedan a cookies” en “ALL”.", btn_save: "Guardar cuenta actual", confirm_overwrite: "⚠️ El nombre ya existe. ¿Deseas sobrescribirlo?", btn_clean: "Cambiar a un nuevo entorno (borrar datos del sitio)", save_empty_err: "⚠️ No se detectaron datos para guardar", copy_account_name: "Copiar nombre de la cuenta", copy_failed: "No se pudo copiar. Cópialo manualmente.", toast_saved: "Cuenta guardada", toast_renamed: "Nombre de cuenta actualizado", toast_deleted: "Cuenta eliminada", toast_copied: "Nombre de cuenta copiado", toast_site_name_updated: "Nombre del sitio actualizado", set_fab_mode: "Modo del botón flotante", fab_auto: "Automático", fab_show: "Siempre visible", fab_hide: "Oculto", fab_auto_title: "Se muestra automáticamente cuando hay cuentas guardadas; se oculta si no hay ninguna", fab_show_title: "El botón flotante se muestra siempre", fab_hide_title: "Oculto por defecto, solo accesible desde el menú", set_lang: "Idioma / Language", set_host_display_mode: "Modo de lista de sitios", host_display_mode_site_name: "Nombre del sitio", host_display_mode_domain: "Dominio", set_backup: "Copia de seguridad y restauración", btn_exp_curr: "Exportar datos del sitio actual", btn_exp_all: "Exportar todos los datos de los sitios", btn_imp: "Importar archivo de respaldo", donate: "Apoyar al autor", btn_clear_all: "Borrar todos los datos del script (usar con precaución)", notice_title: "Términos de uso y descargo de responsabilidad", back: "← Volver", no_data: "🍃 No hay cuentas", confirm_clean: "¿Seguro que deseas borrar todos los rastros del sitio actual y comenzar un nuevo entorno?", confirm_clear_all: "⚠️ Advertencia: Esto eliminará todos los datos de cuentas de todos los sitios guardados por este script. ¡Esta acción no se puede deshacer!", import_ok: "✅ Se importaron/actualizaron correctamente {count} cuenta(s)", import_err: "❌ Error de importación: formato de archivo inválido", export_err: "⚠️ No hay datos para exportar", menu_open: "🚀 Abrir gestor de cuentas", dlg_ok: "Aceptar", dlg_cancel: "Cancelar", about_desc: "Conmutador universal de múltiples cuentas para múltiples sitios", notice_content: `<h4>1. Funcionalidad del script</h4><p>Este script utiliza la API de almacenamiento proporcionada por Tampermonkey para guardar instantáneas de las Cookies, LocalStorage y SessionStorage del sitio web actual. Al cambiar de cuenta, el script borra los datos actuales y restaura la instantánea seleccionada, permitiendo un inicio de sesión rápido con múltiples cuentas.</p><h4>2. Almacenamiento y acceso de red</h4><p>Los datos de las cuentas se almacenan localmente en el administrador interno de Tampermonkey (mediante GM_setValue) de forma predeterminada. El script no sube datos ni accede a servicios remotos por iniciativa propia; solo se conectará al servidor WebDAV que configures cuando habilites y utilices explícitamente la función de sincronización para subir o descargar copias de seguridad.</p><h4>3. Advertencia de riesgo</h4><p>Debido a la naturaleza abierta del entorno del navegador, este script no puede impedir que otros scripts maliciosos bajo el mismo dominio intenten acceder a estos datos mediante mecanismos de almacenamiento. Evita guardar cuentas sensibles en equipos públicos o no confiables.</p><h4>4. Descargo de responsabilidad</h4><p>Este script se proporciona únicamente con fines educativos y de intercambio. El autor no asume ninguna responsabilidad legal por bloqueos de cuentas, fugas de datos o cualquier tipo de pérdida derivada del uso de este script.</p>` }
   };
   Object.assign(I18N_DATA.zh, {
     nav_webdav: "WebDAV 同步",
+    default_account_prefix: "账号",
     webdav_account: "WebDAV 账号",
     webdav_config: "设置",
     webdav_not_configured: "尚未配置 WebDAV",
@@ -91,6 +94,7 @@
     webdav_sync: "云同步",
     webdav_sync_now: "备份",
     webdav_refresh: "刷新列表",
+    webdav_refresh_ok: "刷新成功",
     webdav_backup_list: "云端备份列表",
     webdav_restore: "恢复",
     webdav_delete: "删除",
@@ -114,11 +118,13 @@
     webdav_logout_confirm: "确定退出 WebDAV 并删除本地保存的账号信息吗？",
     webdav_logout_ok: "已退出 WebDAV",
     webdav_timeout: "WebDAV 请求超时，请检查网络或服务状态。",
+    webdav_timeout_check_settings: "已超时，请检查 WebDAV 设置。",
     sync_restore_ok: "✅ 已从云端同步恢复 {count} 个账号！",
     sync_restore_err: "云端恢复失败，压缩包或数据文件无效。"
   });
   Object.assign(I18N_DATA.en, {
     nav_webdav: "WebDAV Sync",
+    default_account_prefix: "Account",
     webdav_account: "WebDAV Account",
     webdav_config: "Settings",
     webdav_not_configured: "WebDAV is not configured yet",
@@ -133,6 +139,7 @@
     webdav_sync: "Cloud Sync",
     webdav_sync_now: "Backup",
     webdav_refresh: "Refresh List",
+    webdav_refresh_ok: "List refreshed",
     webdav_backup_list: "Cloud Backup List",
     webdav_restore: "Restore",
     webdav_delete: "Delete",
@@ -156,11 +163,13 @@
     webdav_logout_confirm: "Sign out of WebDAV and remove the saved local account info?",
     webdav_logout_ok: "Signed out of WebDAV",
     webdav_timeout: "WebDAV request timed out. Check the network or server status.",
+    webdav_timeout_check_settings: "Request timed out. Please check your WebDAV settings.",
     sync_restore_ok: "✅ Restored {count} account(s) from cloud sync!",
     sync_restore_err: "Cloud restore failed. The archive or data file is invalid."
   });
   Object.assign(I18N_DATA.es, {
     nav_webdav: "Sincronización WebDAV",
+    default_account_prefix: "Cuenta",
     webdav_account: "Cuenta WebDAV",
     webdav_config: "Configurar",
     webdav_not_configured: "WebDAV aún no está configurado",
@@ -175,6 +184,7 @@
     webdav_sync: "Sincronización en la nube",
     webdav_sync_now: "Respaldar",
     webdav_refresh: "Actualizar lista",
+    webdav_refresh_ok: "Lista actualizada",
     webdav_backup_list: "Lista de copias en la nube",
     webdav_restore: "Restaurar",
     webdav_delete: "Eliminar",
@@ -198,6 +208,7 @@
     webdav_logout_confirm: "¿Cerrar sesión de WebDAV y eliminar la información guardada localmente?",
     webdav_logout_ok: "WebDAV desconectado",
     webdav_timeout: "La solicitud de WebDAV agotó el tiempo de espera. Revisa la red o el servidor.",
+    webdav_timeout_check_settings: "Se agotó el tiempo de espera. Revisa la configuración de WebDAV.",
     sync_restore_ok: "✅ Se restauraron {count} cuenta(s) desde la sincronización en la nube.",
     sync_restore_err: "La restauración en la nube falló. El archivo comprimido o los datos no son válidos."
   });
@@ -220,28 +231,34 @@
         .acc-header-actions { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); display: none; gap: 6px; align-items: center; }
         .acc-header-right-actions { position:absolute; right:15px; top:50%; transform:translateY(-50%); display:flex; gap:6px; align-items:center; }
         .acc-header-title { font-size: 14px; font-weight: bold; color: #333; text-align: center; }
-        #acc-close-btn { cursor: pointer; color: #ccc; font-size: 16px; padding: 5px; transition: color 0.2s; line-height:1; }
-        #acc-close-btn:hover { color: #666; }
-
         .acc-tab-content { flex: 1; display: none; padding: 15px 15px 0 15px; overflow: hidden; flex-direction: column; background: #fff; }
         .acc-tab-content.active { display: flex; }
         .acc-mgr-toolbar { display:flex; gap:8px; margin-bottom:10px; align-items:center; min-height:30px; }
         .acc-mgr-host-row { display:flex; gap:5px; align-items:center; flex:1; min-width:0; position:relative; min-height:30px; }
         .acc-host-picker { position:relative; flex:1; min-width:0; min-height:30px; }
-        .acc-host-search-input { display:none; width:100%; height:30px; box-sizing:border-box; border:1px solid #e4e8ee; border-radius:6px; padding:7px 10px; font-size:12px; outline:none; color:#333; background:#fff; }
+        .acc-host-search-input { display:none; width:100%; height:30px; box-sizing:border-box; border:1px solid #d0d5dd; border-radius:6px; padding:7px 10px; font-size:12px; outline:none; color:#333; background:#fff; }
         .acc-host-search-input:focus { border-color:#2196F3; box-shadow:0 0 0 2px rgba(33, 150, 243, 0.12); }
         .acc-host-picker.open .acc-host-trigger { display:none; }
         .acc-host-picker.open .acc-host-search-input { display:block; }
         .acc-account-search-box { display:none; flex:1; min-width:0; min-height:30px; }
         .acc-mgr-host-row.searching .acc-host-picker { display:none; }
         .acc-mgr-host-row.searching .acc-account-search-box { display:block; }
-        .acc-host-trigger { width:100%; min-width:0; height:30px; box-sizing:border-box; padding:6px 28px 6px 10px; font-size:12px; border:1px solid #eee; border-radius:4px; outline:none; cursor:pointer; background:#fff; color:#333; text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; position:relative; }
+        .acc-host-trigger { width:100%; min-width:0; height:30px; box-sizing:border-box; padding:6px 28px 6px 10px; font-size:12px; border:1px solid #d0d5dd; border-radius:4px; outline:none; cursor:pointer; background:#fff; color:#333; text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; position:relative; }
+        .acc-host-trigger-content,
+        .acc-host-option-content { display:flex; align-items:center; gap:8px; min-width:0; width:100%; }
+        .acc-host-trigger-label,
+        .acc-host-option-label { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .acc-host-icon { width:16px; height:16px; min-width:16px; border-radius:4px; overflow:hidden; border:none; background:transparent; display:inline-flex; align-items:center; justify-content:center; position:relative; flex-shrink:0; box-sizing:border-box; }
+        .acc-host-favicon { width:100%; height:100%; display:block; object-fit:cover; background:transparent; }
+        .acc-host-icon-fallback { position:absolute; inset:0; display:none; align-items:center; justify-content:center; font-size:9px; font-weight:700; color:#667085; text-transform:uppercase; background:#eef2f6; border-radius:4px; }
+        .acc-host-icon.is-fallback .acc-host-favicon { display:none; }
+        .acc-host-icon.is-fallback .acc-host-icon-fallback { display:flex; }
         .acc-host-trigger::after { content:""; position:absolute; right:10px; top:50%; width:7px; height:7px; border-right:1.5px solid currentColor; border-bottom:1.5px solid currentColor; transform:translateY(-65%) rotate(45deg); opacity:0.7; transition:transform 0.15s ease; }
         .acc-host-picker.open .acc-host-trigger { border-color:#2196F3; box-shadow:0 0 0 2px rgba(33, 150, 243, 0.12); }
         .acc-host-picker.open .acc-host-trigger::after { transform:translateY(-30%) rotate(225deg); }
-        .acc-host-menu { position:absolute; top:calc(100% + 4px); left:0; right:0; background:#fff; border:1px solid #e4e8ee; border-radius:8px; box-shadow:0 10px 24px rgba(15, 23, 42, 0.12); padding:6px; display:none; max-height:320px; overflow:hidden; z-index:20; overscroll-behavior:contain; }
+        .acc-host-menu { position:absolute; top:calc(100% + 4px); left:0; right:0; background:#fff; border:1px solid #d0d5dd; border-radius:8px; box-shadow:0 10px 24px rgba(15, 23, 42, 0.12); padding:6px; display:none; max-height:320px; overflow:hidden; z-index:20; overscroll-behavior:contain; }
         .acc-host-picker.open .acc-host-menu { display:block; }
-        .acc-account-search-input { width:100%; height:30px; box-sizing:border-box; border:1px solid #e4e8ee; border-radius:6px; padding:7px 10px; font-size:12px; outline:none; color:#333; background:#fff; }
+        .acc-account-search-input { width:100%; height:30px; box-sizing:border-box; border:1px solid #d0d5dd; border-radius:6px; padding:7px 10px; font-size:12px; outline:none; color:#333; background:#fff; }
         .acc-account-search-input:focus { border-color:#2196F3; box-shadow:0 0 0 2px rgba(33, 150, 243, 0.12); }
         .acc-host-list { max-height:266px; overflow-y:auto; overscroll-behavior:contain; }
         .acc-host-list::-webkit-scrollbar { width:6px; }
@@ -273,10 +290,12 @@
         .acc-host-edit-cancel:hover { border-color:#2196F3; color:#2196F3; background:#f5fbff; }
         .acc-host-empty { padding:10px; font-size:12px; color:#8a94a3; text-align:center; }
         .acc-toolbar-btn { width:30px; height:30px; border:1px solid #ddd; background:#fff; border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#555; padding:0; transition:0.2s; }
+        .acc-toolbar-btn:disabled { opacity:.5; cursor:not-allowed; }
         .acc-toolbar-btn svg { font-size:16px; }
         .acc-toolbar-btn:hover { background:#e3f2fd; border-color:#2196F3; color:#2196F3; }
 
         .acc-scroll-area { flex: 1; overflow-y: auto; padding-right: 4px; margin-top: 2px; overscroll-behavior: contain;}
+        #switch-area { padding-left:12px; padding-right:12px; margin-left:-12px; margin-right:-12px; }
         .acc-scroll-area::-webkit-scrollbar { width: 4px; }
         .acc-scroll-area::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; }
 
@@ -301,8 +320,11 @@
         .acc-dialog-msg { font-size: 14px; color: #333; margin-bottom: 20px; line-height: 1.5; text-align: center; white-space: pre-wrap; font-weight: 500; }
         .acc-dialog-footer { display: flex; gap: 10px; }
         .acc-dialog-btn { flex: 1; padding: 8px 0; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.1s; }
+        .acc-dialog-btn:disabled { opacity:.5; cursor:not-allowed; }
         .acc-dialog-btn-ok { background: #2196F3; color: white; }
         .acc-dialog-btn-ok:hover { background: #1976D2; }
+        .acc-dialog-btn-ok.is-loading { display:flex; align-items:center; justify-content:center; }
+        .acc-inline-spinner { width:14px; height:14px; border:2px solid rgba(255,255,255,.35); border-top-color:#fff; border-radius:50%; animation:acc-spin .8s linear infinite; }
         .acc-dialog-btn-cancel { background: #f5f5f5; color: #666; }
         .acc-dialog-btn-cancel:hover { background: #e0e0e0; }
         .acc-form-mask { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 2000006; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
@@ -317,18 +339,19 @@
         .acc-toast-text { overflow:hidden; text-overflow:ellipsis; }
 
         /* Others ... */
-        .acc-switch-item { display:flex; align-items:stretch; gap:2px; margin-bottom:8px; position:relative; }
-        .acc-switch-card { flex:1; min-width:0; padding: 12px; padding-right: 40px; border: 1px solid #eee; border-radius: 8px; cursor: pointer; transition: 0.2s; position: relative; background: #fff; }
+        .acc-switch-item { display:flex; align-items:stretch; margin-bottom:8px; position:relative; }
+        .acc-switch-item::before { content:""; position:absolute; left:-12px; top:0; bottom:0; width:16px; }
+        .acc-switch-card { flex:1; min-width:0; padding: 12px; padding-right: 40px; border: 1px solid #d0d5dd; border-radius: 8px; cursor: pointer; transition: 0.2s; position: relative; background: #fff; }
         .acc-switch-card:hover { border-color: #2196F3; }
         .acc-switch-card:hover .acc-card-name svg {fill: #2196F3 !important;stroke: #2196F3 !important;transition: all 0.2s ease;}
         .acc-switch-card-static { cursor: default; }
-        .acc-switch-handle { width:6px; flex-shrink:0; align-self:stretch; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; color:#c4c4c4; font-size:9px; font-weight:700; user-select:none; cursor:grab; line-height:1; border-radius:4px; padding:0; opacity:0; visibility:hidden; pointer-events:none; transition:opacity 0.15s ease, color 0.15s ease, background 0.15s ease; }
+        .acc-switch-handle { position:absolute; left:-8px; top:0; bottom:0; width:6px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; color:#c4c4c4; font-size:9px; font-weight:700; user-select:none; cursor:grab; line-height:1; border-radius:4px; padding:0; opacity:0; visibility:hidden; pointer-events:none; transition:opacity 0.15s ease, color 0.15s ease, background 0.15s ease; z-index:2; }
         .acc-switch-handle span { display:block; letter-spacing:0; }
         .acc-switch-item:hover .acc-switch-handle,
         .acc-switch-item.dragging-source .acc-switch-handle { color:#2196F3; background:#f2f8fd; opacity:1; visibility:visible; pointer-events:auto; }
         .acc-switch-ghost { box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18); opacity: 0.96; }
         .acc-switch-item.dragging-source .acc-switch-card { border:1px dashed #2196F3; opacity:0.45; background:#fff; }
-        .acc-switch-list-sorting .acc-switch-card:hover { border-color:#eee; background:#fff; }
+        .acc-switch-list-sorting .acc-switch-card:hover { border-color:#d0d5dd; background:#fff; }
         .acc-switch-list-sorting .acc-switch-card:hover .acc-card-name svg { fill: currentColor !important; stroke: currentColor !important; }
         .acc-switch-settings-btn { position:absolute; right:8px; bottom:8px; width:24px; height:24px; border:1px solid #ddd; border-radius:6px; background:transparent; color:#7d93a8; display:flex; align-items:center; justify-content:center; padding:0; cursor:pointer; opacity:0; visibility:hidden; transition:all 0.15s ease; }
         .acc-switch-settings-btn svg { font-size:14px; }
@@ -352,7 +375,11 @@
         .acc-input-text { flex: 1; width:100%; padding: 8px; margin-bottom:8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; box-sizing: border-box; background: #fff; color: #333; outline: none; transition: all 0.2s; }
         .acc-input-text:focus { border-color: #2196F3; box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2); }
         .acc-btn { border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 5px; transition: 0.2s; }
+        .acc-btn:disabled { opacity:.5; cursor:not-allowed; }
+        .acc-btn.is-loading { pointer-events:none; }
         .acc-btn-blue { flex: 1; background: #2196F3; color: white; }
+        .acc-btn.is-loading .acc-inline-spinner { border-color: rgba(255,255,255,.35); border-top-color:#fff; }
+        .acc-btn-light.is-loading .acc-inline-spinner { border-color: rgba(102,102,102,.2); border-top-color:#666; }
         .acc-btn-danger { width:100%; background:#ffebee; color:#c62828; border:1px solid #ffcdd2; }
         .acc-btn-danger:hover { background:#ffcdd2; border-color:#ef9a9a; }
         .acc-help-tip, .acc-lock-tip { display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; cursor: help; font-size: 16px; }
@@ -407,13 +434,16 @@
   function createState({ constants, i18nData }) {
     const navLang = navigator.language.split("-")[0];
     let currentLang = GM_getValue(constants.CFG.LANG, i18nData[navLang] ? navLang : "en");
+    const storedHostIconCache = GM_getValue(constants.CFG.HOST_ICON_CACHE, {});
     if (!i18nData[currentLang]) {
       currentLang = "en";
     }
+    const hostIconCache = storedHostIconCache && typeof storedHostIconCache === "object" && !Array.isArray(storedHostIconCache) ? storedHostIconCache : {};
     return {
       currentLang,
       currentViewingHost: constants.HOST,
       hostDisplayMode: GM_getValue(constants.CFG.HOST_DISPLAY_MODE, "siteName"),
+      hostIconCache,
       hostEditingHost: null,
       hostEditingValue: "",
       isForcedShow: false,
@@ -438,6 +468,7 @@
 
   // src/app/utils.js
   function createUtils({ state, constants, i18nData }) {
+    let trustedHtmlPolicy;
     return {
       normalizeText(value) {
         return String(value || "").replace(/\s+/g, " ").trim();
@@ -445,8 +476,40 @@
       t(key) {
         return i18nData[state.currentLang][key] || key;
       },
+      isWebDavTimeoutError(error) {
+        const message = String(error?.message || error || "").trim();
+        return message === this.t("webdav_timeout");
+      },
+      isWebDavRequestError(error) {
+        const message = String(error?.message || error || "").trim();
+        return /^(GET|PUT|POST|DELETE|PROPFIND|MKCOL|HEAD|OPTIONS|PATCH)\s+/i.test(message);
+      },
+      getWebDavErrorMessage(error, fallbackKey = "") {
+        const message = String(error?.message || error || "").trim();
+        if (this.isWebDavTimeoutError(error) || this.isWebDavRequestError(error)) {
+          return this.t("webdav_timeout_check_settings");
+        }
+        return message || (fallbackKey ? this.t(fallbackKey) : "");
+      },
       escapeHtml(value) {
         return String(value || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+      },
+      toTrustedHtml(html) {
+        const normalized = String(html || "");
+        if (trustedHtmlPolicy === void 0) {
+          try {
+            trustedHtmlPolicy = typeof trustedTypes !== "undefined" && typeof trustedTypes.createPolicy === "function" ? trustedTypes.getPolicy?.("anme-html") || trustedTypes.createPolicy("anme-html", {
+              createHTML: (value) => String(value || "")
+            }) : null;
+          } catch {
+            trustedHtmlPolicy = null;
+          }
+        }
+        return trustedHtmlPolicy ? trustedHtmlPolicy.createHTML(normalized) : normalized;
+      },
+      setHTML(element, html) {
+        if (!element) return;
+        element.innerHTML = this.toTrustedHtml(html);
       },
       extractName(key) {
         return key.split("::")[1] || key;
@@ -521,6 +584,16 @@
       getHostDisplayName(host, mode = state.hostDisplayMode || "siteName") {
         return mode === "domain" ? host : this.getSiteNameByHost(host);
       },
+      getCachedHostIcon(host) {
+        const cacheEntry = state.hostIconCache?.[host];
+        if (!cacheEntry || typeof cacheEntry !== "object") return "";
+        return typeof cacheEntry.dataUrl === "string" ? cacheEntry.dataUrl : "";
+      },
+      getHostIconFallbackText(host, label = "") {
+        const normalized = this.normalizeText(label || host).replace(/^www\./i, "");
+        const firstChar = Array.from(normalized).find((char) => /[A-Za-z0-9\u4E00-\u9FFF]/.test(char));
+        return (firstChar || "#").toUpperCase();
+      },
       suggestSiteName(pageTitle = this.getPageTitle(), host = constants.HOST) {
         const storedSiteName = this.findStoredSiteName(host);
         if (storedSiteName) {
@@ -530,10 +603,19 @@
       },
       suggestAccountName(host = constants.HOST) {
         const existingNames = this.getSortedKeysByHost(host).map((key) => this.extractName(key));
+        const translatedPrefix = this.t("default_account_prefix");
+        const fallbackPrefixes = {
+          zh: "账号",
+          en: "Account",
+          es: "Cuenta"
+        };
+        const prefix = this.normalizeText(
+          translatedPrefix && translatedPrefix !== "default_account_prefix" ? translatedPrefix : fallbackPrefixes[state.currentLang]
+        ) || "Account";
         let index = existingNames.length + 1;
         let candidate = "";
         do {
-          candidate = `账号-${String(index).padStart(2, "0")}`;
+          candidate = `${prefix}-${String(index).padStart(2, "0")}`;
           index += 1;
         } while (existingNames.includes(candidate));
         return candidate;
@@ -553,17 +635,17 @@
           <div class="acc-header-actions" id="acc-header-actions">
               <button class="acc-toolbar-btn" id="btn-header-back" title="${utils.t("back")}">${constants.ICONS.BACK}</button>
               <button class="acc-toolbar-btn" id="btn-go-current-host" title="${utils.t("back_current_host")}">${constants.ICONS.HOME}</button>
-              <button class="acc-toolbar-btn" id="btn-clean-env" title="${utils.t("btn_clean")}">${constants.ICONS.CLEAN}</button>
               <button class="acc-toolbar-btn" id="btn-open-save-modal" title="${utils.t("btn_save")}">${constants.ICONS.SAVE}</button>
+              <button class="acc-toolbar-btn" id="btn-clean-env" title="${utils.t("btn_clean")}">${constants.ICONS.CLEAN}</button>
           </div>
           <div class="acc-header-title" id="acc-header-text"></div>
           <div class="acc-header-right-actions">
               <button class="acc-toolbar-btn" id="btn-open-project" title="GitHub">${constants.ICONS.GITHUB}</button>
               <button class="acc-toolbar-btn" id="btn-open-webdav" title="${utils.t("nav_webdav")}">${constants.ICONS.CLOUD}</button>
               <button class="acc-toolbar-btn" id="btn-open-settings" title="${utils.t("nav_set")}">${constants.ICONS.SETTINGS}</button>
-              <div id="acc-close-btn">&times;</div>
-          </div>
-      </div>
+              <button class="acc-toolbar-btn" id="acc-close-btn" title="${utils.t("dlg_cancel")}" type="button">${constants.ICONS.CLOSE}</button>
+            </div>
+        </div>
 
       <div class="acc-tab-content active" id="pg-switch">
           <div class="acc-mgr-toolbar">
@@ -725,7 +807,7 @@
   }
 
   // src/app/core/accounts.js
-  function createAccountMethods({ constants, utils, getUI, shared }) {
+  function createAccountMethods({ constants, utils, getUI, getCore, shared }) {
     return {
       async detectAvailableSnapshotSources() {
         const cookies = await shared.listCookies();
@@ -761,6 +843,7 @@
           currentOrder.push(name);
           GM_setValue(constants.ORDER_PREFIX + constants.HOST, currentOrder);
         }
+        getCore()?.syncHostIconCache?.();
         return true;
       },
       renameAccount(oldKey, newName, host) {
@@ -795,6 +878,7 @@
         const newOrder = order.filter((item) => item !== name);
         if (newOrder.length === 0) {
           GM_deleteValue(orderKey);
+          getCore()?.removeHostIconCache?.(host);
         } else {
           GM_setValue(orderKey, newOrder);
         }
@@ -897,7 +981,7 @@
       },
       clearAllData() {
         GM_listValues().forEach((key) => {
-          if (key.startsWith(constants.PREFIX) || key.startsWith(constants.ORDER_PREFIX) || key.startsWith(constants.SITE_NAME_PREFIX)) {
+          if (key.startsWith(constants.PREFIX) || key.startsWith(constants.ORDER_PREFIX) || key.startsWith(constants.SITE_NAME_PREFIX) || key === constants.CFG.HOST_ICON_CACHE || key === constants.CFG.WEBDAV_SECRET) {
             GM_deleteValue(key);
           }
         });
@@ -954,7 +1038,10 @@
         if (!content) return;
         const inspectorWindow = window.open("", "_blank");
         if (!inspectorWindow) return;
-        inspectorWindow.document.head.innerHTML = `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(constants.ICONS.LOGO)}">`;
+        utils.setHTML(
+          inspectorWindow.document.head,
+          `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(constants.ICONS.LOGO)}">`
+        );
         const noDataHtml = "<p>No data to display.</p>";
         const escapeHtml = (value) => {
           if (value === null || value === void 0) return "";
@@ -1041,10 +1128,10 @@
         p { margin-top: 20px; }
       `;
         inspectorWindow.document.head.appendChild(style);
-        inspectorWindow.document.body.innerHTML = `
+        utils.setHTML(inspectorWindow.document.body, `
         <h3>${utils.extractName(key)} - ${type}</h3>
         ${inspectorHtml}
-      `;
+      `);
       }
     };
   }
@@ -1080,6 +1167,52 @@
   }
   var textEncoder = new TextEncoder();
   var textDecoder = new TextDecoder();
+  var WEBDAV_PASSWORD_PREFIX = "enc:v2:";
+  function createRandomHex(length = 32) {
+    const bytes = new Uint8Array(Math.ceil(length / 2));
+    if (typeof crypto !== "undefined" && typeof crypto.getRandomValues === "function") {
+      crypto.getRandomValues(bytes);
+    } else {
+      for (let index = 0; index < bytes.length; index += 1) {
+        bytes[index] = Math.floor(Math.random() * 256);
+      }
+    }
+    return [...bytes].map((byte) => byte.toString(16).padStart(2, "0")).join("").slice(0, length);
+  }
+  function toBinaryText(value) {
+    return unescape(encodeURIComponent(String(value || "")));
+  }
+  function fromBinaryText(value) {
+    try {
+      return decodeURIComponent(escape(value));
+    } catch {
+      return "";
+    }
+  }
+  function xorBinaryText(sourceText, secret) {
+    const source = String(sourceText || "");
+    const key = toBinaryText(secret || "anme-webdav") || "anme-webdav";
+    let masked = "";
+    for (let index = 0; index < source.length; index += 1) {
+      masked += String.fromCharCode(source.charCodeAt(index) ^ key.charCodeAt(index % key.length));
+    }
+    return masked;
+  }
+  function encryptWebDavPassword(password, secret) {
+    const plainText = String(password || "");
+    if (!plainText) return "";
+    return `${WEBDAV_PASSWORD_PREFIX}${btoa(xorBinaryText(toBinaryText(plainText), secret))}`;
+  }
+  function decryptWebDavPassword(passwordCipher, secret) {
+    const cipherText = String(passwordCipher || "");
+    if (!cipherText) return "";
+    if (!cipherText.startsWith(WEBDAV_PASSWORD_PREFIX)) return "";
+    try {
+      return fromBinaryText(xorBinaryText(atob(cipherText.slice(WEBDAV_PASSWORD_PREFIX.length)), secret));
+    } catch {
+      return "";
+    }
+  }
   function normalizeBaseUrl(url) {
     return String(url || "").trim().replace(/\/+$/, "");
   }
@@ -1097,31 +1230,17 @@
   function withManagedDirectory(config, constants) {
     return {
       ...config,
-      directory: getManagedDirectory(constants),
-      storageMode: "directory"
-    };
-  }
-  function withFlatNamespace(config) {
-    return {
-      ...config,
-      directory: "",
-      storageMode: "flat"
+      directory: getManagedDirectory(constants)
     };
   }
   function joinRemoteUrl(remoteUrl, fileName) {
     return `${remoteUrl.replace(/\/+$/, "")}/${encodeURIComponent(fileName)}`;
   }
-  function getNamespacePrefix(constants) {
-    return `${String(constants.META.NAME || "anme").toLowerCase().replace(/[^a-z0-9]+/g, "-")}-webdav`;
+  function getManifestName() {
+    return ".anme-index.json";
   }
-  function normalizeStorageMode(storageMode) {
-    return storageMode === "flat" ? "flat" : "directory";
-  }
-  function getManifestName(config, constants) {
-    return normalizeStorageMode(config.storageMode) === "flat" ? `${getNamespacePrefix(constants)}.index.json` : ".anme-index.json";
-  }
-  function getRemoteBackupName(config, constants, displayName) {
-    return normalizeStorageMode(config.storageMode) === "flat" ? `${getNamespacePrefix(constants)}__${displayName}` : displayName;
+  function getRemoteBackupName(_config, _constants, displayName) {
+    return displayName;
   }
   function toRemoteUrl(config) {
     const baseUrl = normalizeBaseUrl(config.url);
@@ -1199,8 +1318,18 @@
     }).filter((item) => item.fileName && item.pathname !== basePath && !item.isCollection && isBackupArchiveFile(item.fileName, constants)).sort((a, b) => new Date(b.lastModified || 0) - new Date(a.lastModified || 0));
   }
   function createWebDavMethods({ constants, utils, getUI, getCore }) {
+    const getOrCreateWebDavSecret = () => {
+      const existingSecret = String(GM_getValue(constants.CFG.WEBDAV_SECRET, "") || "");
+      if (existingSecret) {
+        return existingSecret;
+      }
+      const nextSecret = createRandomHex(32);
+      GM_setValue(constants.CFG.WEBDAV_SECRET, nextSecret);
+      return nextSecret;
+    };
     const request = (config, { method = "GET", url, headers = {}, data, responseType = "text", fetch = false }) => new Promise((resolve, reject) => {
       let settled = false;
+      let timedOut = false;
       let timeoutTimer = null;
       const finish = (handler) => (payload) => {
         if (settled) return;
@@ -1227,19 +1356,22 @@
           }
           reject(new Error(`${method} ${url} failed with ${response.status}`));
         }),
-        onerror: finish(() => reject(new Error(`${method} ${url} failed`)))
+        onerror: finish(
+          () => reject(new Error(timedOut ? utils.t("webdav_timeout") : `${method} ${url} failed`))
+        )
       };
       if (data !== void 0 && data !== null) {
         requestOptions.data = data;
       }
       const xhr = GM_xmlhttpRequest(requestOptions);
       timeoutTimer = setTimeout(() => {
+        timedOut = true;
         try {
           xhr?.abort?.();
         } catch {
         }
         finish(() => reject(new Error(utils.t("webdav_timeout"))))();
-      }, 1e4);
+      }, 5e3);
     });
     return {
       getCachedWebDavBackups() {
@@ -1258,25 +1390,27 @@
       },
       getWebDavConfig() {
         const config = GM_getValue(constants.CFG.WEBDAV_CONFIG, {});
+        const secret = getOrCreateWebDavSecret();
+        const password = decryptWebDavPassword(String(config.passwordCipher || ""), secret);
         return {
           url: String(config.url || ""),
           username: String(config.username || ""),
-          password: String(config.password || ""),
-          directory: normalizeStorageMode(config.storageMode) === "flat" ? "" : typeof config.directory === "string" ? config.directory : getManagedDirectory(constants),
-          storageMode: normalizeStorageMode(config.storageMode)
+          password,
+          directory: getManagedDirectory(constants)
         };
       },
       saveWebDavConfig(config) {
-        const normalizedConfig = normalizeStorageMode(config.storageMode) === "flat" ? withFlatNamespace(config) : withManagedDirectory(config, constants);
+        const normalizedConfig = withManagedDirectory(config, constants);
+        const password = String(normalizedConfig.password || "");
         GM_setValue(constants.CFG.WEBDAV_CONFIG, {
           url: normalizeBaseUrl(normalizedConfig.url),
           username: String(normalizedConfig.username || "").trim(),
-          password: String(normalizedConfig.password || ""),
-          storageMode: normalizedConfig.storageMode
+          passwordCipher: encryptWebDavPassword(password, getOrCreateWebDavSecret())
         });
       },
       clearWebDavConfig() {
         GM_deleteValue(constants.CFG.WEBDAV_CONFIG);
+        GM_deleteValue(constants.CFG.WEBDAV_SECRET);
         GM_deleteValue(constants.CFG.WEBDAV_BACKUPS_CACHE);
       },
       hasWebDavConfig() {
@@ -1334,7 +1468,7 @@
           }
         });
         return parseWebDavList(response.responseText || "", remoteUrl, constants).map((item) => ({
-          fileName: normalizeStorageMode(config.storageMode) === "flat" ? item.fileName.replace(new RegExp(`^${getNamespacePrefix(constants)}__`), "") : item.fileName,
+          fileName: item.fileName,
           remoteFileName: item.fileName,
           lastModified: item.lastModified ? new Date(item.lastModified).toISOString() : "",
           size: item.size
@@ -1342,7 +1476,7 @@
       },
       async readWebDavIndex(config) {
         const remoteUrl = toRemoteUrl(config);
-        const manifestName = getManifestName(config, constants);
+        const manifestName = getManifestName();
         try {
           const response = await request(config, {
             method: "GET",
@@ -1360,7 +1494,7 @@
       },
       async writeWebDavIndex(config, backups) {
         const remoteUrl = toRemoteUrl(config);
-        const manifestName = getManifestName(config, constants);
+        const manifestName = getManifestName();
         await request(config, {
           method: "PUT",
           url: joinRemoteUrl(remoteUrl, manifestName),
@@ -1370,34 +1504,27 @@
           }
         });
       },
-      async validateWebDavConfig(config) {
-        const baseConfig = {
+      normalizeWebDavConfig(config) {
+        return withManagedDirectory({
           url: normalizeBaseUrl(config.url),
           username: String(config.username || "").trim(),
-          password: String(config.password || ""),
-          storageMode: normalizeStorageMode(config.storageMode)
-        };
-        if (!baseConfig.url || !baseConfig.username || !baseConfig.password) {
+          password: String(config.password || "")
+        }, constants);
+      },
+      async validateWebDavConfig(config) {
+        const normalizedConfig = this.normalizeWebDavConfig(config);
+        if (!normalizedConfig.url || !normalizedConfig.username || !normalizedConfig.password) {
           throw new Error(utils.t("webdav_missing_config"));
         }
-        const candidateConfigs = [withManagedDirectory(baseConfig, constants), withFlatNamespace(baseConfig)];
-        let firstError = null;
-        for (const candidate of candidateConfigs) {
-          try {
-            await this.verifyWriteAccess(candidate);
-            await this.readWebDavIndex(candidate);
-            this.saveWebDavConfig(candidate);
-            return candidate;
-          } catch (error) {
-            if (!firstError) {
-              firstError = error;
-            }
-          }
-        }
-        throw firstError || new Error(utils.t("webdav_verify_err"));
+        await this.verifyWriteAccess(normalizedConfig);
+        await this.readWebDavIndex(normalizedConfig);
+        return normalizedConfig;
+      },
+      async getValidatedWebDavConfig() {
+        return this.validateWebDavConfig(this.getWebDavConfig());
       },
       async listWebDavBackups() {
-        const config = await this.validateWebDavConfig(this.getWebDavConfig());
+        const config = await this.getValidatedWebDavConfig();
         let backups = await this.readWebDavIndex(config);
         if (!backups.length) {
           backups = await this.readWebDavDirectory(config);
@@ -1406,7 +1533,7 @@
         return this.saveCachedWebDavBackups(backups);
       },
       async uploadWebDavBackup() {
-        const config = await this.validateWebDavConfig(this.getWebDavConfig());
+        const config = await this.getValidatedWebDavConfig();
         const core = getCore();
         const exportObj = core.buildExportObject("all");
         if (!exportObj) {
@@ -1438,7 +1565,7 @@
         return fileName;
       },
       async restoreWebDavBackup(fileName) {
-        const config = await this.validateWebDavConfig(this.getWebDavConfig());
+        const config = await this.getValidatedWebDavConfig();
         const remoteUrl = toRemoteUrl(config);
         let backups = await this.readWebDavIndex(config);
         if (!backups.length) {
@@ -1463,7 +1590,7 @@
         return result;
       },
       async deleteWebDavBackup(fileName) {
-        const config = await this.validateWebDavConfig(this.getWebDavConfig());
+        const config = await this.getValidatedWebDavConfig();
         const remoteUrl = toRemoteUrl(config);
         let backups = await this.readWebDavIndex(config);
         if (!backups.length) {
@@ -1483,50 +1610,189 @@
   }
 
   // src/app/core.js
-  function createCore({ constants, utils }) {
+  function createCore({ state, constants, utils }) {
     let ui = null;
     const shared = createCoreShared();
+    const hostIconFetchJobs = /* @__PURE__ */ new Map();
+    const getHostIconCache = () => {
+      if (!state.hostIconCache || typeof state.hostIconCache !== "object" || Array.isArray(state.hostIconCache)) {
+        state.hostIconCache = {};
+      }
+      return state.hostIconCache;
+    };
+    const syncHostIconCache = () => {
+      const nextCache = {};
+      Object.entries(getHostIconCache()).forEach(([host, entry]) => {
+        if (host && entry?.dataUrl && utils.getSortedKeysByHost(host).length > 0) {
+          nextCache[host] = { dataUrl: entry.dataUrl };
+        }
+      });
+      GM_setValue(constants.CFG.HOST_ICON_CACHE, nextCache);
+    };
+    const getCachedHostIcon = (host) => {
+      const entry = host ? getHostIconCache()[host] : null;
+      return entry && typeof entry === "object" && entry.dataUrl ? entry.dataUrl : "";
+    };
+    const blobToDataUrl = (blob, mimeType) => new Promise((resolve, reject) => {
+      try {
+        const normalizedBlob = mimeType && blob.type !== mimeType ? blob.slice(0, blob.size, mimeType) : blob;
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.onerror = () => reject(new Error("favicon_read_failed"));
+        reader.readAsDataURL(normalizedBlob);
+      } catch (error) {
+        reject(error);
+      }
+    });
+    const buildCurrentHostIconSources = () => {
+      const sources = [];
+      if (typeof document !== "undefined") {
+        document.querySelectorAll('link[rel*="icon"][href]').forEach((element) => {
+          try {
+            const rawHref = String(element.getAttribute("href") || "").trim();
+            if (!rawHref) return;
+            if (/^data:/i.test(rawHref)) {
+              sources.push({ type: "inline", value: rawHref });
+              return;
+            }
+            const iconUrl = new URL(rawHref, location.href);
+            if (iconUrl.protocol === "http:" || iconUrl.protocol === "https:") {
+              sources.push({ type: "request", value: iconUrl.href });
+            }
+          } catch (_) {
+            return;
+          }
+        });
+      }
+      sources.push({ type: "request", value: new URL("/favicon.ico", location.origin).href });
+      return [...new Map(sources.filter((source) => source?.value).map((source) => [source.value, source])).values()];
+    };
+    const requestHostIcon = (url) => new Promise((resolve, reject) => {
+      const xhr = GM_xmlhttpRequest({
+        method: "GET",
+        url,
+        responseType: "blob",
+        timeout: 5e3,
+        headers: {
+          Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
+        },
+        onload: async (response) => {
+          if (response.status < 200 || response.status >= 300 || !response.response) {
+            reject(new Error(`favicon_http_${response.status || 0}`));
+            return;
+          }
+          try {
+            const blob = response.response;
+            if (!blob.size) {
+              reject(new Error("favicon_empty"));
+              return;
+            }
+            const dataUrl = await blobToDataUrl(blob, blob.type || "image/x-icon");
+            if (!dataUrl) {
+              reject(new Error("favicon_empty"));
+              return;
+            }
+            resolve(dataUrl);
+          } catch (error) {
+            reject(error);
+          }
+        },
+        ontimeout: () => reject(new Error("favicon_timeout")),
+        onerror: () => reject(new Error("favicon_request_failed"))
+      });
+      if (!xhr) {
+        reject(new Error("favicon_request_failed"));
+      }
+    });
     const core = {
       setUI(nextUi) {
         ui = nextUi;
+      },
+      syncHostIconCache() {
+        syncHostIconCache();
+      },
+      removeHostIconCache(host) {
+        if (!host) return;
+        delete getHostIconCache()[host];
+        hostIconFetchJobs.delete(host);
+        syncHostIconCache();
+      },
+      async ensureHostIcon(host) {
+        if (!host) return "";
+        const cachedIcon = getCachedHostIcon(host);
+        if (cachedIcon) {
+          return cachedIcon;
+        }
+        if (host !== constants.HOST) {
+          return "";
+        }
+        if (hostIconFetchJobs.has(host)) {
+          return hostIconFetchJobs.get(host);
+        }
+        const job = (async () => {
+          try {
+            for (const source of buildCurrentHostIconSources()) {
+              try {
+                const dataUrl = source.type === "inline" ? source.value : await requestHostIcon(source.value);
+                getHostIconCache()[host] = { dataUrl };
+                syncHostIconCache();
+                return dataUrl;
+              } catch (_) {
+                continue;
+              }
+            }
+            return "";
+          } finally {
+            hostIconFetchJobs.delete(host);
+          }
+        })();
+        hostIconFetchJobs.set(host, job);
+        return job;
       }
     };
     const getUI = () => ui;
     const getCore = () => core;
     Object.assign(
       core,
-      createAccountMethods({ constants, utils, getUI, shared }),
+      createAccountMethods({ constants, utils, getUI, getCore, shared }),
       createEnvironmentMethods({ getUI, shared }),
       createInspectorMethods({ constants, utils }),
       createBackupMethods({ constants, utils, getUI }),
       createWebDavMethods({ constants, utils, getUI, getCore })
     );
+    syncHostIconCache();
     return core;
   }
 
   // src/app/ui/events.js
   function createEventMethods({ state, constants, utils, core, ui }) {
     return {
-      bindPanelEvents() {
-        const $ = (selector) => ui.qs(selector);
-        const $$ = (selector) => ui.qsa(selector);
-        const shouldPreventWheelLeak = (scrollArea, deltaY) => {
-          if (!scrollArea || scrollArea.scrollHeight <= scrollArea.clientHeight) {
-            return true;
-          }
-          if (deltaY < 0 && scrollArea.scrollTop <= 0) {
-            return true;
-          }
-          if (deltaY > 0 && scrollArea.scrollTop + scrollArea.clientHeight >= scrollArea.scrollHeight - 1) {
-            return true;
-          }
-          return false;
-        };
-        const getHosts = () => {
-          const hosts = utils.listAllHosts();
-          if (!hosts.includes(constants.HOST)) hosts.push(constants.HOST);
-          return hosts;
-        };
+      shouldPreventWheelLeak(scrollArea, deltaY) {
+        if (!scrollArea || scrollArea.scrollHeight <= scrollArea.clientHeight) {
+          return true;
+        }
+        if (deltaY < 0 && scrollArea.scrollTop <= 0) {
+          return true;
+        }
+        if (deltaY > 0 && scrollArea.scrollTop + scrollArea.clientHeight >= scrollArea.scrollHeight - 1) {
+          return true;
+        }
+        return false;
+      },
+      getHosts() {
+        const hosts = utils.listAllHosts();
+        if (!hosts.includes(constants.HOST)) hosts.push(constants.HOST);
+        return hosts;
+      },
+      resetHostPicker($, closePicker = true) {
+        state.hostSearchQuery = "";
+        state.hostEditingHost = null;
+        state.hostEditingValue = "";
+        if (closePicker) {
+          $("#host-picker")?.classList.remove("open");
+        }
+      },
+      bindPanelShellEvents({ $, $$ }) {
         ["keydown", "keyup", "keypress", "input", "contextmenu", "wheel"].forEach((eventName) => {
           state.panel.addEventListener(
             eventName,
@@ -1534,7 +1800,7 @@
               event.stopPropagation();
               if (eventName === "wheel") {
                 const scrollArea = event.target.closest(".acc-scroll-area, .acc-host-menu, .acc-host-list");
-                if (shouldPreventWheelLeak(scrollArea, event.deltaY)) {
+                if (ui.shouldPreventWheelLeak(scrollArea, event.deltaY)) {
                   event.preventDefault();
                 }
               }
@@ -1580,6 +1846,8 @@
           }
           ui.activatePage(activePageBeforeRebuild, ui.getPageTitle(activePageBeforeRebuild));
         };
+      },
+      bindSwitchEvents({ $, getHosts, resetHostPicker }) {
         $("#host-display-mode-sel").onchange = (event) => {
           state.hostDisplayMode = event.target.value || "siteName";
           if (state.hostDisplayMode !== "siteName") {
@@ -1635,9 +1903,7 @@
           const willOpen = !picker.classList.contains("open");
           picker.classList.toggle("open", willOpen);
           if (willOpen) {
-            state.hostSearchQuery = "";
-            state.hostEditingHost = null;
-            state.hostEditingValue = "";
+            resetHostPicker(false);
             ui.renderHostSelector(getHosts());
             ui.qs("#host-search-input")?.focus();
           }
@@ -1652,10 +1918,7 @@
           if (event.key !== "Escape") return;
           event.preventDefault();
           event.stopPropagation();
-          state.hostSearchQuery = "";
-          state.hostEditingHost = null;
-          state.hostEditingValue = "";
-          $("#host-picker")?.classList.remove("open");
+          resetHostPicker();
           ui.renderHostSelector(getHosts());
           ui.qs("#host-search-input")?.blur();
           state.panel?.focus();
@@ -1702,17 +1965,44 @@
           const option = event.target.closest(".acc-host-option");
           if (!option) return;
           state.currentViewingHost = option.dataset.host;
-          state.hostSearchQuery = "";
-          $("#host-picker")?.classList.remove("open");
+          resetHostPicker();
           ui.refresh();
         };
+        $("#host-menu").addEventListener("input", (event) => {
+          const editInput = event.target.closest(".acc-host-edit-input");
+          if (!editInput) return;
+          state.hostEditingValue = editInput.value;
+        });
+        $("#host-menu").addEventListener("keydown", (event) => {
+          const editInput = event.target.closest(".acc-host-edit-input");
+          if (!editInput) return;
+          if (event.key === "Escape") {
+            event.preventDefault();
+            event.stopPropagation();
+            state.hostEditingHost = null;
+            state.hostEditingValue = "";
+            ui.renderHostSelector(getHosts());
+            ui.qs(".acc-host-edit-input")?.blur();
+            state.panel?.focus();
+            return;
+          }
+          if (event.key === "Enter") {
+            event.preventDefault();
+            event.stopPropagation();
+            core.updateSiteName(editInput.dataset.host, editInput.value);
+            state.hostEditingHost = null;
+            state.hostEditingValue = "";
+            ui.refresh();
+            ui.showToast(utils.t("toast_site_name_updated"));
+          }
+        });
         $("#btn-account-search-toggle").onclick = (event) => {
           event.stopPropagation();
           state.accountSearchActive = !state.accountSearchActive;
           if (!state.accountSearchActive) {
             state.accountSearchQuery = "";
           }
-          $("#host-picker")?.classList.remove("open");
+          resetHostPicker();
           ui.refresh();
           if (state.accountSearchActive) {
             ui.qs("#account-search-input")?.focus();
@@ -1732,6 +2022,12 @@
           ui.qs("#account-search-input")?.blur();
           state.panel?.focus();
         };
+        state.panel.addEventListener("click", (event) => {
+          if (event.target.closest("#host-picker")) return;
+          resetHostPicker();
+        });
+      },
+      bindNavigationEvents({ $, resetHostPicker }) {
         $("#btn-open-settings").onclick = () => {
           if (state.activePage !== "pg-set") {
             state.settingsReturnPage = state.activePage;
@@ -1747,7 +2043,7 @@
         };
         $("#btn-go-current-host").onclick = () => {
           state.currentViewingHost = constants.HOST;
-          $("#host-picker")?.classList.remove("open");
+          resetHostPicker();
           ui.refresh();
         };
         $("#btn-header-back").onclick = () => {
@@ -1763,6 +2059,14 @@
           const targetPage = state.settingsReturnPage || "pg-switch";
           ui.activatePage(targetPage, ui.getPageTitle(targetPage));
         };
+        $("#go-about").onclick = () => {
+          ui.activatePage("pg-about", utils.t("nav_about"));
+        };
+        $("#go-notice").onclick = () => {
+          ui.activatePage("pg-notice", utils.t("nav_notice"));
+        };
+      },
+      bindAccountSettingsEvents({ $ }) {
         $("#btn-open-save-modal").onclick = () => {
           ui.showSaveAccountModal();
         };
@@ -1774,42 +2078,6 @@
         $("#btn-export-curr").onclick = () => core.exportData("current");
         $("#btn-export-all").onclick = () => core.exportData("all");
         $("#btn-import-trigger").onclick = () => $("#inp-import-file").click();
-        $("#btn-webdav-config").onclick = async () => {
-          await ui.showWebDavConfigModal();
-        };
-        $("#btn-webdav-sync").onclick = async () => {
-          try {
-            ui.toggleLoading(true, utils.t("webdav_syncing"));
-            const fileName = await core.uploadWebDavBackup();
-            if (fileName) {
-              state.webdavBackups = core.getCachedWebDavBackups();
-              ui.renderWebDavBackupList(state.webdavBackups);
-              ui.showToast(utils.t("webdav_sync_ok"));
-            }
-          } catch (error) {
-            await ui.alert(error.message || utils.t("webdav_sync_err"));
-          } finally {
-            ui.toggleLoading(false);
-          }
-        };
-        $("#btn-webdav-refresh").onclick = async () => {
-          await ui.loadWebDavBackups();
-        };
-        $("#btn-webdav-logout").onclick = async () => {
-          if (!core.hasWebDavConfig()) return;
-          const confirmed = await ui.confirm(utils.t("webdav_logout_confirm"));
-          if (!confirmed) return;
-          core.clearWebDavConfig();
-          state.webdavBackups = [];
-          ui.renderWebDavView();
-          ui.showToast(utils.t("webdav_logout_ok"));
-        };
-        $("#go-about").onclick = () => {
-          ui.activatePage("pg-about", utils.t("nav_about"));
-        };
-        $("#go-notice").onclick = () => {
-          ui.activatePage("pg-notice", utils.t("nav_notice"));
-        };
         $("#btn-account-rename-save").onclick = async () => {
           const oldKey = state.accountSettingsKey;
           const nameInput = $("#account-settings-name");
@@ -1817,8 +2085,7 @@
           const newName = nameInput.value.trim();
           const targetHost = state.accountSettingsHost || constants.HOST;
           const originalName = utils.extractName(oldKey);
-          if (!newName) return;
-          if (newName === originalName) return;
+          if (!newName || newName === originalName) return;
           const newKey = utils.makeKey(newName, targetHost);
           if (GM_getValue(newKey)) {
             await ui.alert(utils.t("rename_conflict"));
@@ -1854,41 +2121,39 @@
             ui.refresh();
           }
         };
-        state.panel.addEventListener("click", (event) => {
-          if (event.target.closest("#host-picker")) return;
-          state.hostSearchQuery = "";
-          state.hostEditingHost = null;
-          state.hostEditingValue = "";
-          $("#host-picker")?.classList.remove("open");
-        });
-        $("#host-menu").addEventListener("input", (event) => {
-          const editInput = event.target.closest(".acc-host-edit-input");
-          if (!editInput) return;
-          state.hostEditingValue = editInput.value;
-        });
-        $("#host-menu").addEventListener("keydown", (event) => {
-          const editInput = event.target.closest(".acc-host-edit-input");
-          if (!editInput) return;
-          if (event.key === "Escape") {
-            event.preventDefault();
-            event.stopPropagation();
-            state.hostEditingHost = null;
-            state.hostEditingValue = "";
-            ui.renderHostSelector(getHosts());
-            ui.qs(".acc-host-edit-input")?.blur();
-            state.panel?.focus();
-            return;
-          }
-          if (event.key === "Enter") {
-            event.preventDefault();
-            event.stopPropagation();
-            core.updateSiteName(editInput.dataset.host, editInput.value);
-            state.hostEditingHost = null;
-            state.hostEditingValue = "";
-            ui.refresh();
-            ui.showToast(utils.t("toast_site_name_updated"));
-          }
-        });
+      },
+      bindWebDavEvents({ $ }) {
+        $("#btn-webdav-config").onclick = async () => {
+          await ui.showWebDavConfigModal();
+        };
+        $("#btn-webdav-sync").onclick = async () => {
+          const syncBtn = $("#btn-webdav-sync");
+          await ui.runUiAction({
+            button: syncBtn,
+            idleText: utils.t("webdav_sync_now"),
+            errorKey: "webdav_sync_err",
+            successMessage: utils.t("webdav_sync_ok"),
+            action: () => core.uploadWebDavBackup(),
+            onSuccess: (fileName) => {
+              if (fileName) {
+                state.webdavBackups = core.getCachedWebDavBackups();
+                ui.renderWebDavBackupList(state.webdavBackups);
+              }
+            }
+          });
+        };
+        $("#btn-webdav-refresh").onclick = async () => {
+          await ui.loadWebDavBackups();
+        };
+        $("#btn-webdav-logout").onclick = async () => {
+          if (!core.hasWebDavConfig()) return;
+          const confirmed = await ui.confirm(utils.t("webdav_logout_confirm"));
+          if (!confirmed) return;
+          core.clearWebDavConfig();
+          state.webdavBackups = [];
+          ui.renderWebDavView();
+          ui.showToast(utils.t("webdav_logout_ok"));
+        };
         $("#webdav-backup-list").onclick = async (event) => {
           const actionBtn = event.target.closest("[data-action][data-file]");
           if (!actionBtn) return;
@@ -1900,33 +2165,44 @@
           if (action === "delete") {
             const confirmed = await ui.confirm(utils.t("webdav_delete_confirm").replace("{name}", fileName));
             if (!confirmed) return;
-            try {
-              ui.toggleLoading(true, utils.t("webdav_loading"));
-              await core.deleteWebDavBackup(fileName);
-              state.webdavBackups = core.getCachedWebDavBackups();
-              ui.renderWebDavBackupList(state.webdavBackups);
-              ui.showToast(utils.t("webdav_delete_ok"));
-            } catch (error) {
-              await ui.alert(error.message || utils.t("webdav_delete_err"));
-            } finally {
-              ui.toggleLoading(false);
-            }
+            await ui.runUiAction({
+              loadingText: utils.t("webdav_loading"),
+              errorKey: "webdav_delete_err",
+              successMessage: utils.t("webdav_delete_ok"),
+              action: () => core.deleteWebDavBackup(fileName),
+              onSuccess: () => {
+                state.webdavBackups = core.getCachedWebDavBackups();
+                ui.renderWebDavBackupList(state.webdavBackups);
+              }
+            });
             return;
           }
           if (action === "restore") {
             const confirmed = await ui.confirm(utils.t("webdav_restore_confirm").replace("{name}", fileName));
             if (!confirmed) return;
-            try {
-              ui.toggleLoading(true, utils.t("webdav_restoring"));
-              const result = await core.restoreWebDavBackup(fileName);
-              ui.toggleLoading(false);
-              await ui.alert(utils.t(result.messageKey).replace("{count}", result.count));
-            } catch (error) {
-              ui.toggleLoading(false);
-              await ui.alert(error.message || utils.t("sync_restore_err"));
-            }
+            await ui.runUiAction({
+              loadingText: utils.t("webdav_restoring"),
+              errorKey: "sync_restore_err",
+              action: () => core.restoreWebDavBackup(fileName),
+              onSuccess: (result) => {
+                ui.showToast(utils.t(result.messageKey).replace("{count}", result.count), 2400);
+              }
+            });
           }
         };
+      },
+      bindPanelEvents() {
+        const $ = (selector) => ui.qs(selector);
+        const $$ = (selector) => ui.qsa(selector);
+        const getHosts = () => ui.getHosts();
+        const resetHostPicker = (closePicker = true) => {
+          ui.resetHostPicker($, closePicker);
+        };
+        ui.bindPanelShellEvents({ $, $$ });
+        ui.bindSwitchEvents({ $, getHosts, resetHostPicker });
+        ui.bindNavigationEvents({ $, resetHostPicker });
+        ui.bindAccountSettingsEvents({ $ });
+        ui.bindWebDavEvents({ $ });
       }
     };
   }
@@ -1964,10 +2240,10 @@
         if (!state.toastEl) {
           state.toastEl = document.createElement("div");
           state.toastEl.className = "acc-toast";
-          state.toastEl.innerHTML = `
+          utils.setHTML(state.toastEl, `
           <span class="acc-toast-icon">${constants.ICONS.NOTICE}</span>
           <span class="acc-toast-text"></span>
-        `;
+        `);
           state.panel.appendChild(state.toastEl);
         }
         const textNode = state.toastEl.querySelector(".acc-toast-text");
@@ -1983,6 +2259,62 @@
           state.toastTimer = null;
         }, duration);
       },
+      setButtonLoading(button, loading, idleText = "", spinnerClassName = "acc-inline-spinner") {
+        if (!button) return;
+        if (loading) {
+          button.style.minWidth = `${button.offsetWidth}px`;
+          button.style.minHeight = `${button.offsetHeight}px`;
+        }
+        button.disabled = loading;
+        button.classList.toggle("is-loading", loading);
+        utils.setHTML(button, loading ? `<span class="${spinnerClassName}" aria-hidden="true"></span>` : idleText);
+        if (!loading) {
+          button.style.minWidth = "";
+          button.style.minHeight = "";
+        }
+      },
+      async runUiAction({
+        button = null,
+        idleText = "",
+        loadingText = "",
+        errorKey = "",
+        successMessage = "",
+        successDuration = 1800,
+        action,
+        onSuccess,
+        onError
+      }) {
+        try {
+          if (button) {
+            ui.setButtonLoading(button, true, idleText);
+          } else if (loadingText) {
+            ui.toggleLoading(true, loadingText);
+          }
+          const result = await action();
+          if (onSuccess) {
+            await onSuccess(result);
+          }
+          if (successMessage) {
+            ui.showToast(successMessage, successDuration);
+          }
+          return result;
+        } catch (error) {
+          if (onError) {
+            const handled = await onError(error);
+            if (handled === false) {
+              return null;
+            }
+          }
+          ui.showToast(utils.getWebDavErrorMessage(error, errorKey));
+          return null;
+        } finally {
+          if (button) {
+            ui.setButtonLoading(button, false, idleText);
+          } else if (loadingText) {
+            ui.toggleLoading(false);
+          }
+        }
+      },
       async alert(message) {
         return ui.showDialog(message, false);
       },
@@ -1997,7 +2329,7 @@
             state.dialogMask.className = "acc-dialog-mask";
             currentPanel.appendChild(state.dialogMask);
           }
-          state.dialogMask.innerHTML = `
+          utils.setHTML(state.dialogMask, `
           <div class="acc-dialog-box">
               <div class="acc-dialog-msg">${message}</div>
               <div class="acc-dialog-footer">
@@ -2005,7 +2337,7 @@
                   <button class="acc-dialog-btn acc-dialog-btn-ok" id="acc-dlg-ok">${utils.t("dlg_ok")}</button>
               </div>
           </div>
-        `;
+        `);
           state.dialogMask.style.display = "flex";
           const okBtn = ui.qs("#acc-dlg-ok");
           const cancelBtn = ui.qs("#acc-dlg-cancel");
@@ -2017,15 +2349,58 @@
           if (cancelBtn) cancelBtn.onclick = () => close(false);
         });
       },
-      async showSaveAccountModal() {
-        if (!state.saveFormMask) {
-          state.saveFormMask = document.createElement("div");
-          state.saveFormMask.className = "acc-form-mask";
-          state.panel.appendChild(state.saveFormMask);
+      ensureFormMask() {
+        if (state.saveFormMask) return state.saveFormMask;
+        state.saveFormMask = document.createElement("div");
+        state.saveFormMask.className = "acc-form-mask";
+        state.panel.appendChild(state.saveFormMask);
+        return state.saveFormMask;
+      },
+      hideFormModal() {
+        if (state.saveFormMask) {
+          state.saveFormMask.style.display = "none";
         }
-        state.saveFormMask.innerHTML = `
+      },
+      async showFormModal({ title, contentHtml, submitText, onOpen }) {
+        const mask = ui.ensureFormMask();
+        utils.setHTML(mask, `
         <div class="acc-form-box">
-          <div class="acc-form-title">${utils.t("btn_save")}</div>
+          <div class="acc-form-title">${title}</div>
+          ${contentHtml}
+          <div class="acc-form-footer">
+            <button class="acc-dialog-btn acc-dialog-btn-cancel" id="acc-form-cancel">${utils.t("dlg_cancel")}</button>
+            <button class="acc-dialog-btn acc-dialog-btn-ok" id="acc-form-submit">${submitText}</button>
+          </div>
+        </div>
+      `);
+        mask.style.display = "flex";
+        const context = {
+          mask,
+          qs: (selector) => mask.querySelector(selector),
+          qsa: (selector) => [...mask.querySelectorAll(selector)],
+          cancelBtn: mask.querySelector("#acc-form-cancel"),
+          submitBtn: mask.querySelector("#acc-form-submit"),
+          close: () => ui.hideFormModal(),
+          setSubmitting: (loading, idleText = submitText) => {
+            if (context.cancelBtn) {
+              context.cancelBtn.disabled = loading;
+            }
+            ui.setButtonLoading(context.submitBtn, loading, idleText);
+          }
+        };
+        if (context.cancelBtn) {
+          context.cancelBtn.onclick = context.close;
+        }
+        if (onOpen) {
+          await onOpen(context);
+        }
+        return context;
+      },
+      async showSaveAccountModal() {
+        await ui.showFormModal({
+          title: utils.t("btn_save"),
+          submitText: utils.t("btn_save"),
+          contentHtml: `
           <div class="acc-chk">
             <label class="acc-chk-label" title="Cookie"><input type="checkbox" id="form-c-ck" class="acc-custom-chk" checked> Cookie</label>
             <label class="acc-chk-label" title="LocalStorage"><input type="checkbox" id="form-c-ls" class="acc-custom-chk"> LS</label>
@@ -2037,153 +2412,144 @@
           <input type="text" id="form-site-name" class="acc-input-text" placeholder="${utils.t("placeholder_site_name")}" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false">
           <div class="acc-form-label">${utils.t("account_name")}</div>
           <input type="text" id="form-acc-name" class="acc-input-text" placeholder="${utils.t("placeholder_name")}" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false">
-          <div class="acc-form-footer">
-            <button class="acc-dialog-btn acc-dialog-btn-cancel" id="form-cancel-btn">${utils.t("dlg_cancel")}</button>
-            <button class="acc-dialog-btn acc-dialog-btn-ok" id="form-save-btn">${utils.t("btn_save")}</button>
-          </div>
-        </div>
-      `;
-        state.saveFormMask.style.display = "flex";
-        const nameInput = ui.qs("#form-acc-name");
-        const siteNameInput = ui.qs("#form-site-name");
-        siteNameInput.value = utils.suggestSiteName(utils.getPageTitle(), constants.HOST);
-        nameInput.value = utils.suggestAccountName(constants.HOST);
-        const toggleAvailability = (selector, available) => {
-          const input = ui.qs(selector);
-          const label = input?.closest(".acc-chk-label");
-          if (!input || !label) return;
-          input.disabled = !available;
-          input.checked = available && input.id === "form-c-ck";
-          label.classList.toggle("disabled", !available);
-        };
-        const updateState = () => {
-          const ck = ui.qs("#form-c-ck")?.checked;
-          const ls = ui.qs("#form-c-ls")?.checked;
-          const ss = ui.qs("#form-c-ss")?.checked;
-          const saveBtn = ui.qs("#form-save-btn");
-          if (!saveBtn) return;
-          const canSave = (ck || ls || ss) && nameInput.value.trim().length > 0 && siteNameInput.value.trim().length > 0;
-          saveBtn.disabled = !canSave;
-          saveBtn.style.opacity = canSave ? "1" : "0.5";
-          saveBtn.style.cursor = canSave ? "pointer" : "not-allowed";
-        };
-        ["#form-c-ck", "#form-c-ls", "#form-c-ss"].forEach((id) => {
-          ui.qs(id).addEventListener("change", updateState);
-        });
-        siteNameInput.addEventListener("input", updateState);
-        nameInput.addEventListener("input", updateState);
-        nameInput.addEventListener("keydown", async (event) => {
-          if (event.key !== "Enter") return;
-          event.preventDefault();
-          event.stopPropagation();
-          ui.qs("#form-save-btn").click();
-        });
-        ui.qs("#form-cancel-btn").onclick = () => {
-          state.saveFormMask.style.display = "none";
-        };
-        ui.qs("#form-save-btn").onclick = async () => {
-          const name = nameInput.value.trim();
-          const siteName = siteNameInput.value.trim();
-          if (!name) return;
-          if (!siteName) return;
-          const targetKey = utils.makeKey(name);
-          if (GM_getValue(targetKey)) {
-            const confirmed = await ui.confirm(utils.t("confirm_overwrite"));
-            if (!confirmed) return;
+        `,
+          onOpen: async ({ qs, submitBtn, close }) => {
+            const nameInput = qs("#form-acc-name");
+            const siteNameInput = qs("#form-site-name");
+            siteNameInput.value = utils.suggestSiteName(utils.getPageTitle(), constants.HOST);
+            nameInput.value = utils.suggestAccountName(constants.HOST);
+            const toggleAvailability = (selector, available) => {
+              const input = qs(selector);
+              const label = input?.closest(".acc-chk-label");
+              if (!input || !label) return;
+              input.disabled = !available;
+              input.checked = available && input.id === "form-c-ck";
+              label.classList.toggle("disabled", !available);
+            };
+            const updateState = () => {
+              const ck = qs("#form-c-ck")?.checked;
+              const ls = qs("#form-c-ls")?.checked;
+              const ss = qs("#form-c-ss")?.checked;
+              const canSave = (ck || ls || ss) && nameInput.value.trim().length > 0 && siteNameInput.value.trim().length > 0;
+              submitBtn.disabled = !canSave;
+            };
+            ["#form-c-ck", "#form-c-ls", "#form-c-ss"].forEach((selector) => {
+              qs(selector)?.addEventListener("change", updateState);
+            });
+            siteNameInput.addEventListener("input", updateState);
+            nameInput.addEventListener("input", updateState);
+            nameInput.addEventListener("keydown", (event) => {
+              if (event.key !== "Enter" || submitBtn.disabled) return;
+              event.preventDefault();
+              event.stopPropagation();
+              submitBtn.click();
+            });
+            submitBtn.onclick = async () => {
+              const name = nameInput.value.trim();
+              const siteName = siteNameInput.value.trim();
+              if (!name || !siteName) return;
+              const targetKey = utils.makeKey(name);
+              if (GM_getValue(targetKey)) {
+                const confirmed = await ui.confirm(utils.t("confirm_overwrite"));
+                if (!confirmed) return;
+              }
+              const saved = await core.saveAccount(name, siteName, {
+                ck: qs("#form-c-ck").checked,
+                ls: qs("#form-c-ls").checked,
+                ss: qs("#form-c-ss").checked
+              });
+              if (!saved) return;
+              close();
+              ui.refresh();
+              ui.showToast(utils.t("toast_saved"));
+            };
+            const availableSources = await core.detectAvailableSnapshotSources();
+            toggleAvailability("#form-c-ck", availableSources.ck);
+            toggleAvailability("#form-c-ls", availableSources.ls);
+            toggleAvailability("#form-c-ss", availableSources.ss);
+            updateState();
+            if (utils.getSortedKeysByHost(constants.HOST).length > 0) {
+              nameInput.focus();
+              nameInput.select();
+            } else {
+              siteNameInput.focus();
+              siteNameInput.select();
+            }
           }
-          const saved = await core.saveAccount(name, siteName, {
-            ck: ui.qs("#form-c-ck").checked,
-            ls: ui.qs("#form-c-ls").checked,
-            ss: ui.qs("#form-c-ss").checked
-          });
-          if (!saved) return;
-          state.saveFormMask.style.display = "none";
-          ui.refresh();
-          ui.showToast(utils.t("toast_saved"));
-        };
-        const availableSources = await core.detectAvailableSnapshotSources();
-        toggleAvailability("#form-c-ck", availableSources.ck);
-        toggleAvailability("#form-c-ls", availableSources.ls);
-        toggleAvailability("#form-c-ss", availableSources.ss);
-        updateState();
-        if (utils.getSortedKeysByHost(constants.HOST).length > 0) {
-          nameInput.focus();
-          nameInput.select();
-        } else {
-          siteNameInput.focus();
-          siteNameInput.select();
-        }
+        });
       },
       async showWebDavConfigModal() {
-        if (!state.saveFormMask) {
-          state.saveFormMask = document.createElement("div");
-          state.saveFormMask.className = "acc-form-mask";
-          state.panel.appendChild(state.saveFormMask);
-        }
         const config = core.getWebDavConfig();
-        state.saveFormMask.innerHTML = `
-        <div class="acc-form-box">
-          <div class="acc-form-title">${utils.t("nav_webdav")}</div>
+        await ui.showFormModal({
+          title: utils.t("nav_webdav"),
+          submitText: utils.t("webdav_verify_save"),
+          contentHtml: `
           <div class="acc-form-label">${utils.t("webdav_url")}</div>
           <input type="text" id="form-webdav-url" class="acc-input-text" placeholder="${utils.t("webdav_url_placeholder")}" value="${utils.escapeHtml(config.url)}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
           <div class="acc-form-label">${utils.t("webdav_username")}</div>
           <input type="text" id="form-webdav-username" class="acc-input-text" placeholder="${utils.t("webdav_username_placeholder")}" value="${utils.escapeHtml(config.username)}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
           <div class="acc-form-label">${utils.t("webdav_password")}</div>
           <input type="password" id="form-webdav-password" class="acc-input-text" placeholder="${utils.t("webdav_password_placeholder")}" value="${utils.escapeHtml(config.password)}" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false">
-          <div class="acc-form-footer">
-            <button class="acc-dialog-btn acc-dialog-btn-cancel" id="form-webdav-cancel">${utils.t("dlg_cancel")}</button>
-            <button class="acc-dialog-btn acc-dialog-btn-ok" id="form-webdav-save">${utils.t("webdav_verify_save")}</button>
-          </div>
-        </div>
-      `;
-        state.saveFormMask.style.display = "flex";
-        const urlInput = ui.qs("#form-webdav-url");
-        const usernameInput = ui.qs("#form-webdav-username");
-        const passwordInput = ui.qs("#form-webdav-password");
-        const saveBtn = ui.qs("#form-webdav-save");
-        const updateState = () => {
-          const canSave = urlInput.value.trim().length > 0 && usernameInput.value.trim().length > 0 && passwordInput.value.length > 0;
-          saveBtn.disabled = !canSave;
-          saveBtn.style.opacity = canSave ? "1" : "0.5";
-          saveBtn.style.cursor = canSave ? "pointer" : "not-allowed";
-        };
-        [urlInput, usernameInput, passwordInput].forEach((input) => {
-          input.addEventListener("input", updateState);
-          input.addEventListener("keydown", (event) => {
-            if (event.key === "Enter" && !saveBtn.disabled) {
-              event.preventDefault();
-              saveBtn.click();
+        `,
+          onOpen: async ({ qs, submitBtn, setSubmitting, close }) => {
+            const urlInput = qs("#form-webdav-url");
+            const usernameInput = qs("#form-webdav-username");
+            const passwordInput = qs("#form-webdav-password");
+            let isSaving = false;
+            const updateState = () => {
+              const canSave = urlInput.value.trim().length > 0 && usernameInput.value.trim().length > 0 && passwordInput.value.length > 0;
+              [urlInput, usernameInput, passwordInput].forEach((input) => {
+                input.disabled = isSaving;
+              });
+              setSubmitting(isSaving, utils.t("webdav_verify_save"));
+              if (!isSaving) {
+                submitBtn.disabled = !canSave;
+              }
+            };
+            const setSavingState = (saving) => {
+              isSaving = saving;
+              updateState();
+            };
+            [urlInput, usernameInput, passwordInput].forEach((input) => {
+              input.addEventListener("input", updateState);
+              input.addEventListener("keydown", (event) => {
+                if (event.key === "Enter" && !submitBtn.disabled) {
+                  event.preventDefault();
+                  submitBtn.click();
+                }
+              });
+            });
+            submitBtn.onclick = async () => {
+              const nextConfig = {
+                url: urlInput.value.trim(),
+                username: usernameInput.value.trim(),
+                password: passwordInput.value
+              };
+              try {
+                setSavingState(true);
+                const validatedConfig = await core.validateWebDavConfig(nextConfig);
+                core.saveWebDavConfig(validatedConfig);
+                close();
+                state.webdavBackups = core.getCachedWebDavBackups();
+                ui.renderWebDavView();
+                ui.showToast(utils.t("webdav_verified"));
+              } catch (error) {
+                setSavingState(false);
+                ui.showToast(utils.getWebDavErrorMessage(error, "webdav_verify_err"));
+                return;
+              }
+              setSavingState(false);
+            };
+            updateState();
+            if (config.username) {
+              usernameInput.focus();
+              usernameInput.select();
+            } else {
+              urlInput.focus();
+              urlInput.select();
             }
-          });
-        });
-        ui.qs("#form-webdav-cancel").onclick = () => {
-          state.saveFormMask.style.display = "none";
-        };
-        saveBtn.onclick = async () => {
-          const nextConfig = {
-            url: urlInput.value.trim(),
-            username: usernameInput.value.trim(),
-            password: passwordInput.value
-          };
-          try {
-            const resolvedConfig = await core.validateWebDavConfig(nextConfig);
-            core.saveWebDavConfig(resolvedConfig);
-            state.saveFormMask.style.display = "none";
-            state.webdavBackups = core.getCachedWebDavBackups();
-            ui.renderWebDavView();
-            ui.showToast(utils.t("webdav_verified"));
-          } catch (error) {
-            await ui.alert(error.message || utils.t("webdav_verify_err"));
           }
-        };
-        updateState();
-        if (config.username) {
-          usernameInput.focus();
-          usernameInput.select();
-        } else {
-          urlInput.focus();
-          urlInput.select();
-        }
+        });
       }
     };
   }
@@ -2243,10 +2609,10 @@
         if (!loader) {
           loader = document.createElement("div");
           loader.className = "acc-loading-mask";
-          loader.innerHTML = `
+          utils.setHTML(loader, `
           <div class="acc-spinner"></div>
           <div class="acc-loading-text"></div>
-        `;
+        `);
           state.panel.appendChild(loader);
         }
         loader.querySelector(".acc-loading-text").innerText = text;
@@ -2311,7 +2677,7 @@
         }
         state.fab = document.createElement("div");
         state.fab.id = "acc-mgr-fab";
-        state.fab.innerHTML = constants.ICONS.LOGO;
+        utils.setHTML(state.fab, constants.ICONS.LOGO);
         state.uiRoot.appendChild(state.fab);
         const savedPos = GM_getValue(constants.CFG.FAB_POS);
         if (savedPos && savedPos.left !== void 0) {
@@ -2382,7 +2748,7 @@
         state.panel.id = "acc-mgr-panel";
         state.panel.className = "acc-panel";
         state.panel.setAttribute("tabindex", "-1");
-        state.panel.innerHTML = templates.panel();
+        utils.setHTML(state.panel, templates.panel());
         state.uiRoot.appendChild(state.panel);
         ui.bindPanelEvents();
       }
@@ -2397,27 +2763,48 @@
         const hostMenu = ui.qs("#host-menu");
         const hostSearchInput = ui.qs("#host-search-input");
         if (!hostTrigger || !hostMenu) return;
-        const currentLabel = state.currentViewingHost === constants.HOST ? "📌" : "🌐";
+        const buildHostIcon = (host, label, className = "") => {
+          const fallbackText = utils.escapeHtml(utils.getHostIconFallbackText(host, label));
+          const cachedIconUrl = utils.escapeHtml(utils.getCachedHostIcon(host));
+          const hasCachedIcon = Boolean(cachedIconUrl);
+          return `
+          <span class="acc-host-icon${className ? ` ${className}` : ""}${hasCachedIcon ? "" : " is-fallback"}" aria-hidden="true">
+            <img class="acc-host-favicon" ${hasCachedIcon ? `src="${cachedIconUrl}"` : ""} alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">
+            <span class="acc-host-icon-fallback">${fallbackText}</span>
+          </span>
+        `;
+        };
         const query = state.hostSearchQuery.trim().toLowerCase();
         const visibleHosts = hosts.filter((host) => {
           const siteName = utils.getSiteNameByHost(host).toLowerCase();
           return host.toLowerCase().includes(query) || siteName.includes(query);
         });
-        hostTrigger.textContent = `${currentLabel} ${utils.getHostDisplayName(state.currentViewingHost)}`;
+        const currentDisplayName = utils.getHostDisplayName(state.currentViewingHost);
+        utils.setHTML(hostTrigger, `
+        <span class="acc-host-trigger-content">
+          ${buildHostIcon(state.currentViewingHost, currentDisplayName)}
+          <span class="acc-host-trigger-label">${utils.escapeHtml(currentDisplayName)}</span>
+        </span>
+      `);
         if (hostSearchInput) {
           hostSearchInput.value = state.hostSearchQuery;
         }
-        hostMenu.innerHTML = `
+        utils.setHTML(hostMenu, `
         <div class="acc-host-list">
           ${visibleHosts.length ? visibleHosts.map((host) => {
-          const prefix = host === constants.HOST ? "📌" : "🌐";
           const isActive = host === state.currentViewingHost ? " active" : "";
-          const label = utils.escapeHtml(utils.getHostDisplayName(host));
+          const displayName = utils.getHostDisplayName(host);
+          const label = utils.escapeHtml(displayName);
           const isEditing = state.hostDisplayMode === "siteName" && state.hostEditingHost === host;
           const editValue = utils.escapeHtml(state.hostEditingValue || utils.getSiteNameByHost(host));
           return `
                     <div class="acc-host-option-row${isActive}">
-                      <button class="acc-host-option" type="button" data-host="${host}">${prefix} ${label}</button>
+                      <button class="acc-host-option" type="button" data-host="${host}">
+                        <span class="acc-host-option-content">
+                          ${buildHostIcon(host, displayName)}
+                          <span class="acc-host-option-label">${label}</span>
+                        </span>
+                      </button>
                       ${state.hostDisplayMode === "siteName" ? `<button class="acc-host-edit-link" type="button" data-edit-host="${host}" title="${utils.t("edit_site_name")}">${constants.ICONS.EDIT}</button>` : ""}
                       <button class="acc-host-open-link" type="button" data-open-host="${host}" title="${utils.t("open_site")}">&#8599;</button>
                       ${isEditing ? `
@@ -2431,7 +2818,9 @@
                   `;
         }).join("") : `<div class="acc-host-empty">${utils.t("no_data")}</div>`}
         </div>
-      `;
+      `);
+        core.ensureHostIcon(constants.HOST).catch(() => {
+        });
       },
       initPointerSortableList({ containerSelector, itemSelector, keySelector, orderHost, afterSort, handleSelector }) {
         const container = ui.qs(containerSelector);
@@ -2567,7 +2956,10 @@
         const currentKeys = utils.getSortedKeysByHost(state.currentViewingHost).filter((key) => !searchQuery || utils.extractName(key).toLowerCase().includes(searchQuery));
         const switchArea = ui.qs("#switch-area");
         if (!switchArea) return;
-        switchArea.innerHTML = currentKeys.length === 0 ? templates.noData() : currentKeys.map((key) => templates.switchCard(key, GM_getValue(key))).join("");
+        utils.setHTML(
+          switchArea,
+          currentKeys.length === 0 ? templates.noData() : currentKeys.map((key) => templates.switchCard(key, GM_getValue(key))).join("")
+        );
         ui.initPointerSortableList({
           containerSelector: "#switch-area",
           itemSelector: ".acc-switch-item",
@@ -2590,13 +2982,9 @@
         input.value = originalName;
         input.disabled = !data;
         deleteBtn.disabled = !data;
-        deleteBtn.style.opacity = data ? "1" : "0.5";
-        deleteBtn.style.cursor = data ? "pointer" : "not-allowed";
         const updateSaveState = () => {
           const canSave = Boolean(data) && input.value.trim().length > 0 && input.value.trim() !== originalName;
           saveBtn.disabled = !canSave;
-          saveBtn.style.opacity = canSave ? "1" : "0.5";
-          saveBtn.style.cursor = canSave ? "pointer" : "not-allowed";
         };
         input.oninput = updateSaveState;
         input.onkeydown = (event) => {
@@ -2614,7 +3002,7 @@
         if (!hostRow || !searchInput || !searchToggleBtn) return;
         hostRow.classList.toggle("searching", state.accountSearchActive);
         searchInput.value = state.accountSearchQuery;
-        searchToggleBtn.innerHTML = state.accountSearchActive ? constants.ICONS.CLOSE : constants.ICONS.SEARCH;
+        utils.setHTML(searchToggleBtn, state.accountSearchActive ? constants.ICONS.CLOSE : constants.ICONS.SEARCH);
         searchToggleBtn.title = state.accountSearchActive ? utils.t("close_search_accounts") : utils.t("search_accounts");
       },
       openAccountSettings(key) {
@@ -2632,18 +3020,15 @@
     return {
       renderWebDavView() {
         const config = core.getWebDavConfig();
+        const hasConfig = core.hasWebDavConfig();
         const statusEl = ui.qs("#webdav-status");
         const syncBtn = ui.qs("#btn-webdav-sync");
         const logoutBtn = ui.qs("#btn-webdav-logout");
         if (!statusEl || !syncBtn || !logoutBtn) return;
-        statusEl.textContent = core.hasWebDavConfig() ? utils.t("webdav_connected_as").replace("{user}", config.username) : utils.t("webdav_not_configured");
-        syncBtn.disabled = !core.hasWebDavConfig();
-        syncBtn.style.opacity = syncBtn.disabled ? "0.5" : "1";
-        syncBtn.style.cursor = syncBtn.disabled ? "not-allowed" : "pointer";
-        logoutBtn.disabled = !core.hasWebDavConfig();
-        logoutBtn.style.opacity = logoutBtn.disabled ? "0.5" : "1";
-        logoutBtn.style.cursor = logoutBtn.disabled ? "not-allowed" : "pointer";
-        if (core.hasWebDavConfig()) {
+        statusEl.textContent = hasConfig ? utils.t("webdav_connected_as").replace("{user}", config.username) : utils.t("webdav_not_configured");
+        syncBtn.disabled = !hasConfig;
+        logoutBtn.disabled = !hasConfig;
+        if (hasConfig) {
           state.webdavBackups = core.getCachedWebDavBackups();
         } else {
           state.webdavBackups = [];
@@ -2654,15 +3039,17 @@
         const container = ui.qs("#webdav-backup-list");
         if (!container) return;
         if (errorMessage) {
-          container.innerHTML = `<div class="acc-webdav-empty">${utils.escapeHtml(errorMessage)}</div>`;
+          utils.setHTML(container, `<div class="acc-webdav-empty">${utils.escapeHtml(errorMessage)}</div>`);
           return;
         }
         if (!backups.length) {
-          container.innerHTML = `<div class="acc-webdav-empty">${utils.t("webdav_no_backups")}</div>`;
+          utils.setHTML(container, `<div class="acc-webdav-empty">${utils.t("webdav_no_backups")}</div>`);
           return;
         }
-        container.innerHTML = backups.map(
-          (backup) => `
+        utils.setHTML(
+          container,
+          backups.map(
+            (backup) => `
             <div class="acc-webdav-item">
               <div class="acc-webdav-item-main">
                 <div class="acc-webdav-item-name" title="${utils.escapeHtml(backup.fileName)}">${utils.escapeHtml(backup.fileName)}</div>
@@ -2677,30 +3064,39 @@
               </div>
             </div>
           `
-        ).join("");
+          ).join("")
+        );
       },
       async loadWebDavBackups() {
         const config = core.getWebDavConfig();
+        const refreshBtn = ui.qs("#btn-webdav-refresh");
         if (!config.url || !config.username || !config.password) {
           state.webdavBackups = [];
           ui.renderWebDavBackupList([], utils.t("webdav_need_config"));
           return;
         }
-        ui.toggleLoading(true, utils.t("webdav_loading"));
-        try {
-          state.webdavBackups = await core.listWebDavBackups();
-          ui.renderWebDavBackupList(state.webdavBackups);
-        } catch (error) {
-          state.webdavBackups = core.getCachedWebDavBackups();
-          if (state.webdavBackups.length) {
-            ui.renderWebDavBackupList(state.webdavBackups);
-            ui.showToast(error.message || utils.t("webdav_list_err"));
-          } else {
-            ui.renderWebDavBackupList([], error.message || utils.t("webdav_list_err"));
+        await ui.runUiAction({
+          button: refreshBtn,
+          idleText: utils.t("webdav_refresh"),
+          errorKey: "webdav_list_err",
+          successMessage: utils.t("webdav_refresh_ok"),
+          action: async () => {
+            state.webdavBackups = await core.listWebDavBackups();
+            return state.webdavBackups;
+          },
+          onSuccess: (backups) => {
+            ui.renderWebDavBackupList(backups);
+          },
+          onError: (error) => {
+            const toastMessage = utils.getWebDavErrorMessage(error, "webdav_list_err");
+            state.webdavBackups = core.getCachedWebDavBackups();
+            if (state.webdavBackups.length) {
+              ui.renderWebDavBackupList(state.webdavBackups);
+            } else {
+              ui.renderWebDavBackupList([], toastMessage);
+            }
           }
-        } finally {
-          ui.toggleLoading(false);
-        }
+        });
       }
     };
   }
@@ -2749,7 +3145,7 @@
     const state = createState({ constants: CONST, i18nData: I18N_DATA });
     const utils = createUtils({ state, constants: CONST, i18nData: I18N_DATA });
     const templates = createTemplates({ state, constants: CONST, i18nData: I18N_DATA, utils });
-    const core = createCore({ constants: CONST, utils });
+    const core = createCore({ state, constants: CONST, utils });
     const ui = createUI({ state, constants: CONST, utils, templates, core, styleCss: STYLE_CSS });
     core.setUI(ui);
     const start = () => {
