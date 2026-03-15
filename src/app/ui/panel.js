@@ -55,10 +55,10 @@ export function createPanelMethods({ state, constants, utils, templates, styleCs
       if (!loader) {
         loader = document.createElement('div');
         loader.className = 'acc-loading-mask';
-        loader.innerHTML = `
+        utils.setHTML(loader, `
           <div class="acc-spinner"></div>
           <div class="acc-loading-text"></div>
-        `;
+        `);
         state.panel.appendChild(loader);
       }
 
@@ -134,7 +134,7 @@ export function createPanelMethods({ state, constants, utils, templates, styleCs
 
       state.fab = document.createElement('div');
       state.fab.id = 'acc-mgr-fab';
-      state.fab.innerHTML = constants.ICONS.LOGO;
+      utils.setHTML(state.fab, constants.ICONS.LOGO);
       state.uiRoot.appendChild(state.fab);
 
       const savedPos = GM_getValue(constants.CFG.FAB_POS);
@@ -213,7 +213,7 @@ export function createPanelMethods({ state, constants, utils, templates, styleCs
       state.panel.id = 'acc-mgr-panel';
       state.panel.className = 'acc-panel';
       state.panel.setAttribute('tabindex', '-1');
-      state.panel.innerHTML = templates.panel();
+      utils.setHTML(state.panel, templates.panel());
       state.uiRoot.appendChild(state.panel);
       ui.bindPanelEvents();
     }

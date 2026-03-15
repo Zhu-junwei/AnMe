@@ -33,10 +33,10 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
       if (!state.toastEl) {
         state.toastEl = document.createElement('div');
         state.toastEl.className = 'acc-toast';
-        state.toastEl.innerHTML = `
+        utils.setHTML(state.toastEl, `
           <span class="acc-toast-icon">${constants.ICONS.NOTICE}</span>
           <span class="acc-toast-text"></span>
-        `;
+        `);
         state.panel.appendChild(state.toastEl);
       }
 
@@ -63,7 +63,7 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
       }
       button.disabled = loading;
       button.classList.toggle('is-loading', loading);
-      button.innerHTML = loading ? `<span class="${spinnerClassName}" aria-hidden="true"></span>` : idleText;
+      utils.setHTML(button, loading ? `<span class="${spinnerClassName}" aria-hidden="true"></span>` : idleText);
       if (!loading) {
         button.style.minWidth = '';
         button.style.minHeight = '';
@@ -127,7 +127,7 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
           currentPanel.appendChild(state.dialogMask);
         }
 
-        state.dialogMask.innerHTML = `
+        utils.setHTML(state.dialogMask, `
           <div class="acc-dialog-box">
               <div class="acc-dialog-msg">${message}</div>
               <div class="acc-dialog-footer">
@@ -135,7 +135,7 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
                   <button class="acc-dialog-btn acc-dialog-btn-ok" id="acc-dlg-ok">${utils.t('dlg_ok')}</button>
               </div>
           </div>
-        `;
+        `);
         state.dialogMask.style.display = 'flex';
 
         const okBtn = ui.qs('#acc-dlg-ok');
@@ -163,7 +163,7 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
     },
     async showFormModal({ title, contentHtml, submitText, onOpen }) {
       const mask = ui.ensureFormMask();
-      mask.innerHTML = `
+      utils.setHTML(mask, `
         <div class="acc-form-box">
           <div class="acc-form-title">${title}</div>
           ${contentHtml}
@@ -172,7 +172,7 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
             <button class="acc-dialog-btn acc-dialog-btn-ok" id="acc-form-submit">${submitText}</button>
           </div>
         </div>
-      `;
+      `);
       mask.style.display = 'flex';
 
       const context = {

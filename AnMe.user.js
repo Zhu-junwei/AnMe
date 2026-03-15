@@ -468,6 +468,7 @@
 
   // src/app/utils.js
   function createUtils({ state, constants, i18nData }) {
+    let trustedHtmlPolicy;
     return {
       normalizeText(value) {
         return String(value || "").replace(/\s+/g, " ").trim();
@@ -492,6 +493,23 @@
       },
       escapeHtml(value) {
         return String(value || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+      },
+      toTrustedHtml(html) {
+        const normalized = String(html || "");
+        if (trustedHtmlPolicy === void 0) {
+          try {
+            trustedHtmlPolicy = typeof trustedTypes !== "undefined" && typeof trustedTypes.createPolicy === "function" ? trustedTypes.getPolicy?.("anme-html") || trustedTypes.createPolicy("anme-html", {
+              createHTML: (value) => String(value || "")
+            }) : null;
+          } catch {
+            trustedHtmlPolicy = null;
+          }
+        }
+        return trustedHtmlPolicy ? trustedHtmlPolicy.createHTML(normalized) : normalized;
+      },
+      setHTML(element, html) {
+        if (!element) return;
+        element.innerHTML = this.toTrustedHtml(html);
       },
       extractName(key) {
         return key.split("::")[1] || key;
@@ -1020,7 +1038,10 @@
         if (!content) return;
         const inspectorWindow = window.open("", "_blank");
         if (!inspectorWindow) return;
-        inspectorWindow.document.head.innerHTML = `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(constants.ICONS.LOGO)}">`;
+        utils.setHTML(
+          inspectorWindow.document.head,
+          `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(constants.ICONS.LOGO)}">`
+        );
         const noDataHtml = "<p>No data to display.</p>";
         const escapeHtml = (value) => {
           if (value === null || value === void 0) return "";
@@ -1107,10 +1128,10 @@
         p { margin-top: 20px; }
       `;
         inspectorWindow.document.head.appendChild(style);
-        inspectorWindow.document.body.innerHTML = `
+        utils.setHTML(inspectorWindow.document.body, `
         <h3>${utils.extractName(key)} - ${type}</h3>
         ${inspectorHtml}
-      `;
+      `);
       }
     };
   }
@@ -2219,10 +2240,10 @@
         if (!state.toastEl) {
           state.toastEl = document.createElement("div");
           state.toastEl.className = "acc-toast";
-          state.toastEl.innerHTML = `
+          utils.setHTML(state.toastEl, `
           <span class="acc-toast-icon">${constants.ICONS.NOTICE}</span>
           <span class="acc-toast-text"></span>
-        `;
+        `);
           state.panel.appendChild(state.toastEl);
         }
         const textNode = state.toastEl.querySelector(".acc-toast-text");
@@ -2246,7 +2267,7 @@
         }
         button.disabled = loading;
         button.classList.toggle("is-loading", loading);
-        button.innerHTML = loading ? `<span class="${spinnerClassName}" aria-hidden="true"></span>` : idleText;
+        utils.setHTML(button, loading ? `<span class="${spinnerClassName}" aria-hidden="true"></span>` : idleText);
         if (!loading) {
           button.style.minWidth = "";
           button.style.minHeight = "";
@@ -2308,7 +2329,7 @@
             state.dialogMask.className = "acc-dialog-mask";
             currentPanel.appendChild(state.dialogMask);
           }
-          state.dialogMask.innerHTML = `
+          utils.setHTML(state.dialogMask, `
           <div class="acc-dialog-box">
               <div class="acc-dialog-msg">${message}</div>
               <div class="acc-dialog-footer">
@@ -2316,7 +2337,7 @@
                   <button class="acc-dialog-btn acc-dialog-btn-ok" id="acc-dlg-ok">${utils.t("dlg_ok")}</button>
               </div>
           </div>
-        `;
+        `);
           state.dialogMask.style.display = "flex";
           const okBtn = ui.qs("#acc-dlg-ok");
           const cancelBtn = ui.qs("#acc-dlg-cancel");
@@ -2342,7 +2363,7 @@
       },
       async showFormModal({ title, contentHtml, submitText, onOpen }) {
         const mask = ui.ensureFormMask();
-        mask.innerHTML = `
+        utils.setHTML(mask, `
         <div class="acc-form-box">
           <div class="acc-form-title">${title}</div>
           ${contentHtml}
@@ -2351,7 +2372,7 @@
             <button class="acc-dialog-btn acc-dialog-btn-ok" id="acc-form-submit">${submitText}</button>
           </div>
         </div>
-      `;
+      `);
         mask.style.display = "flex";
         const context = {
           mask,
@@ -2588,10 +2609,10 @@
         if (!loader) {
           loader = document.createElement("div");
           loader.className = "acc-loading-mask";
-          loader.innerHTML = `
+          utils.setHTML(loader, `
           <div class="acc-spinner"></div>
           <div class="acc-loading-text"></div>
-        `;
+        `);
           state.panel.appendChild(loader);
         }
         loader.querySelector(".acc-loading-text").innerText = text;
@@ -2656,7 +2677,7 @@
         }
         state.fab = document.createElement("div");
         state.fab.id = "acc-mgr-fab";
-        state.fab.innerHTML = constants.ICONS.LOGO;
+        utils.setHTML(state.fab, constants.ICONS.LOGO);
         state.uiRoot.appendChild(state.fab);
         const savedPos = GM_getValue(constants.CFG.FAB_POS);
         if (savedPos && savedPos.left !== void 0) {
@@ -2727,7 +2748,7 @@
         state.panel.id = "acc-mgr-panel";
         state.panel.className = "acc-panel";
         state.panel.setAttribute("tabindex", "-1");
-        state.panel.innerHTML = templates.panel();
+        utils.setHTML(state.panel, templates.panel());
         state.uiRoot.appendChild(state.panel);
         ui.bindPanelEvents();
       }
@@ -2759,16 +2780,16 @@
           return host.toLowerCase().includes(query) || siteName.includes(query);
         });
         const currentDisplayName = utils.getHostDisplayName(state.currentViewingHost);
-        hostTrigger.innerHTML = `
+        utils.setHTML(hostTrigger, `
         <span class="acc-host-trigger-content">
           ${buildHostIcon(state.currentViewingHost, currentDisplayName)}
           <span class="acc-host-trigger-label">${utils.escapeHtml(currentDisplayName)}</span>
         </span>
-      `;
+      `);
         if (hostSearchInput) {
           hostSearchInput.value = state.hostSearchQuery;
         }
-        hostMenu.innerHTML = `
+        utils.setHTML(hostMenu, `
         <div class="acc-host-list">
           ${visibleHosts.length ? visibleHosts.map((host) => {
           const isActive = host === state.currentViewingHost ? " active" : "";
@@ -2797,7 +2818,7 @@
                   `;
         }).join("") : `<div class="acc-host-empty">${utils.t("no_data")}</div>`}
         </div>
-      `;
+      `);
         core.ensureHostIcon(constants.HOST).catch(() => {
         });
       },
@@ -2935,7 +2956,10 @@
         const currentKeys = utils.getSortedKeysByHost(state.currentViewingHost).filter((key) => !searchQuery || utils.extractName(key).toLowerCase().includes(searchQuery));
         const switchArea = ui.qs("#switch-area");
         if (!switchArea) return;
-        switchArea.innerHTML = currentKeys.length === 0 ? templates.noData() : currentKeys.map((key) => templates.switchCard(key, GM_getValue(key))).join("");
+        utils.setHTML(
+          switchArea,
+          currentKeys.length === 0 ? templates.noData() : currentKeys.map((key) => templates.switchCard(key, GM_getValue(key))).join("")
+        );
         ui.initPointerSortableList({
           containerSelector: "#switch-area",
           itemSelector: ".acc-switch-item",
@@ -2978,7 +3002,7 @@
         if (!hostRow || !searchInput || !searchToggleBtn) return;
         hostRow.classList.toggle("searching", state.accountSearchActive);
         searchInput.value = state.accountSearchQuery;
-        searchToggleBtn.innerHTML = state.accountSearchActive ? constants.ICONS.CLOSE : constants.ICONS.SEARCH;
+        utils.setHTML(searchToggleBtn, state.accountSearchActive ? constants.ICONS.CLOSE : constants.ICONS.SEARCH);
         searchToggleBtn.title = state.accountSearchActive ? utils.t("close_search_accounts") : utils.t("search_accounts");
       },
       openAccountSettings(key) {
@@ -3015,15 +3039,17 @@
         const container = ui.qs("#webdav-backup-list");
         if (!container) return;
         if (errorMessage) {
-          container.innerHTML = `<div class="acc-webdav-empty">${utils.escapeHtml(errorMessage)}</div>`;
+          utils.setHTML(container, `<div class="acc-webdav-empty">${utils.escapeHtml(errorMessage)}</div>`);
           return;
         }
         if (!backups.length) {
-          container.innerHTML = `<div class="acc-webdav-empty">${utils.t("webdav_no_backups")}</div>`;
+          utils.setHTML(container, `<div class="acc-webdav-empty">${utils.t("webdav_no_backups")}</div>`);
           return;
         }
-        container.innerHTML = backups.map(
-          (backup) => `
+        utils.setHTML(
+          container,
+          backups.map(
+            (backup) => `
             <div class="acc-webdav-item">
               <div class="acc-webdav-item-main">
                 <div class="acc-webdav-item-name" title="${utils.escapeHtml(backup.fileName)}">${utils.escapeHtml(backup.fileName)}</div>
@@ -3038,7 +3064,8 @@
               </div>
             </div>
           `
-        ).join("");
+          ).join("")
+        );
       },
       async loadWebDavBackups() {
         const config = core.getWebDavConfig();

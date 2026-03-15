@@ -26,18 +26,20 @@ export function createWebDavUiMethods({ state, constants, utils, core, ui }) {
       if (!container) return;
 
       if (errorMessage) {
-        container.innerHTML = `<div class="acc-webdav-empty">${utils.escapeHtml(errorMessage)}</div>`;
+        utils.setHTML(container, `<div class="acc-webdav-empty">${utils.escapeHtml(errorMessage)}</div>`);
         return;
       }
 
       if (!backups.length) {
-        container.innerHTML = `<div class="acc-webdav-empty">${utils.t('webdav_no_backups')}</div>`;
+        utils.setHTML(container, `<div class="acc-webdav-empty">${utils.t('webdav_no_backups')}</div>`);
         return;
       }
 
-      container.innerHTML = backups
-        .map(
-          (backup) => `
+      utils.setHTML(
+        container,
+        backups
+          .map(
+            (backup) => `
             <div class="acc-webdav-item">
               <div class="acc-webdav-item-main">
                 <div class="acc-webdav-item-name" title="${utils.escapeHtml(backup.fileName)}">${utils.escapeHtml(backup.fileName)}</div>
@@ -52,8 +54,9 @@ export function createWebDavUiMethods({ state, constants, utils, core, ui }) {
               </div>
             </div>
           `
-        )
-        .join('');
+          )
+          .join('')
+      );
     },
     async loadWebDavBackups() {
       const config = core.getWebDavConfig();

@@ -13,7 +13,10 @@ export function createInspectorMethods({ constants, utils }) {
       const inspectorWindow = window.open('', '_blank');
       if (!inspectorWindow) return;
 
-      inspectorWindow.document.head.innerHTML = `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(constants.ICONS.LOGO)}">`;
+      utils.setHTML(
+        inspectorWindow.document.head,
+        `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(constants.ICONS.LOGO)}">`
+      );
 
       const noDataHtml = '<p>No data to display.</p>';
       const escapeHtml = (value) => {
@@ -120,10 +123,10 @@ export function createInspectorMethods({ constants, utils }) {
         p { margin-top: 20px; }
       `;
       inspectorWindow.document.head.appendChild(style);
-      inspectorWindow.document.body.innerHTML = `
+      utils.setHTML(inspectorWindow.document.body, `
         <h3>${utils.extractName(key)} - ${type}</h3>
         ${inspectorHtml}
-      `;
+      `);
     }
   };
 }

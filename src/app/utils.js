@@ -1,4 +1,6 @@
 export function createUtils({ state, constants, i18nData }) {
+  let trustedHtmlPolicy;
+
   return {
     normalizeText(value) {
       return String(value || '')
@@ -30,6 +32,27 @@ export function createUtils({ state, constants, i18nData }) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
+    },
+    toTrustedHtml(html) {
+      const normalized = String(html || '');
+      if (trustedHtmlPolicy === undefined) {
+        try {
+          trustedHtmlPolicy =
+            typeof trustedTypes !== 'undefined' && typeof trustedTypes.createPolicy === 'function'
+              ? trustedTypes.getPolicy?.('anme-html') ||
+                trustedTypes.createPolicy('anme-html', {
+                  createHTML: (value) => String(value || '')
+                })
+              : null;
+        } catch {
+          trustedHtmlPolicy = null;
+        }
+      }
+      return trustedHtmlPolicy ? trustedHtmlPolicy.createHTML(normalized) : normalized;
+    },
+    setHTML(element, html) {
+      if (!element) return;
+      element.innerHTML = this.toTrustedHtml(html);
     },
     extractName(key) {
       return key.split('::')[1] || key;

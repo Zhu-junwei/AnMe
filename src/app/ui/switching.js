@@ -23,16 +23,16 @@ export function createSwitchingMethods({ state, constants, utils, templates, cor
         return host.toLowerCase().includes(query) || siteName.includes(query);
       });
       const currentDisplayName = utils.getHostDisplayName(state.currentViewingHost);
-      hostTrigger.innerHTML = `
+      utils.setHTML(hostTrigger, `
         <span class="acc-host-trigger-content">
           ${buildHostIcon(state.currentViewingHost, currentDisplayName)}
           <span class="acc-host-trigger-label">${utils.escapeHtml(currentDisplayName)}</span>
         </span>
-      `;
+      `);
       if (hostSearchInput) {
         hostSearchInput.value = state.hostSearchQuery;
       }
-      hostMenu.innerHTML = `
+      utils.setHTML(hostMenu, `
         <div class="acc-host-list">
           ${visibleHosts.length
             ? visibleHosts
@@ -73,7 +73,7 @@ export function createSwitchingMethods({ state, constants, utils, templates, cor
                 .join('')
             : `<div class="acc-host-empty">${utils.t('no_data')}</div>`}
         </div>
-      `;
+      `);
       core.ensureHostIcon(constants.HOST).catch(() => {});
     },
     initPointerSortableList({ containerSelector, itemSelector, keySelector, orderHost, afterSort, handleSelector }) {
@@ -238,10 +238,12 @@ export function createSwitchingMethods({ state, constants, utils, templates, cor
         .filter((key) => !searchQuery || utils.extractName(key).toLowerCase().includes(searchQuery));
       const switchArea = ui.qs('#switch-area');
       if (!switchArea) return;
-      switchArea.innerHTML =
+      utils.setHTML(
+        switchArea,
         currentKeys.length === 0
           ? templates.noData()
-          : currentKeys.map((key) => templates.switchCard(key, GM_getValue(key))).join('');
+          : currentKeys.map((key) => templates.switchCard(key, GM_getValue(key))).join('')
+      );
       ui.initPointerSortableList({
         containerSelector: '#switch-area',
         itemSelector: '.acc-switch-item',
@@ -293,7 +295,7 @@ export function createSwitchingMethods({ state, constants, utils, templates, cor
 
       hostRow.classList.toggle('searching', state.accountSearchActive);
       searchInput.value = state.accountSearchQuery;
-      searchToggleBtn.innerHTML = state.accountSearchActive ? constants.ICONS.CLOSE : constants.ICONS.SEARCH;
+      utils.setHTML(searchToggleBtn, state.accountSearchActive ? constants.ICONS.CLOSE : constants.ICONS.SEARCH);
       searchToggleBtn.title = state.accountSearchActive ? utils.t('close_search_accounts') : utils.t('search_accounts');
     },
     openAccountSettings(key) {
