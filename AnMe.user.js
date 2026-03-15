@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AnMe
 // @author       zjw
-// @version      10.0.2
+// @version      10.0.3
 // @namespace    https://github.com/Zhu-junwei/AnMe
 // @description  通用多网站多账号切换器
 // @description:zh  通用多网站多账号切换器
@@ -1236,8 +1236,9 @@
   function joinRemoteUrl(remoteUrl, fileName) {
     return `${remoteUrl.replace(/\/+$/, "")}/${encodeURIComponent(fileName)}`;
   }
-  function getManifestName() {
-    return ".anme-index.json";
+  function appendCacheBust(url) {
+    const separator = url.includes("?") ? "&" : "?";
+    return `${url}${separator}_=${Date.now()}`;
   }
   function getRemoteBackupName(_config, _constants, displayName) {
     return displayName;
@@ -1318,6 +1319,10 @@
     }).filter((item) => item.fileName && item.pathname !== basePath && !item.isCollection && isBackupArchiveFile(item.fileName, constants)).sort((a, b) => new Date(b.lastModified || 0) - new Date(a.lastModified || 0));
   }
   function createWebDavMethods({ constants, utils, getUI, getCore }) {
+    const noCacheHeaders = {
+      "Cache-Control": "no-store, no-cache, max-age=0",
+      Pragma: "no-cache"
+    };
     const getOrCreateWebDavSecret = () => {
       const existingSecret = String(GM_getValue(constants.CFG.WEBDAV_SECRET, "") || "");
       if (existingSecret) {
@@ -1462,9 +1467,10 @@
         const remoteUrl = toRemoteUrl(config);
         const response = await request(config, {
           method: "PROPFIND",
-          url: remoteUrl,
+          url: appendCacheBust(remoteUrl),
           headers: {
-            Depth: "1"
+            Depth: "1",
+            ...noCacheHeaders
           }
         });
         return parseWebDavList(response.responseText || "", remoteUrl, constants).map((item) => ({
@@ -1473,36 +1479,6 @@
           lastModified: item.lastModified ? new Date(item.lastModified).toISOString() : "",
           size: item.size
         }));
-      },
-      async readWebDavIndex(config) {
-        const remoteUrl = toRemoteUrl(config);
-        const manifestName = getManifestName();
-        try {
-          const response = await request(config, {
-            method: "GET",
-            url: joinRemoteUrl(remoteUrl, manifestName),
-            responseType: "text"
-          });
-          const parsed = JSON.parse(response.responseText || "{}");
-          return Array.isArray(parsed.backups) ? parsed.backups : [];
-        } catch (error) {
-          if (/ 404$/.test(error.message)) {
-            return [];
-          }
-          throw error;
-        }
-      },
-      async writeWebDavIndex(config, backups) {
-        const remoteUrl = toRemoteUrl(config);
-        const manifestName = getManifestName();
-        await request(config, {
-          method: "PUT",
-          url: joinRemoteUrl(remoteUrl, manifestName),
-          data: JSON.stringify({ backups }, null, 2),
-          headers: {
-            "Content-Type": "application/json;charset=utf-8"
-          }
-        });
       },
       normalizeWebDavConfig(config) {
         return withManagedDirectory({
@@ -1517,7 +1493,7 @@
           throw new Error(utils.t("webdav_missing_config"));
         }
         await this.verifyWriteAccess(normalizedConfig);
-        await this.readWebDavIndex(normalizedConfig);
+        await this.readWebDavDirectory(normalizedConfig);
         return normalizedConfig;
       },
       async getValidatedWebDavConfig() {
@@ -1525,10 +1501,7 @@
       },
       async listWebDavBackups() {
         const config = await this.getValidatedWebDavConfig();
-        let backups = await this.readWebDavIndex(config);
-        if (!backups.length) {
-          backups = await this.readWebDavDirectory(config);
-        }
+        let backups = await this.readWebDavDirectory(config);
         backups = backups.sort((a, b) => new Date(b.lastModified || 0) - new Date(a.lastModified || 0));
         return this.saveCachedWebDavBackups(backups);
       },
@@ -1553,24 +1526,23 @@
             "Content-Type": "application/octet-stream"
           }
         });
-        const backups = await this.readWebDavIndex(config);
-        backups.unshift({
-          fileName,
-          remoteFileName,
-          lastModified: (/* @__PURE__ */ new Date()).toISOString(),
-          size: archiveBytes.byteLength
-        });
-        await this.writeWebDavIndex(config, backups);
-        this.saveCachedWebDavBackups(backups);
+        const backups = await this.readWebDavDirectory(config);
+        const nextBackups = [
+          {
+            fileName,
+            remoteFileName,
+            lastModified: (/* @__PURE__ */ new Date()).toISOString(),
+            size: archiveBytes.byteLength
+          },
+          ...backups.filter((item) => item.fileName !== fileName)
+        ].sort((a, b) => new Date(b.lastModified || 0) - new Date(a.lastModified || 0));
+        this.saveCachedWebDavBackups(nextBackups);
         return fileName;
       },
       async restoreWebDavBackup(fileName) {
         const config = await this.getValidatedWebDavConfig();
         const remoteUrl = toRemoteUrl(config);
-        let backups = await this.readWebDavIndex(config);
-        if (!backups.length) {
-          backups = await this.readWebDavDirectory(config);
-        }
+        const backups = await this.readWebDavDirectory(config);
         const matchedBackup = backups.find((item) => item.fileName === fileName);
         const remoteFileName = matchedBackup?.remoteFileName || getRemoteBackupName(config, constants, fileName);
         const response = await request(config, {
@@ -1592,10 +1564,7 @@
       async deleteWebDavBackup(fileName) {
         const config = await this.getValidatedWebDavConfig();
         const remoteUrl = toRemoteUrl(config);
-        let backups = await this.readWebDavIndex(config);
-        if (!backups.length) {
-          backups = await this.readWebDavDirectory(config);
-        }
+        const backups = await this.readWebDavDirectory(config);
         const matchedBackup = backups.find((item) => item.fileName === fileName);
         const remoteFileName = matchedBackup?.remoteFileName || getRemoteBackupName(config, constants, fileName);
         await request(config, {
@@ -1603,7 +1572,6 @@
           url: joinRemoteUrl(remoteUrl, remoteFileName)
         });
         const nextBackups = backups.filter((item) => item.fileName !== fileName);
-        await this.writeWebDavIndex(config, nextBackups);
         this.saveCachedWebDavBackups(nextBackups);
       }
     };
