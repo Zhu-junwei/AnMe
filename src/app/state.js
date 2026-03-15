@@ -34,6 +34,9 @@ export function createState({ constants, i18nData }) {
     panel: null,
     dialogMask: null,
     saveFormMask: null,
+    noteTooltipEl: null,
+    noteTooltipTarget: null,
+    noteTooltipItem: null,
     toastEl: null,
     toastTimer: null
   };

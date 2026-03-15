@@ -257,27 +257,32 @@ export function createSwitchingMethods({ state, constants, utils, templates, cor
     },
     renderAccountSettingsView() {
       const input = ui.qs('#account-settings-name');
+      const noteInput = ui.qs('#account-settings-note');
       const saveBtn = ui.qs('#btn-account-rename-save');
       const deleteBtn = ui.qs('#btn-account-delete');
-      if (!input || !saveBtn || !deleteBtn) return;
+      if (!input || !noteInput || !saveBtn || !deleteBtn) return;
 
       const key = state.accountSettingsKey;
       const data = key ? GM_getValue(key) : null;
       const originalName = data ? utils.extractName(key) : '';
+      const originalNote = utils.normalizeNoteText(data?.note);
 
       input.value = originalName;
+      noteInput.value = originalNote;
       input.disabled = !data;
+      noteInput.disabled = !data;
       deleteBtn.disabled = !data;
 
       const updateSaveState = () => {
         const canSave =
           Boolean(data) &&
           input.value.trim().length > 0 &&
-          input.value.trim() !== originalName;
+          (input.value.trim() !== originalName || utils.normalizeNoteText(noteInput.value) !== originalNote);
         saveBtn.disabled = !canSave;
       };
 
       input.oninput = updateSaveState;
+      noteInput.oninput = updateSaveState;
       input.onkeydown = (event) => {
         if (event.key === 'Enter' && !saveBtn.disabled) {
           event.preventDefault();

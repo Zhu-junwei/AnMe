@@ -1,5 +1,82 @@
 export function createEventMethods({ state, constants, utils, core, ui }) {
   return {
+    ensureNoteTooltip() {
+      if (state.noteTooltipEl || !state.uiRoot) return state.noteTooltipEl;
+      const tooltip = document.createElement('div');
+      tooltip.className = 'acc-floating-note-tooltip';
+      const content = document.createElement('div');
+      content.className = 'acc-floating-note-tooltip-content';
+      ['mousedown', 'mouseup', 'click'].forEach((eventName) => {
+        tooltip.addEventListener(eventName, (event) => {
+          event.stopPropagation();
+        });
+      });
+      content.addEventListener(
+        'wheel',
+        (event) => {
+          event.stopPropagation();
+          if (ui.shouldPreventWheelLeak(content, event.deltaY)) {
+            event.preventDefault();
+          }
+        },
+        { passive: false }
+      );
+      tooltip.appendChild(content);
+      tooltip.addEventListener('mouseenter', () => {
+        if (state.noteTooltipEl) {
+          state.noteTooltipEl.classList.add('show');
+        }
+      });
+      tooltip.addEventListener('mouseleave', (event) => {
+        if (state.noteTooltipTarget?.contains(event.relatedTarget)) return;
+        ui.hideNoteTooltip();
+      });
+      state.uiRoot.appendChild(tooltip);
+      state.noteTooltipEl = tooltip;
+      return tooltip;
+    },
+    showNoteTooltip(button) {
+      const note = String(button?.dataset?.note || '').trim();
+      if (!note) return;
+
+      const tooltip = ui.ensureNoteTooltip();
+      if (!tooltip) return;
+
+      const content = tooltip.querySelector('.acc-floating-note-tooltip-content');
+      if (!content) return;
+
+      state.noteTooltipItem?.classList.remove('acc-note-active');
+      state.noteTooltipItem = button.closest('.acc-switch-item');
+      state.noteTooltipItem?.classList.add('acc-note-active');
+      content.textContent = note;
+      tooltip.style.display = 'block';
+
+      const buttonRect = button.getBoundingClientRect();
+      const tooltipRect = tooltip.getBoundingClientRect();
+      const left = Math.max(8, buttonRect.left - tooltipRect.width - 8);
+      const top = Math.min(
+        Math.max(8, buttonRect.top - 4),
+        window.innerHeight - tooltipRect.height - 8
+      );
+      const arrowTop = Math.min(
+        Math.max(12, buttonRect.top - top + 6),
+        tooltipRect.height - 12
+      );
+
+      tooltip.style.left = `${left}px`;
+      tooltip.style.top = `${top}px`;
+      tooltip.style.setProperty('--acc-note-arrow-top', `${arrowTop}px`);
+      tooltip.classList.add('show');
+      state.noteTooltipTarget = button;
+    },
+    hideNoteTooltip() {
+      if (!state.noteTooltipEl) return;
+      state.noteTooltipEl.classList.remove('show');
+      state.noteTooltipEl.style.display = 'none';
+      state.noteTooltipTarget = null;
+      state.noteTooltipItem?.classList.remove('acc-note-active');
+      state.noteTooltipItem = null;
+    },
     shouldPreventWheelLeak(scrollArea, deltaY) {
       if (!scrollArea || scrollArea.scrollHeight <= scrollArea.clientHeight) {
         return true;
@@ -35,7 +112,7 @@ export function createEventMethods({ state, constants, utils, core, ui }) {
           (event) => {
             event.stopPropagation();
             if (eventName === 'wheel') {
-              const scrollArea = event.target.closest('.acc-scroll-area, .acc-host-menu, .acc-host-list');
+              const scrollArea = event.target.closest('.acc-scroll-area, .acc-host-menu, .acc-host-list, .acc-floating-note-tooltip-content, .acc-input-note');
               if (ui.shouldPreventWheelLeak(scrollArea, event.deltaY)) {
                 event.preventDefault();
               }
@@ -125,6 +202,12 @@ export function createEventMethods({ state, constants, utils, core, ui }) {
           return;
         }
 
+        const noteBtn = event.target.closest('.acc-switch-note-btn');
+        if (noteBtn) {
+          event.stopPropagation();
+          return;
+        }
+
         const tag = event.target.closest('.acc-click-tag');
         if (tag) {
           event.stopPropagation();
@@ -143,6 +226,32 @@ export function createEventMethods({ state, constants, utils, core, ui }) {
           core.loadAccount(card.dataset.key);
         }
       };
+
+      $('#switch-area').addEventListener('mouseover', (event) => {
+        const noteBtn = event.target.closest('.acc-switch-note-btn');
+        if (!noteBtn) return;
+        ui.showNoteTooltip(noteBtn);
+      });
+
+      $('#switch-area').addEventListener('mouseout', (event) => {
+        const noteBtn = event.target.closest('.acc-switch-note-btn');
+        if (!noteBtn) return;
+        if (noteBtn.contains(event.relatedTarget) || state.noteTooltipEl?.contains(event.relatedTarget)) return;
+        ui.hideNoteTooltip();
+      });
+
+      $('#switch-area').addEventListener('focusin', (event) => {
+        const noteBtn = event.target.closest('.acc-switch-note-btn');
+        if (!noteBtn) return;
+        ui.showNoteTooltip(noteBtn);
+      });
+
+      $('#switch-area').addEventListener('focusout', (event) => {
+        const noteBtn = event.target.closest('.acc-switch-note-btn');
+        if (!noteBtn) return;
+        if (noteBtn.contains(event.relatedTarget) || state.noteTooltipEl?.contains(event.relatedTarget)) return;
+        ui.hideNoteTooltip();
+      });
 
       $('#host-trigger').onclick = (event) => {
         event.stopPropagation();
@@ -356,24 +465,26 @@ export function createEventMethods({ state, constants, utils, core, ui }) {
       $('#btn-account-rename-save').onclick = async () => {
         const oldKey = state.accountSettingsKey;
         const nameInput = $('#account-settings-name');
-        if (!oldKey || !nameInput) return;
+        const noteInput = $('#account-settings-note');
+        if (!oldKey || !nameInput || !noteInput) return;
 
         const newName = nameInput.value.trim();
+        const newNote = utils.normalizeNoteText(noteInput.value);
         const targetHost = state.accountSettingsHost || constants.HOST;
         const originalName = utils.extractName(oldKey);
-        if (!newName || newName === originalName) return;
+        const originalNote = utils.normalizeNoteText(GM_getValue(oldKey)?.note);
+        if (!newName || (newName === originalName && newNote === originalNote)) return;
 
         const newKey = utils.makeKey(newName, targetHost);
-        if (GM_getValue(newKey)) {
+        if (newKey !== oldKey && GM_getValue(newKey)) {
           await ui.alert(utils.t('rename_conflict'));
           return;
         }
 
-        core.renameAccount(oldKey, newName, targetHost);
-        state.accountSettingsKey = newKey;
+        state.accountSettingsKey = core.updateAccount(oldKey, { name: newName, note: newNote }, targetHost);
         ui.refresh();
         ui.activatePage('pg-account-settings', utils.t('account_settings'));
-        ui.showToast(utils.t('toast_renamed'));
+        ui.showToast(utils.t('toast_account_updated'));
       };
 
       $('#btn-account-delete').onclick = async () => {

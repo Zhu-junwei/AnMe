@@ -7,6 +7,14 @@ export function createUtils({ state, constants, i18nData }) {
         .replace(/\s+/g, ' ')
         .trim();
     },
+    normalizeNoteText(value) {
+      return String(value || '')
+        .replace(/\r\n?/g, '\n')
+        .split('\n')
+        .map((line) => line.trim())
+        .join('\n')
+        .trim();
+    },
     t(key) {
       return i18nData[state.currentLang][key] || key;
     },

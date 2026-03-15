@@ -44,7 +44,16 @@ import { createUI } from './app/ui.js';
   document.addEventListener('click', (event) => {
     if (!state.panel || !state.panel.classList.contains('show')) return;
     const path = event.composedPath();
-    if (!path.includes(state.panel) && !path.includes(state.fab) && !path.includes(state.dialogMask)) {
+    const isInsideNoteTooltip =
+      Boolean(state.noteTooltipEl) &&
+      (path.includes(state.noteTooltipEl) ||
+        path.some((node) => typeof state.noteTooltipEl?.contains === 'function' && state.noteTooltipEl.contains(node)));
+    if (
+      !path.includes(state.panel) &&
+      !path.includes(state.fab) &&
+      !path.includes(state.dialogMask) &&
+      !isInsideNoteTooltip
+    ) {
       ui.closePanel();
     }
   });

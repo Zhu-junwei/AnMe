@@ -119,8 +119,7 @@ export function createBackupMethods({ constants, utils, getUI }) {
           key.startsWith(constants.PREFIX) ||
           key.startsWith(constants.ORDER_PREFIX) ||
           key.startsWith(constants.SITE_NAME_PREFIX) ||
-          key === constants.CFG.HOST_ICON_CACHE ||
-          key === constants.CFG.WEBDAV_SECRET
+          key === constants.CFG.HOST_ICON_CACHE
         ) {
           GM_deleteValue(key);
         }

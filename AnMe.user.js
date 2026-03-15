@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AnMe
 // @author       zjw
-// @version      10.0.3
+// @version      10.0.4
 // @namespace    https://github.com/Zhu-junwei/AnMe
 // @description  通用多网站多账号切换器
 // @description:zh  通用多网站多账号切换器
@@ -80,6 +80,10 @@
   Object.assign(I18N_DATA.zh, {
     nav_webdav: "WebDAV 同步",
     default_account_prefix: "账号",
+    account_note: "备注",
+    placeholder_note: "给该账号添加备注（可选）...",
+    view_note: "查看备注",
+    toast_account_updated: "账号信息已更新",
     webdav_account: "WebDAV 账号",
     webdav_config: "设置",
     webdav_not_configured: "尚未配置 WebDAV",
@@ -90,6 +94,7 @@
     webdav_username_placeholder: "请输入 WebDAV 用户名",
     webdav_password: "密码",
     webdav_password_placeholder: "请输入 WebDAV 密码",
+    webdav_password_keep_placeholder: "已保存密码，留空则保持不变",
     webdav_verify_save: "验证并保存",
     webdav_sync: "云同步",
     webdav_sync_now: "备份",
@@ -125,6 +130,10 @@
   Object.assign(I18N_DATA.en, {
     nav_webdav: "WebDAV Sync",
     default_account_prefix: "Account",
+    account_note: "Note",
+    placeholder_note: "Add an optional note for this account...",
+    view_note: "View note",
+    toast_account_updated: "Account details updated",
     webdav_account: "WebDAV Account",
     webdav_config: "Settings",
     webdav_not_configured: "WebDAV is not configured yet",
@@ -135,6 +144,7 @@
     webdav_username_placeholder: "Enter WebDAV username",
     webdav_password: "Password",
     webdav_password_placeholder: "Enter WebDAV password",
+    webdav_password_keep_placeholder: "Password saved. Leave blank to keep it unchanged",
     webdav_verify_save: "Verify and Save",
     webdav_sync: "Cloud Sync",
     webdav_sync_now: "Backup",
@@ -170,6 +180,10 @@
   Object.assign(I18N_DATA.es, {
     nav_webdav: "Sincronización WebDAV",
     default_account_prefix: "Cuenta",
+    account_note: "Nota",
+    placeholder_note: "Agrega una nota opcional para esta cuenta...",
+    view_note: "Ver nota",
+    toast_account_updated: "Información de la cuenta actualizada",
     webdav_account: "Cuenta WebDAV",
     webdav_config: "Configurar",
     webdav_not_configured: "WebDAV aún no está configurado",
@@ -180,6 +194,7 @@
     webdav_username_placeholder: "Introduce el usuario de WebDAV",
     webdav_password: "Contraseña",
     webdav_password_placeholder: "Introduce la contraseña de WebDAV",
+    webdav_password_keep_placeholder: "La contraseña ya está guardada. Déjalo vacío para conservarla",
     webdav_verify_save: "Verificar y guardar",
     webdav_sync: "Sincronización en la nube",
     webdav_sync_now: "Respaldar",
@@ -221,7 +236,7 @@
         * { box-sizing: border-box; }
         a { text-decoration:none; }
 
-        #acc-mgr-fab, .acc-panel, .acc-dialog-mask { pointer-events: auto; }
+        #acc-mgr-fab, .acc-panel, .acc-dialog-mask, .acc-floating-note-tooltip { pointer-events: auto; }
         #acc-mgr-fab { padding: 10px;position: fixed; bottom: 100px; right: 30px; width: 44px; height: 44px; background: #2196F3; color: white; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 20px; cursor: move; z-index: 1000000; box-shadow: 0 8px 30px rgba(0,0,0,0.25); user-select: none; border: none; touch-action: none; transition: transform 0.1s; }
         #acc-mgr-fab:active { transform: scale(0.95); }
 
@@ -331,6 +346,7 @@
         .acc-form-box { background: white; width: 300px; border-radius: 12px; padding: 18px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 10px; animation: accPop 0.05s ease-out; }
         .acc-form-title { font-size: 14px; font-weight: 700; color: #333; }
         .acc-form-label { font-size: 12px; font-weight: 700; color: #667085; margin-bottom: -4px; }
+        .acc-required { color:#ef4444; margin-left:4px; }
         .acc-form-footer { display: flex; gap: 10px; margin-top: 4px; }
         .acc-toast { position:absolute; top:12px; left:50%; transform:translateX(-50%) translateY(-8px); display:flex; align-items:center; gap:6px; max-width:260px; padding:7px 10px; border:1px solid #d7e5f5; border-radius:999px; background:rgba(255,255,255,0.96); color:#36506b; box-shadow:0 10px 24px rgba(15, 23, 42, 0.12); font-size:12px; line-height:1; opacity:0; visibility:hidden; transition:opacity 0.18s ease, transform 0.18s ease; z-index:2000012; pointer-events:none; white-space:nowrap; }
         .acc-toast.show { opacity:1; visibility:visible; transform:translateX(-50%) translateY(0); }
@@ -353,6 +369,24 @@
         .acc-switch-item.dragging-source .acc-switch-card { border:1px dashed #2196F3; opacity:0.45; background:#fff; }
         .acc-switch-list-sorting .acc-switch-card:hover { border-color:#d0d5dd; background:#fff; }
         .acc-switch-list-sorting .acc-switch-card:hover .acc-card-name svg { fill: currentColor !important; stroke: currentColor !important; }
+        .acc-switch-note-wrap { position:absolute; right:8px; bottom:38px; display:flex; flex-direction:column; align-items:flex-end; opacity:0; visibility:hidden; pointer-events:none; transition:all 0.15s ease; }
+        .acc-switch-item:hover .acc-switch-note-wrap,
+        .acc-switch-item.acc-note-active .acc-switch-note-wrap,
+        .acc-switch-note-wrap:focus-within { opacity:1; visibility:visible; pointer-events:auto; }
+        .acc-switch-note-btn { width:24px; height:24px; border:1px solid #ddd; border-radius:6px; background:transparent; color:#7d93a8; display:flex; align-items:center; justify-content:center; padding:0; cursor:pointer; transition:all 0.15s ease; }
+        .acc-switch-note-btn svg { font-size:14px; }
+        .acc-switch-note-btn:hover,
+        .acc-switch-note-btn:active,
+        .acc-switch-note-btn:focus-visible { color:#2196F3; border-color:#2196F3; background:#e3f2fd; outline:none; }
+        .acc-floating-note-tooltip { position:fixed; left:0; top:0; min-width:180px; max-width:280px; padding:8px 10px; border:1px solid #d7e5f5; border-radius:10px; background:rgba(255,255,255,0.98); color:#36506b; box-shadow:0 10px 24px rgba(15, 23, 42, 0.14); font-size:12px; line-height:1.45; opacity:0; visibility:hidden; transform:translateX(4px); transition:all 0.15s ease; pointer-events:auto; user-select:text; cursor:text; z-index:2000011; --acc-note-arrow-top:18px; overflow:visible; }
+        .acc-floating-note-tooltip.show { opacity:1; visibility:visible; transform:translateX(0); }
+        .acc-floating-note-tooltip-content { max-height:220px; overflow-y:auto; overflow-x:hidden; scrollbar-gutter:stable; white-space:pre-wrap; word-break:break-word; padding-right:2px; }
+        .acc-floating-note-tooltip::before,
+        .acc-floating-note-tooltip::after { content:""; position:absolute; left:100%; top:var(--acc-note-arrow-top); width:0; height:0; transform:translateY(-50%); border-style:solid; }
+        .acc-floating-note-tooltip::before { border-width:8px 0 8px 9px; border-color:transparent transparent transparent #d7e5f5; }
+        .acc-floating-note-tooltip::after { margin-left:-1px; border-width:7px 0 7px 8px; border-color:transparent transparent transparent rgba(255,255,255,0.98); }
+        .acc-floating-note-tooltip-content::-webkit-scrollbar { width:6px; }
+        .acc-floating-note-tooltip-content::-webkit-scrollbar-thumb { background:#d3d9e2; border-radius:999px; }
         .acc-switch-settings-btn { position:absolute; right:8px; bottom:8px; width:24px; height:24px; border:1px solid #ddd; border-radius:6px; background:transparent; color:#7d93a8; display:flex; align-items:center; justify-content:center; padding:0; cursor:pointer; opacity:0; visibility:hidden; transition:all 0.15s ease; }
         .acc-switch-settings-btn svg { font-size:14px; }
         .acc-switch-item:hover .acc-switch-settings-btn,
@@ -374,6 +408,8 @@
         .acc-row-btn { display: flex; gap: 8px; align-items: center; margin-bottom:3px}
         .acc-input-text { flex: 1; width:100%; padding: 8px; margin-bottom:8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; box-sizing: border-box; background: #fff; color: #333; outline: none; transition: all 0.2s; }
         .acc-input-text:focus { border-color: #2196F3; box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2); }
+        .acc-password-mask-input { -webkit-text-security: disc; }
+        .acc-input-note { min-height:72px; resize:vertical; line-height:1.45; overflow-y:auto; overflow-x:hidden; overscroll-behavior:contain; }
         .acc-btn { border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 5px; transition: 0.2s; }
         .acc-btn:disabled { opacity:.5; cursor:not-allowed; }
         .acc-btn.is-loading { pointer-events:none; }
@@ -461,6 +497,9 @@
       panel: null,
       dialogMask: null,
       saveFormMask: null,
+      noteTooltipEl: null,
+      noteTooltipTarget: null,
+      noteTooltipItem: null,
       toastEl: null,
       toastTimer: null
     };
@@ -472,6 +511,9 @@
     return {
       normalizeText(value) {
         return String(value || "").replace(/\s+/g, " ").trim();
+      },
+      normalizeNoteText(value) {
+        return String(value || "").replace(/\r\n?/g, "\n").split("\n").map((line) => line.trim()).join("\n").trim();
       },
       t(key) {
         return i18nData[state.currentLang][key] || key;
@@ -733,8 +775,12 @@
       <div class="acc-tab-content" id="pg-account-settings">
           <div class="acc-scroll-area">
               <div class="acc-set-group">
-                  <div class="acc-set-title">${utils.t("account_name")}</div>
+                  <div class="acc-set-title">${utils.t("account_name")}<span class="acc-required">*</span></div>
                   <input type="text" id="account-settings-name" class="acc-input-text" placeholder="${utils.t("placeholder_name")}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+              </div>
+              <div class="acc-set-group">
+                  <div class="acc-set-title">${utils.t("account_note")}</div>
+                  <textarea id="account-settings-note" class="acc-input-text acc-input-note" placeholder="${utils.t("placeholder_note")}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea>
               </div>
               <div class="acc-row-btn">
                   <button class="acc-btn acc-btn-blue" id="btn-account-rename-save">${utils.t("save_changes")}</button>
@@ -779,10 +825,16 @@
         const switchable = state.currentViewingHost === constants.HOST;
         const accountName = utils.extractName(key);
         const escapedAccountName = utils.escapeHtml(accountName);
+        const accountNote = utils.normalizeNoteText(data?.note);
+        const escapedAccountNote = utils.escapeHtml(accountNote);
         return `
       <div class="acc-switch-item" data-key="${key}" draggable="false">
           <span class="acc-switch-handle" aria-hidden="true"><span>::</span><span>::</span></span>
           <div class="acc-switch-card${switchable ? "" : " acc-switch-card-static"}" data-key="${key}">
+              ${accountNote ? `
+              <div class="acc-switch-note-wrap">
+                  <button class="acc-switch-note-btn" type="button" data-key="${key}" data-note="${escapedAccountNote}" aria-label="${utils.t("view_note")}">${constants.ICONS.NOTICE}</button>
+              </div>` : ""}
               <button class="acc-switch-settings-btn" data-key="${key}" title="${utils.t("account_settings")}">${constants.ICONS.SETTINGS}</button>
               <div class="acc-card-body">
                   <div class="acc-card-name">
@@ -817,11 +869,12 @@
           ss: Object.keys(sessionStorage || {}).length > 0
         };
       },
-      async saveAccount(name, siteName, options = { ck: true, ls: false, ss: false }) {
+      async saveAccount(name, siteName, options = { ck: true, ls: false, ss: false, note: "" }) {
         const ui = getUI();
         const snapshot = {
           time: Date.now(),
           siteName: utils.normalizeSiteName(siteName),
+          note: utils.normalizeNoteText(options.note),
           localStorage: options.ls ? { ...localStorage } : {},
           sessionStorage: options.ss ? { ...sessionStorage } : {},
           cookies: []
@@ -847,16 +900,31 @@
         return true;
       },
       renameAccount(oldKey, newName, host) {
+        return this.updateAccount(oldKey, { name: newName }, host);
+      },
+      updateAccount(oldKey, nextValues, host) {
         const data = GM_getValue(oldKey);
-        GM_deleteValue(oldKey);
-        GM_setValue(utils.makeKey(newName, host), data);
-        const orderKey = constants.ORDER_PREFIX + host;
-        const order = GM_getValue(orderKey, []);
-        const idx = order.indexOf(utils.extractName(oldKey));
-        if (idx !== -1) {
-          order[idx] = newName;
-          GM_setValue(orderKey, order);
+        if (!data) return oldKey;
+        const nextName = utils.normalizeText(nextValues?.name || utils.extractName(oldKey));
+        const nextKey = utils.makeKey(nextName, host);
+        const nextData = {
+          ...data,
+          note: utils.normalizeNoteText(nextValues?.note ?? data.note)
+        };
+        if (nextKey !== oldKey) {
+          GM_deleteValue(oldKey);
         }
+        GM_setValue(nextKey, nextData);
+        const orderKey = constants.ORDER_PREFIX + host;
+        if (nextKey !== oldKey) {
+          const order = GM_getValue(orderKey, []);
+          const idx = order.indexOf(utils.extractName(oldKey));
+          if (idx !== -1) {
+            order[idx] = nextName;
+            GM_setValue(orderKey, order);
+          }
+        }
+        return nextKey;
       },
       updateSiteName(host, siteName) {
         const normalizedSiteName = utils.normalizeSiteName(siteName, host);
@@ -981,7 +1049,7 @@
       },
       clearAllData() {
         GM_listValues().forEach((key) => {
-          if (key.startsWith(constants.PREFIX) || key.startsWith(constants.ORDER_PREFIX) || key.startsWith(constants.SITE_NAME_PREFIX) || key === constants.CFG.HOST_ICON_CACHE || key === constants.CFG.WEBDAV_SECRET) {
+          if (key.startsWith(constants.PREFIX) || key.startsWith(constants.ORDER_PREFIX) || key.startsWith(constants.SITE_NAME_PREFIX) || key === constants.CFG.HOST_ICON_CACHE) {
             GM_deleteValue(key);
           }
         });
@@ -1240,9 +1308,6 @@
     const separator = url.includes("?") ? "&" : "?";
     return `${url}${separator}_=${Date.now()}`;
   }
-  function getRemoteBackupName(_config, _constants, displayName) {
-    return displayName;
-  }
   function toRemoteUrl(config) {
     const baseUrl = normalizeBaseUrl(config.url);
     const directory = normalizeDirectory(config.directory);
@@ -1386,7 +1451,6 @@
       saveCachedWebDavBackups(backups) {
         const normalizedBackups = Array.isArray(backups) ? backups.map((item) => ({
           fileName: String(item.fileName || ""),
-          remoteFileName: String(item.remoteFileName || item.fileName || ""),
           lastModified: String(item.lastModified || ""),
           size: Number(item.size) || 0
         })) : [];
@@ -1475,7 +1539,6 @@
         });
         return parseWebDavList(response.responseText || "", remoteUrl, constants).map((item) => ({
           fileName: item.fileName,
-          remoteFileName: item.fileName,
           lastModified: item.lastModified ? new Date(item.lastModified).toISOString() : "",
           size: item.size
         }));
@@ -1517,10 +1580,9 @@
         const archiveBytes = await encodeBackupPayload(exportObj, constants);
         const timestamp = (/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-");
         const fileName = `${constants.META.NAME}_Sync_${timestamp}${getBackupExtension(constants)}`;
-        const remoteFileName = getRemoteBackupName(config, constants, fileName);
         await request(config, {
           method: "PUT",
-          url: joinRemoteUrl(remoteUrl, remoteFileName),
+          url: joinRemoteUrl(remoteUrl, fileName),
           data: archiveBytes.buffer,
           headers: {
             "Content-Type": "application/octet-stream"
@@ -1530,7 +1592,6 @@
         const nextBackups = [
           {
             fileName,
-            remoteFileName,
             lastModified: (/* @__PURE__ */ new Date()).toISOString(),
             size: archiveBytes.byteLength
           },
@@ -1542,12 +1603,9 @@
       async restoreWebDavBackup(fileName) {
         const config = await this.getValidatedWebDavConfig();
         const remoteUrl = toRemoteUrl(config);
-        const backups = await this.readWebDavDirectory(config);
-        const matchedBackup = backups.find((item) => item.fileName === fileName);
-        const remoteFileName = matchedBackup?.remoteFileName || getRemoteBackupName(config, constants, fileName);
         const response = await request(config, {
           method: "GET",
-          url: joinRemoteUrl(remoteUrl, remoteFileName),
+          url: joinRemoteUrl(remoteUrl, fileName),
           responseType: "arraybuffer",
           fetch: true,
           headers: {
@@ -1565,11 +1623,9 @@
         const config = await this.getValidatedWebDavConfig();
         const remoteUrl = toRemoteUrl(config);
         const backups = await this.readWebDavDirectory(config);
-        const matchedBackup = backups.find((item) => item.fileName === fileName);
-        const remoteFileName = matchedBackup?.remoteFileName || getRemoteBackupName(config, constants, fileName);
         await request(config, {
           method: "DELETE",
-          url: joinRemoteUrl(remoteUrl, remoteFileName)
+          url: joinRemoteUrl(remoteUrl, fileName)
         });
         const nextBackups = backups.filter((item) => item.fileName !== fileName);
         this.saveCachedWebDavBackups(nextBackups);
@@ -1735,6 +1791,78 @@
   // src/app/ui/events.js
   function createEventMethods({ state, constants, utils, core, ui }) {
     return {
+      ensureNoteTooltip() {
+        if (state.noteTooltipEl || !state.uiRoot) return state.noteTooltipEl;
+        const tooltip = document.createElement("div");
+        tooltip.className = "acc-floating-note-tooltip";
+        const content = document.createElement("div");
+        content.className = "acc-floating-note-tooltip-content";
+        ["mousedown", "mouseup", "click"].forEach((eventName) => {
+          tooltip.addEventListener(eventName, (event) => {
+            event.stopPropagation();
+          });
+        });
+        content.addEventListener(
+          "wheel",
+          (event) => {
+            event.stopPropagation();
+            if (ui.shouldPreventWheelLeak(content, event.deltaY)) {
+              event.preventDefault();
+            }
+          },
+          { passive: false }
+        );
+        tooltip.appendChild(content);
+        tooltip.addEventListener("mouseenter", () => {
+          if (state.noteTooltipEl) {
+            state.noteTooltipEl.classList.add("show");
+          }
+        });
+        tooltip.addEventListener("mouseleave", (event) => {
+          if (state.noteTooltipTarget?.contains(event.relatedTarget)) return;
+          ui.hideNoteTooltip();
+        });
+        state.uiRoot.appendChild(tooltip);
+        state.noteTooltipEl = tooltip;
+        return tooltip;
+      },
+      showNoteTooltip(button) {
+        const note = String(button?.dataset?.note || "").trim();
+        if (!note) return;
+        const tooltip = ui.ensureNoteTooltip();
+        if (!tooltip) return;
+        const content = tooltip.querySelector(".acc-floating-note-tooltip-content");
+        if (!content) return;
+        state.noteTooltipItem?.classList.remove("acc-note-active");
+        state.noteTooltipItem = button.closest(".acc-switch-item");
+        state.noteTooltipItem?.classList.add("acc-note-active");
+        content.textContent = note;
+        tooltip.style.display = "block";
+        const buttonRect = button.getBoundingClientRect();
+        const tooltipRect = tooltip.getBoundingClientRect();
+        const left = Math.max(8, buttonRect.left - tooltipRect.width - 8);
+        const top = Math.min(
+          Math.max(8, buttonRect.top - 4),
+          window.innerHeight - tooltipRect.height - 8
+        );
+        const arrowTop = Math.min(
+          Math.max(12, buttonRect.top - top + 6),
+          tooltipRect.height - 12
+        );
+        tooltip.style.left = `${left}px`;
+        tooltip.style.top = `${top}px`;
+        tooltip.style.setProperty("--acc-note-arrow-top", `${arrowTop}px`);
+        tooltip.classList.add("show");
+        state.noteTooltipTarget = button;
+      },
+      hideNoteTooltip() {
+        if (!state.noteTooltipEl) return;
+        state.noteTooltipEl.classList.remove("show");
+        state.noteTooltipEl.style.display = "none";
+        state.noteTooltipTarget = null;
+        state.noteTooltipItem?.classList.remove("acc-note-active");
+        state.noteTooltipItem = null;
+      },
       shouldPreventWheelLeak(scrollArea, deltaY) {
         if (!scrollArea || scrollArea.scrollHeight <= scrollArea.clientHeight) {
           return true;
@@ -1767,7 +1895,7 @@
             (event) => {
               event.stopPropagation();
               if (eventName === "wheel") {
-                const scrollArea = event.target.closest(".acc-scroll-area, .acc-host-menu, .acc-host-list");
+                const scrollArea = event.target.closest(".acc-scroll-area, .acc-host-menu, .acc-host-list, .acc-floating-note-tooltip-content, .acc-input-note");
                 if (ui.shouldPreventWheelLeak(scrollArea, event.deltaY)) {
                   event.preventDefault();
                 }
@@ -1848,6 +1976,11 @@
             ui.openAccountSettings(settingsBtn.dataset.key);
             return;
           }
+          const noteBtn = event.target.closest(".acc-switch-note-btn");
+          if (noteBtn) {
+            event.stopPropagation();
+            return;
+          }
           const tag = event.target.closest(".acc-click-tag");
           if (tag) {
             event.stopPropagation();
@@ -1864,6 +1997,28 @@
             core.loadAccount(card.dataset.key);
           }
         };
+        $("#switch-area").addEventListener("mouseover", (event) => {
+          const noteBtn = event.target.closest(".acc-switch-note-btn");
+          if (!noteBtn) return;
+          ui.showNoteTooltip(noteBtn);
+        });
+        $("#switch-area").addEventListener("mouseout", (event) => {
+          const noteBtn = event.target.closest(".acc-switch-note-btn");
+          if (!noteBtn) return;
+          if (noteBtn.contains(event.relatedTarget) || state.noteTooltipEl?.contains(event.relatedTarget)) return;
+          ui.hideNoteTooltip();
+        });
+        $("#switch-area").addEventListener("focusin", (event) => {
+          const noteBtn = event.target.closest(".acc-switch-note-btn");
+          if (!noteBtn) return;
+          ui.showNoteTooltip(noteBtn);
+        });
+        $("#switch-area").addEventListener("focusout", (event) => {
+          const noteBtn = event.target.closest(".acc-switch-note-btn");
+          if (!noteBtn) return;
+          if (noteBtn.contains(event.relatedTarget) || state.noteTooltipEl?.contains(event.relatedTarget)) return;
+          ui.hideNoteTooltip();
+        });
         $("#host-trigger").onclick = (event) => {
           event.stopPropagation();
           const picker = $("#host-picker");
@@ -2049,21 +2204,23 @@
         $("#btn-account-rename-save").onclick = async () => {
           const oldKey = state.accountSettingsKey;
           const nameInput = $("#account-settings-name");
-          if (!oldKey || !nameInput) return;
+          const noteInput = $("#account-settings-note");
+          if (!oldKey || !nameInput || !noteInput) return;
           const newName = nameInput.value.trim();
+          const newNote = utils.normalizeNoteText(noteInput.value);
           const targetHost = state.accountSettingsHost || constants.HOST;
           const originalName = utils.extractName(oldKey);
-          if (!newName || newName === originalName) return;
+          const originalNote = utils.normalizeNoteText(GM_getValue(oldKey)?.note);
+          if (!newName || newName === originalName && newNote === originalNote) return;
           const newKey = utils.makeKey(newName, targetHost);
-          if (GM_getValue(newKey)) {
+          if (newKey !== oldKey && GM_getValue(newKey)) {
             await ui.alert(utils.t("rename_conflict"));
             return;
           }
-          core.renameAccount(oldKey, newName, targetHost);
-          state.accountSettingsKey = newKey;
+          state.accountSettingsKey = core.updateAccount(oldKey, { name: newName, note: newNote }, targetHost);
           ui.refresh();
           ui.activatePage("pg-account-settings", utils.t("account_settings"));
-          ui.showToast(utils.t("toast_renamed"));
+          ui.showToast(utils.t("toast_account_updated"));
         };
         $("#btn-account-delete").onclick = async () => {
           const key = state.accountSettingsKey;
@@ -2376,14 +2533,17 @@
             <span class="acc-help-tip" title="${utils.t("tip_help")}">${constants.ICONS.HELP}</span>
             <span class="acc-lock-tip" title="${utils.t("tip_lock")}">${constants.ICONS.LOCK}</span>
           </div>
-          <div class="acc-form-label">${utils.t("site_name")}</div>
+          <div class="acc-form-label">${utils.t("site_name")}<span class="acc-required">*</span></div>
           <input type="text" id="form-site-name" class="acc-input-text" placeholder="${utils.t("placeholder_site_name")}" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false">
-          <div class="acc-form-label">${utils.t("account_name")}</div>
+          <div class="acc-form-label">${utils.t("account_name")}<span class="acc-required">*</span></div>
           <input type="text" id="form-acc-name" class="acc-input-text" placeholder="${utils.t("placeholder_name")}" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false">
+          <div class="acc-form-label">${utils.t("account_note")}</div>
+          <textarea id="form-acc-note" class="acc-input-text acc-input-note" placeholder="${utils.t("placeholder_note")}" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea>
         `,
           onOpen: async ({ qs, submitBtn, close }) => {
             const nameInput = qs("#form-acc-name");
             const siteNameInput = qs("#form-site-name");
+            const noteInput = qs("#form-acc-note");
             siteNameInput.value = utils.suggestSiteName(utils.getPageTitle(), constants.HOST);
             nameInput.value = utils.suggestAccountName(constants.HOST);
             const toggleAvailability = (selector, available) => {
@@ -2424,7 +2584,8 @@
               const saved = await core.saveAccount(name, siteName, {
                 ck: qs("#form-c-ck").checked,
                 ls: qs("#form-c-ls").checked,
-                ss: qs("#form-c-ss").checked
+                ss: qs("#form-c-ss").checked,
+                note: noteInput.value
               });
               if (!saved) return;
               close();
@@ -2448,6 +2609,8 @@
       },
       async showWebDavConfigModal() {
         const config = core.getWebDavConfig();
+        const hasSavedPassword = Boolean(config.password);
+        const maskedPassword = "******";
         await ui.showFormModal({
           title: utils.t("nav_webdav"),
           submitText: utils.t("webdav_verify_save"),
@@ -2457,15 +2620,16 @@
           <div class="acc-form-label">${utils.t("webdav_username")}</div>
           <input type="text" id="form-webdav-username" class="acc-input-text" placeholder="${utils.t("webdav_username_placeholder")}" value="${utils.escapeHtml(config.username)}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
           <div class="acc-form-label">${utils.t("webdav_password")}</div>
-          <input type="password" id="form-webdav-password" class="acc-input-text" placeholder="${utils.t("webdav_password_placeholder")}" value="${utils.escapeHtml(config.password)}" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false">
+          <input type="text" id="form-webdav-password" class="acc-input-text acc-password-mask-input" placeholder="${utils.t("webdav_password_placeholder")}" value="${hasSavedPassword ? maskedPassword : ""}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
         `,
           onOpen: async ({ qs, submitBtn, setSubmitting, close }) => {
             const urlInput = qs("#form-webdav-url");
             const usernameInput = qs("#form-webdav-username");
             const passwordInput = qs("#form-webdav-password");
             let isSaving = false;
+            let passwordDirty = false;
             const updateState = () => {
-              const canSave = urlInput.value.trim().length > 0 && usernameInput.value.trim().length > 0 && passwordInput.value.length > 0;
+              const canSave = urlInput.value.trim().length > 0 && usernameInput.value.trim().length > 0 && (passwordDirty && passwordInput.value.length > 0 || !passwordDirty && hasSavedPassword || !hasSavedPassword && passwordInput.value.length > 0);
               [urlInput, usernameInput, passwordInput].forEach((input) => {
                 input.disabled = isSaving;
               });
@@ -2478,20 +2642,39 @@
               isSaving = saving;
               updateState();
             };
+            const beginPasswordEdit = () => {
+              if (!hasSavedPassword || passwordDirty || passwordInput.value !== maskedPassword) return;
+              passwordInput.value = "";
+              passwordDirty = true;
+              updateState();
+            };
+            const restoreMaskedPassword = () => {
+              if (!hasSavedPassword || !passwordDirty || passwordInput.value.length > 0) return;
+              passwordDirty = false;
+              passwordInput.value = maskedPassword;
+              updateState();
+            };
             [urlInput, usernameInput, passwordInput].forEach((input) => {
               input.addEventListener("input", updateState);
               input.addEventListener("keydown", (event) => {
+                if (input === passwordInput && passwordInput.value === maskedPassword && event.key.length === 1) {
+                  beginPasswordEdit();
+                }
                 if (event.key === "Enter" && !submitBtn.disabled) {
                   event.preventDefault();
                   submitBtn.click();
                 }
               });
             });
+            passwordInput.addEventListener("focus", beginPasswordEdit);
+            passwordInput.addEventListener("mousedown", beginPasswordEdit);
+            passwordInput.addEventListener("paste", beginPasswordEdit);
+            passwordInput.addEventListener("blur", restoreMaskedPassword);
             submitBtn.onclick = async () => {
               const nextConfig = {
                 url: urlInput.value.trim(),
                 username: usernameInput.value.trim(),
-                password: passwordInput.value
+                password: passwordDirty && passwordInput.value ? passwordInput.value : config.password
               };
               try {
                 setSavingState(true);
@@ -2558,6 +2741,7 @@
         if (saveBtn) saveBtn.style.display = isSwitchActive && canOperateCurrentHost ? "flex" : "none";
       },
       activatePage(pageId, title = ui.getPageTitle(pageId)) {
+        ui.hideNoteTooltip?.();
         ui.qsa(".acc-tab-content").forEach((element) => element.classList.remove("active"));
         const page = ui.qs(`#${pageId}`);
         if (page) page.classList.add("active");
@@ -2588,6 +2772,7 @@
       },
       refresh() {
         if (!state.fab || !state.panel) return;
+        ui.hideNoteTooltip?.();
         ui.renderSwitchView();
         ui.renderAccountSettingsView();
         if (state.activePage === "pg-webdav") {
@@ -2619,6 +2804,7 @@
         state.panel.style.left = `${Math.max(10, rect.left - 290)}px`;
       },
       closePanel() {
+        ui.hideNoteTooltip?.();
         if (state.panel) state.panel.classList.remove("show");
         state.isForcedShow = false;
         ui.refresh();
@@ -2941,20 +3127,25 @@
       },
       renderAccountSettingsView() {
         const input = ui.qs("#account-settings-name");
+        const noteInput = ui.qs("#account-settings-note");
         const saveBtn = ui.qs("#btn-account-rename-save");
         const deleteBtn = ui.qs("#btn-account-delete");
-        if (!input || !saveBtn || !deleteBtn) return;
+        if (!input || !noteInput || !saveBtn || !deleteBtn) return;
         const key = state.accountSettingsKey;
         const data = key ? GM_getValue(key) : null;
         const originalName = data ? utils.extractName(key) : "";
+        const originalNote = utils.normalizeNoteText(data?.note);
         input.value = originalName;
+        noteInput.value = originalNote;
         input.disabled = !data;
+        noteInput.disabled = !data;
         deleteBtn.disabled = !data;
         const updateSaveState = () => {
-          const canSave = Boolean(data) && input.value.trim().length > 0 && input.value.trim() !== originalName;
+          const canSave = Boolean(data) && input.value.trim().length > 0 && (input.value.trim() !== originalName || utils.normalizeNoteText(noteInput.value) !== originalNote);
           saveBtn.disabled = !canSave;
         };
         input.oninput = updateSaveState;
+        noteInput.oninput = updateSaveState;
         input.onkeydown = (event) => {
           if (event.key === "Enter" && !saveBtn.disabled) {
             event.preventDefault();
@@ -3139,7 +3330,8 @@
     document.addEventListener("click", (event) => {
       if (!state.panel || !state.panel.classList.contains("show")) return;
       const path = event.composedPath();
-      if (!path.includes(state.panel) && !path.includes(state.fab) && !path.includes(state.dialogMask)) {
+      const isInsideNoteTooltip = Boolean(state.noteTooltipEl) && (path.includes(state.noteTooltipEl) || path.some((node) => typeof state.noteTooltipEl?.contains === "function" && state.noteTooltipEl.contains(node)));
+      if (!path.includes(state.panel) && !path.includes(state.fab) && !path.includes(state.dialogMask) && !isInsideNoteTooltip) {
         ui.closePanel();
       }
     });
