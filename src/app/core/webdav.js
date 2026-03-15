@@ -91,8 +91,9 @@ function joinRemoteUrl(remoteUrl, fileName) {
   return `${remoteUrl.replace(/\/+$/, '')}/${encodeURIComponent(fileName)}`;
 }
 
-function getManifestName() {
-  return '.anme-index.json';
+function appendCacheBust(url) {
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}_=${Date.now()}`;
 }
 
 function getRemoteBackupName(_config, _constants, displayName) {
@@ -191,6 +192,11 @@ function parseWebDavList(xmlText, baseUrl, constants) {
 }
 
 export function createWebDavMethods({ constants, utils, getUI, getCore }) {
+  const noCacheHeaders = {
+    'Cache-Control': 'no-store, no-cache, max-age=0',
+    Pragma: 'no-cache'
+  };
+
   const getOrCreateWebDavSecret = () => {
     const existingSecret = String(GM_getValue(constants.CFG.WEBDAV_SECRET, '') || '');
     if (existingSecret) {
@@ -347,9 +353,10 @@ export function createWebDavMethods({ constants, utils, getUI, getCore }) {
       const remoteUrl = toRemoteUrl(config);
       const response = await request(config, {
         method: 'PROPFIND',
-        url: remoteUrl,
+        url: appendCacheBust(remoteUrl),
         headers: {
-          Depth: '1'
+          Depth: '1',
+          ...noCacheHeaders
         }
       });
       return parseWebDavList(response.responseText || '', remoteUrl, constants).map((item) => ({
@@ -358,36 +365,6 @@ export function createWebDavMethods({ constants, utils, getUI, getCore }) {
         lastModified: item.lastModified ? new Date(item.lastModified).toISOString() : '',
         size: item.size
       }));
-    },
-    async readWebDavIndex(config) {
-      const remoteUrl = toRemoteUrl(config);
-      const manifestName = getManifestName();
-      try {
-        const response = await request(config, {
-          method: 'GET',
-          url: joinRemoteUrl(remoteUrl, manifestName),
-          responseType: 'text'
-        });
-        const parsed = JSON.parse(response.responseText || '{}');
-        return Array.isArray(parsed.backups) ? parsed.backups : [];
-      } catch (error) {
-        if (/ 404$/.test(error.message)) {
-          return [];
-        }
-        throw error;
-      }
-    },
-    async writeWebDavIndex(config, backups) {
-      const remoteUrl = toRemoteUrl(config);
-      const manifestName = getManifestName();
-      await request(config, {
-        method: 'PUT',
-        url: joinRemoteUrl(remoteUrl, manifestName),
-        data: JSON.stringify({ backups }, null, 2),
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        }
-      });
     },
     normalizeWebDavConfig(config) {
       return withManagedDirectory({
@@ -403,7 +380,7 @@ export function createWebDavMethods({ constants, utils, getUI, getCore }) {
       }
 
       await this.verifyWriteAccess(normalizedConfig);
-      await this.readWebDavIndex(normalizedConfig);
+      await this.readWebDavDirectory(normalizedConfig);
       return normalizedConfig;
     },
     async getValidatedWebDavConfig() {
@@ -411,10 +388,7 @@ export function createWebDavMethods({ constants, utils, getUI, getCore }) {
     },
     async listWebDavBackups() {
       const config = await this.getValidatedWebDavConfig();
-      let backups = await this.readWebDavIndex(config);
-      if (!backups.length) {
-        backups = await this.readWebDavDirectory(config);
-      }
+      let backups = await this.readWebDavDirectory(config);
       backups = backups.sort((a, b) => new Date(b.lastModified || 0) - new Date(a.lastModified || 0));
       return this.saveCachedWebDavBackups(backups);
     },
@@ -441,25 +415,24 @@ export function createWebDavMethods({ constants, utils, getUI, getCore }) {
         }
       });
 
-      const backups = await this.readWebDavIndex(config);
-      backups.unshift({
-        fileName,
-        remoteFileName,
-        lastModified: new Date().toISOString(),
-        size: archiveBytes.byteLength
-      });
-      await this.writeWebDavIndex(config, backups);
-      this.saveCachedWebDavBackups(backups);
+      const backups = await this.readWebDavDirectory(config);
+      const nextBackups = [
+        {
+          fileName,
+          remoteFileName,
+          lastModified: new Date().toISOString(),
+          size: archiveBytes.byteLength
+        },
+        ...backups.filter((item) => item.fileName !== fileName)
+      ].sort((a, b) => new Date(b.lastModified || 0) - new Date(a.lastModified || 0));
+      this.saveCachedWebDavBackups(nextBackups);
 
       return fileName;
     },
     async restoreWebDavBackup(fileName) {
       const config = await this.getValidatedWebDavConfig();
       const remoteUrl = toRemoteUrl(config);
-      let backups = await this.readWebDavIndex(config);
-      if (!backups.length) {
-        backups = await this.readWebDavDirectory(config);
-      }
+      const backups = await this.readWebDavDirectory(config);
       const matchedBackup = backups.find((item) => item.fileName === fileName);
       const remoteFileName = matchedBackup?.remoteFileName || getRemoteBackupName(config, constants, fileName);
       const response = await request(config, {
@@ -481,10 +454,7 @@ export function createWebDavMethods({ constants, utils, getUI, getCore }) {
     async deleteWebDavBackup(fileName) {
       const config = await this.getValidatedWebDavConfig();
       const remoteUrl = toRemoteUrl(config);
-      let backups = await this.readWebDavIndex(config);
-      if (!backups.length) {
-        backups = await this.readWebDavDirectory(config);
-      }
+      const backups = await this.readWebDavDirectory(config);
       const matchedBackup = backups.find((item) => item.fileName === fileName);
       const remoteFileName = matchedBackup?.remoteFileName || getRemoteBackupName(config, constants, fileName);
       await request(config, {
@@ -493,7 +463,6 @@ export function createWebDavMethods({ constants, utils, getUI, getCore }) {
       });
 
       const nextBackups = backups.filter((item) => item.fileName !== fileName);
-      await this.writeWebDavIndex(config, nextBackups);
       this.saveCachedWebDavBackups(nextBackups);
     }
   };
