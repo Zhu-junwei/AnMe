@@ -111,8 +111,12 @@ export function createTemplates({ state, constants, i18nData, utils }) {
       <div class="acc-tab-content" id="pg-account-settings">
           <div class="acc-scroll-area">
               <div class="acc-set-group">
-                  <div class="acc-set-title">${utils.t('account_name')}</div>
+                  <div class="acc-set-title">${utils.t('account_name')}<span class="acc-required">*</span></div>
                   <input type="text" id="account-settings-name" class="acc-input-text" placeholder="${utils.t('placeholder_name')}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+              </div>
+              <div class="acc-set-group">
+                  <div class="acc-set-title">${utils.t('account_note')}</div>
+                  <textarea id="account-settings-note" class="acc-input-text acc-input-note" placeholder="${utils.t('placeholder_note')}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea>
               </div>
               <div class="acc-row-btn">
                   <button class="acc-btn acc-btn-blue" id="btn-account-rename-save">${utils.t('save_changes')}</button>
@@ -157,10 +161,16 @@ export function createTemplates({ state, constants, i18nData, utils }) {
       const switchable = state.currentViewingHost === constants.HOST;
       const accountName = utils.extractName(key);
       const escapedAccountName = utils.escapeHtml(accountName);
+      const accountNote = utils.normalizeNoteText(data?.note);
+      const escapedAccountNote = utils.escapeHtml(accountNote);
       return `
       <div class="acc-switch-item" data-key="${key}" draggable="false">
           <span class="acc-switch-handle" aria-hidden="true"><span>::</span><span>::</span></span>
           <div class="acc-switch-card${switchable ? '' : ' acc-switch-card-static'}" data-key="${key}">
+              ${accountNote ? `
+              <div class="acc-switch-note-wrap">
+                  <button class="acc-switch-note-btn" type="button" data-key="${key}" data-note="${escapedAccountNote}" aria-label="${utils.t('view_note')}">${constants.ICONS.NOTICE}</button>
+              </div>` : ''}
               <button class="acc-switch-settings-btn" data-key="${key}" title="${utils.t('account_settings')}">${constants.ICONS.SETTINGS}</button>
               <div class="acc-card-body">
                   <div class="acc-card-name">

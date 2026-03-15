@@ -36,6 +36,7 @@ export function createPanelMethods({ state, constants, utils, templates, styleCs
       if (saveBtn) saveBtn.style.display = isSwitchActive && canOperateCurrentHost ? 'flex' : 'none';
     },
     activatePage(pageId, title = ui.getPageTitle(pageId)) {
+      ui.hideNoteTooltip?.();
       ui.qsa('.acc-tab-content').forEach((element) => element.classList.remove('active'));
       const page = ui.qs(`#${pageId}`);
       if (page) page.classList.add('active');
@@ -68,6 +69,7 @@ export function createPanelMethods({ state, constants, utils, templates, styleCs
     refresh() {
       if (!state.fab || !state.panel) return;
 
+      ui.hideNoteTooltip?.();
       ui.renderSwitchView();
       ui.renderAccountSettingsView();
       if (state.activePage === 'pg-webdav') {
@@ -105,6 +107,7 @@ export function createPanelMethods({ state, constants, utils, templates, styleCs
       state.panel.style.left = `${Math.max(10, rect.left - 290)}px`;
     },
     closePanel() {
+      ui.hideNoteTooltip?.();
       if (state.panel) state.panel.classList.remove('show');
       state.isForcedShow = false;
       ui.refresh();

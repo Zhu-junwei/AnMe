@@ -212,14 +212,17 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
             <span class="acc-help-tip" title="${utils.t('tip_help')}">${constants.ICONS.HELP}</span>
             <span class="acc-lock-tip" title="${utils.t('tip_lock')}">${constants.ICONS.LOCK}</span>
           </div>
-          <div class="acc-form-label">${utils.t('site_name')}</div>
+          <div class="acc-form-label">${utils.t('site_name')}<span class="acc-required">*</span></div>
           <input type="text" id="form-site-name" class="acc-input-text" placeholder="${utils.t('placeholder_site_name')}" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false">
-          <div class="acc-form-label">${utils.t('account_name')}</div>
+          <div class="acc-form-label">${utils.t('account_name')}<span class="acc-required">*</span></div>
           <input type="text" id="form-acc-name" class="acc-input-text" placeholder="${utils.t('placeholder_name')}" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false">
+          <div class="acc-form-label">${utils.t('account_note')}</div>
+          <textarea id="form-acc-note" class="acc-input-text acc-input-note" placeholder="${utils.t('placeholder_note')}" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea>
         `,
         onOpen: async ({ qs, submitBtn, close }) => {
           const nameInput = qs('#form-acc-name');
           const siteNameInput = qs('#form-site-name');
+          const noteInput = qs('#form-acc-note');
           siteNameInput.value = utils.suggestSiteName(utils.getPageTitle(), constants.HOST);
           nameInput.value = utils.suggestAccountName(constants.HOST);
 
@@ -269,7 +272,8 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
             const saved = await core.saveAccount(name, siteName, {
               ck: qs('#form-c-ck').checked,
               ls: qs('#form-c-ls').checked,
-              ss: qs('#form-c-ss').checked
+              ss: qs('#form-c-ss').checked,
+              note: noteInput.value
             });
             if (!saved) return;
 
@@ -296,6 +300,8 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
     },
     async showWebDavConfigModal() {
       const config = core.getWebDavConfig();
+      const hasSavedPassword = Boolean(config.password);
+      const maskedPassword = '******';
       await ui.showFormModal({
         title: utils.t('nav_webdav'),
         submitText: utils.t('webdav_verify_save'),
@@ -305,19 +311,20 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
           <div class="acc-form-label">${utils.t('webdav_username')}</div>
           <input type="text" id="form-webdav-username" class="acc-input-text" placeholder="${utils.t('webdav_username_placeholder')}" value="${utils.escapeHtml(config.username)}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
           <div class="acc-form-label">${utils.t('webdav_password')}</div>
-          <input type="password" id="form-webdav-password" class="acc-input-text" placeholder="${utils.t('webdav_password_placeholder')}" value="${utils.escapeHtml(config.password)}" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false">
+          <input type="text" id="form-webdav-password" class="acc-input-text acc-password-mask-input" placeholder="${utils.t('webdav_password_placeholder')}" value="${hasSavedPassword ? maskedPassword : ''}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
         `,
         onOpen: async ({ qs, submitBtn, setSubmitting, close }) => {
           const urlInput = qs('#form-webdav-url');
           const usernameInput = qs('#form-webdav-username');
           const passwordInput = qs('#form-webdav-password');
           let isSaving = false;
+          let passwordDirty = false;
 
           const updateState = () => {
             const canSave =
               urlInput.value.trim().length > 0 &&
               usernameInput.value.trim().length > 0 &&
-              passwordInput.value.length > 0;
+              ((passwordDirty && passwordInput.value.length > 0) || (!passwordDirty && hasSavedPassword) || (!hasSavedPassword && passwordInput.value.length > 0));
             [urlInput, usernameInput, passwordInput].forEach((input) => {
               input.disabled = isSaving;
             });
@@ -331,9 +338,26 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
             updateState();
           };
 
+          const beginPasswordEdit = () => {
+            if (!hasSavedPassword || passwordDirty || passwordInput.value !== maskedPassword) return;
+            passwordInput.value = '';
+            passwordDirty = true;
+            updateState();
+          };
+
+          const restoreMaskedPassword = () => {
+            if (!hasSavedPassword || !passwordDirty || passwordInput.value.length > 0) return;
+            passwordDirty = false;
+            passwordInput.value = maskedPassword;
+            updateState();
+          };
+
           [urlInput, usernameInput, passwordInput].forEach((input) => {
             input.addEventListener('input', updateState);
             input.addEventListener('keydown', (event) => {
+              if (input === passwordInput && passwordInput.value === maskedPassword && event.key.length === 1) {
+                beginPasswordEdit();
+              }
               if (event.key === 'Enter' && !submitBtn.disabled) {
                 event.preventDefault();
                 submitBtn.click();
@@ -341,11 +365,16 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
             });
           });
 
+          passwordInput.addEventListener('focus', beginPasswordEdit);
+          passwordInput.addEventListener('mousedown', beginPasswordEdit);
+          passwordInput.addEventListener('paste', beginPasswordEdit);
+          passwordInput.addEventListener('blur', restoreMaskedPassword);
+
           submitBtn.onclick = async () => {
             const nextConfig = {
               url: urlInput.value.trim(),
               username: usernameInput.value.trim(),
-              password: passwordInput.value
+              password: passwordDirty && passwordInput.value ? passwordInput.value : config.password
             };
             try {
               setSavingState(true);

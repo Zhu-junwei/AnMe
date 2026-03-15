@@ -96,10 +96,6 @@ function appendCacheBust(url) {
   return `${url}${separator}_=${Date.now()}`;
 }
 
-function getRemoteBackupName(_config, _constants, displayName) {
-  return displayName;
-}
-
 function toRemoteUrl(config) {
   const baseUrl = normalizeBaseUrl(config.url);
   const directory = normalizeDirectory(config.directory);
@@ -263,7 +259,6 @@ export function createWebDavMethods({ constants, utils, getUI, getCore }) {
       const normalizedBackups = Array.isArray(backups)
         ? backups.map((item) => ({
             fileName: String(item.fileName || ''),
-            remoteFileName: String(item.remoteFileName || item.fileName || ''),
             lastModified: String(item.lastModified || ''),
             size: Number(item.size) || 0
           }))
@@ -361,7 +356,6 @@ export function createWebDavMethods({ constants, utils, getUI, getCore }) {
       });
       return parseWebDavList(response.responseText || '', remoteUrl, constants).map((item) => ({
         fileName: item.fileName,
-        remoteFileName: item.fileName,
         lastModified: item.lastModified ? new Date(item.lastModified).toISOString() : '',
         size: item.size
       }));
@@ -405,10 +399,9 @@ export function createWebDavMethods({ constants, utils, getUI, getCore }) {
       const archiveBytes = await encodeBackupPayload(exportObj, constants);
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       const fileName = `${constants.META.NAME}_Sync_${timestamp}${getBackupExtension(constants)}`;
-      const remoteFileName = getRemoteBackupName(config, constants, fileName);
       await request(config, {
         method: 'PUT',
-        url: joinRemoteUrl(remoteUrl, remoteFileName),
+        url: joinRemoteUrl(remoteUrl, fileName),
         data: archiveBytes.buffer,
         headers: {
           'Content-Type': 'application/octet-stream'
@@ -419,7 +412,6 @@ export function createWebDavMethods({ constants, utils, getUI, getCore }) {
       const nextBackups = [
         {
           fileName,
-          remoteFileName,
           lastModified: new Date().toISOString(),
           size: archiveBytes.byteLength
         },
@@ -432,12 +424,9 @@ export function createWebDavMethods({ constants, utils, getUI, getCore }) {
     async restoreWebDavBackup(fileName) {
       const config = await this.getValidatedWebDavConfig();
       const remoteUrl = toRemoteUrl(config);
-      const backups = await this.readWebDavDirectory(config);
-      const matchedBackup = backups.find((item) => item.fileName === fileName);
-      const remoteFileName = matchedBackup?.remoteFileName || getRemoteBackupName(config, constants, fileName);
       const response = await request(config, {
         method: 'GET',
-        url: joinRemoteUrl(remoteUrl, remoteFileName),
+        url: joinRemoteUrl(remoteUrl, fileName),
         responseType: 'arraybuffer',
         fetch: true,
         headers: {
@@ -455,11 +444,9 @@ export function createWebDavMethods({ constants, utils, getUI, getCore }) {
       const config = await this.getValidatedWebDavConfig();
       const remoteUrl = toRemoteUrl(config);
       const backups = await this.readWebDavDirectory(config);
-      const matchedBackup = backups.find((item) => item.fileName === fileName);
-      const remoteFileName = matchedBackup?.remoteFileName || getRemoteBackupName(config, constants, fileName);
       await request(config, {
         method: 'DELETE',
-        url: joinRemoteUrl(remoteUrl, remoteFileName)
+        url: joinRemoteUrl(remoteUrl, fileName)
       });
 
       const nextBackups = backups.filter((item) => item.fileName !== fileName);

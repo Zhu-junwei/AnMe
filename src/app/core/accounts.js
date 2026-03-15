@@ -8,11 +8,12 @@ export function createAccountMethods({ constants, utils, getUI, getCore, shared 
         ss: Object.keys(sessionStorage || {}).length > 0
       };
     },
-    async saveAccount(name, siteName, options = { ck: true, ls: false, ss: false }) {
+    async saveAccount(name, siteName, options = { ck: true, ls: false, ss: false, note: '' }) {
       const ui = getUI();
       const snapshot = {
         time: Date.now(),
         siteName: utils.normalizeSiteName(siteName),
+        note: utils.normalizeNoteText(options.note),
         localStorage: options.ls ? { ...localStorage } : {},
         sessionStorage: options.ss ? { ...sessionStorage } : {},
         cookies: []
@@ -44,17 +45,35 @@ export function createAccountMethods({ constants, utils, getUI, getCore, shared 
       return true;
     },
     renameAccount(oldKey, newName, host) {
+      return this.updateAccount(oldKey, { name: newName }, host);
+    },
+    updateAccount(oldKey, nextValues, host) {
       const data = GM_getValue(oldKey);
-      GM_deleteValue(oldKey);
-      GM_setValue(utils.makeKey(newName, host), data);
+      if (!data) return oldKey;
+
+      const nextName = utils.normalizeText(nextValues?.name || utils.extractName(oldKey));
+      const nextKey = utils.makeKey(nextName, host);
+      const nextData = {
+        ...data,
+        note: utils.normalizeNoteText(nextValues?.note ?? data.note)
+      };
+
+      if (nextKey !== oldKey) {
+        GM_deleteValue(oldKey);
+      }
+      GM_setValue(nextKey, nextData);
 
       const orderKey = constants.ORDER_PREFIX + host;
-      const order = GM_getValue(orderKey, []);
-      const idx = order.indexOf(utils.extractName(oldKey));
-      if (idx !== -1) {
-        order[idx] = newName;
-        GM_setValue(orderKey, order);
+      if (nextKey !== oldKey) {
+        const order = GM_getValue(orderKey, []);
+        const idx = order.indexOf(utils.extractName(oldKey));
+        if (idx !== -1) {
+          order[idx] = nextName;
+          GM_setValue(orderKey, order);
+        }
       }
+
+      return nextKey;
     },
     updateSiteName(host, siteName) {
       const normalizedSiteName = utils.normalizeSiteName(siteName, host);
