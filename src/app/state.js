@@ -32,6 +32,7 @@ export function createState({ constants, i18nData }) {
     uiRoot: null,
     fab: null,
     panel: null,
+    isFullscreenHidden: false,
     dialogMask: null,
     saveFormMask: null,
     noteTooltipEl: null,

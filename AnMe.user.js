@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AnMe
 // @author       zjw
-// @version      10.0.4
+// @version      10.0.5
 // @namespace    https://github.com/Zhu-junwei/AnMe
 // @description  通用多网站多账号切换器
 // @description:zh  通用多网站多账号切换器
@@ -495,6 +495,7 @@
       uiRoot: null,
       fab: null,
       panel: null,
+      isFullscreenHidden: false,
       dialogMask: null,
       saveFormMask: null,
       noteTooltipEl: null,
@@ -2705,9 +2706,66 @@
     };
   }
 
+  // src/app/fullscreen.js
+  var YOUTUBE_HOST_RE = /(^|\.)youtube\.com$/i;
+  var YOUTUBE_FULLSCREEN_SELECTORS = [
+    "#movie_player.ytp-fullscreen",
+    ".html5-video-player.ytp-fullscreen",
+    "ytd-watch-flexy[fullscreen]",
+    "ytd-player[fullscreen]",
+    "ytd-reel-video-renderer[fullscreen]"
+  ];
+  function safeQuerySelector(doc, selector) {
+    if (!doc || typeof doc.querySelector !== "function") {
+      return null;
+    }
+    try {
+      return doc.querySelector(selector);
+    } catch (_) {
+      return null;
+    }
+  }
+  function isFullscreenPlaybackActive({
+    doc = typeof document !== "undefined" ? document : null,
+    host = typeof location !== "undefined" ? location.hostname : ""
+  } = {}) {
+    if (!doc) {
+      return false;
+    }
+    const fullscreenElement = doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement;
+    if (fullscreenElement) {
+      return true;
+    }
+    if (YOUTUBE_HOST_RE.test(host)) {
+      return YOUTUBE_FULLSCREEN_SELECTORS.some((selector) => Boolean(safeQuerySelector(doc, selector)));
+    }
+    return false;
+  }
+
   // src/app/ui/panel.js
   function createPanelMethods({ state, constants, utils, templates, styleCss, ui }) {
     return {
+      isFullscreenPlaybackActive() {
+        return isFullscreenPlaybackActive();
+      },
+      syncFloatingUiVisibility() {
+        if (!state.fab || !state.panel || !state.uiRoot?.host) return;
+        const isFullscreen = ui.isFullscreenPlaybackActive();
+        state.uiRoot.host.style.display = isFullscreen ? "none" : "";
+        if (isFullscreen) {
+          if (!state.isFullscreenHidden) {
+            ui.hideNoteTooltip?.();
+            state.panel.classList.remove("show");
+          }
+          state.isFullscreenHidden = true;
+          return;
+        }
+        state.isFullscreenHidden = false;
+        const fabMode = GM_getValue(constants.CFG.FAB_MODE, "auto");
+        const hasAccounts = utils.getSortedKeysByHost(constants.HOST).length > 0;
+        const isPanelOpen = state.panel.classList.contains("show");
+        state.fab.style.display = isPanelOpen || state.isForcedShow || fabMode === "show" || fabMode === "auto" && hasAccounts ? "flex" : "none";
+      },
       updateHeaderActionsVisibility() {
         const headerActions = ui.qs("#acc-header-actions");
         const switchPage = ui.qs("#pg-switch");
@@ -2788,9 +2846,8 @@
         ui.updateHeaderActionsVisibility();
         const fabMode = GM_getValue(constants.CFG.FAB_MODE, "auto");
         const hasAccounts = utils.getSortedKeysByHost(constants.HOST).length > 0;
-        const isPanelOpen = state.panel.classList.contains("show");
         state.panel.querySelectorAll(".fab-mode-btn").forEach((button) => button.classList.toggle("acc-btn-active", button.dataset.val === fabMode));
-        state.fab.style.display = isPanelOpen || state.isForcedShow || fabMode === "show" || fabMode === "auto" && hasAccounts ? "flex" : "none";
+        ui.syncFloatingUiVisibility();
         const eyes = state.fab.querySelectorAll("path:nth-of-type(1), path:nth-of-type(4)");
         eyes.forEach((path) => {
           path.style.fill = hasAccounts ? "#555" : "none";
@@ -3320,12 +3377,20 @@
       }).observe(document.body, { childList: true });
     };
     window.addEventListener("resize", () => {
-      if (!state.fab || !state.fab.style.left) return;
-      state.fab.style.left = `${Math.min(Math.max(0, parseFloat(state.fab.style.left)), window.innerWidth - 44)}px`;
-      state.fab.style.top = `${Math.min(Math.max(0, parseFloat(state.fab.style.top)), window.innerHeight - 44)}px`;
+      if (!state.fab) return;
+      if (state.fab.style.left) {
+        state.fab.style.left = `${Math.min(Math.max(0, parseFloat(state.fab.style.left)), window.innerWidth - 44)}px`;
+        state.fab.style.top = `${Math.min(Math.max(0, parseFloat(state.fab.style.top)), window.innerHeight - 44)}px`;
+      }
       if (state.panel && state.panel.classList.contains("show")) {
         ui.syncPanelPos();
       }
+      ui.syncFloatingUiVisibility?.();
+    });
+    ["fullscreenchange", "webkitfullscreenchange", "mozfullscreenchange", "MSFullscreenChange"].forEach((eventName) => {
+      document.addEventListener(eventName, () => {
+        ui.syncFloatingUiVisibility?.();
+      });
     });
     document.addEventListener("click", (event) => {
       if (!state.panel || !state.panel.classList.contains("show")) return;

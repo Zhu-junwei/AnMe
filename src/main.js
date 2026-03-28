@@ -32,13 +32,22 @@ import { createUI } from './app/ui.js';
   };
 
   window.addEventListener('resize', () => {
-    if (!state.fab || !state.fab.style.left) return;
+    if (!state.fab) return;
 
-    state.fab.style.left = `${Math.min(Math.max(0, parseFloat(state.fab.style.left)), window.innerWidth - 44)}px`;
-    state.fab.style.top = `${Math.min(Math.max(0, parseFloat(state.fab.style.top)), window.innerHeight - 44)}px`;
+    if (state.fab.style.left) {
+      state.fab.style.left = `${Math.min(Math.max(0, parseFloat(state.fab.style.left)), window.innerWidth - 44)}px`;
+      state.fab.style.top = `${Math.min(Math.max(0, parseFloat(state.fab.style.top)), window.innerHeight - 44)}px`;
+    }
     if (state.panel && state.panel.classList.contains('show')) {
       ui.syncPanelPos();
     }
+    ui.syncFloatingUiVisibility?.();
+  });
+
+  ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach((eventName) => {
+    document.addEventListener(eventName, () => {
+      ui.syncFloatingUiVisibility?.();
+    });
   });
 
   document.addEventListener('click', (event) => {

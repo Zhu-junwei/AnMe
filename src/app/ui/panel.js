@@ -1,5 +1,33 @@
+import { isFullscreenPlaybackActive } from '../fullscreen.js';
+
 export function createPanelMethods({ state, constants, utils, templates, styleCss, ui }) {
   return {
+    isFullscreenPlaybackActive() {
+      return isFullscreenPlaybackActive();
+    },
+    syncFloatingUiVisibility() {
+      if (!state.fab || !state.panel || !state.uiRoot?.host) return;
+
+      const isFullscreen = ui.isFullscreenPlaybackActive();
+      state.uiRoot.host.style.display = isFullscreen ? 'none' : '';
+
+      if (isFullscreen) {
+        if (!state.isFullscreenHidden) {
+          ui.hideNoteTooltip?.();
+          state.panel.classList.remove('show');
+        }
+        state.isFullscreenHidden = true;
+        return;
+      }
+
+      state.isFullscreenHidden = false;
+
+      const fabMode = GM_getValue(constants.CFG.FAB_MODE, 'auto');
+      const hasAccounts = utils.getSortedKeysByHost(constants.HOST).length > 0;
+      const isPanelOpen = state.panel.classList.contains('show');
+      state.fab.style.display =
+        isPanelOpen || state.isForcedShow || fabMode === 'show' || (fabMode === 'auto' && hasAccounts) ? 'flex' : 'none';
+    },
     updateHeaderActionsVisibility() {
       const headerActions = ui.qs('#acc-header-actions');
       const switchPage = ui.qs('#pg-switch');
@@ -87,12 +115,10 @@ export function createPanelMethods({ state, constants, utils, templates, styleCs
 
       const fabMode = GM_getValue(constants.CFG.FAB_MODE, 'auto');
       const hasAccounts = utils.getSortedKeysByHost(constants.HOST).length > 0;
-      const isPanelOpen = state.panel.classList.contains('show');
       state.panel
         .querySelectorAll('.fab-mode-btn')
         .forEach((button) => button.classList.toggle('acc-btn-active', button.dataset.val === fabMode));
-      state.fab.style.display =
-        isPanelOpen || state.isForcedShow || fabMode === 'show' || (fabMode === 'auto' && hasAccounts) ? 'flex' : 'none';
+      ui.syncFloatingUiVisibility();
 
       const eyes = state.fab.querySelectorAll('path:nth-of-type(1), path:nth-of-type(4)');
       eyes.forEach((path) => {
