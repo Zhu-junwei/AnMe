@@ -96,6 +96,16 @@ function appendCacheBust(url) {
   return `${url}${separator}_=${Date.now()}`;
 }
 
+export function formatLocalTimestampForFileName(date = new Date()) {
+  const value = date instanceof Date ? date : new Date(date);
+  const pad = (part, length = 2) => String(part).padStart(length, '0');
+
+  return [
+    `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}`,
+    `${pad(value.getHours())}-${pad(value.getMinutes())}-${pad(value.getSeconds())}-${pad(value.getMilliseconds(), 3)}`
+  ].join('T');
+}
+
 function toRemoteUrl(config) {
   const baseUrl = normalizeBaseUrl(config.url);
   const directory = normalizeDirectory(config.directory);
@@ -397,7 +407,7 @@ export function createWebDavMethods({ constants, utils, getUI, getCore }) {
 
       const remoteUrl = toRemoteUrl(config);
       const archiveBytes = await encodeBackupPayload(exportObj, constants);
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const timestamp = formatLocalTimestampForFileName();
       const fileName = `${constants.META.NAME}_Sync_${timestamp}${getBackupExtension(constants)}`;
       await request(config, {
         method: 'PUT',
