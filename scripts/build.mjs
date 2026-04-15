@@ -1,7 +1,21 @@
 import { readFile } from 'node:fs/promises';
 import { build } from 'esbuild';
 
-const banner = (await readFile('scripts/userscript.header.txt', 'utf8')).trimEnd();
+function formatBuildUpdatedAt(date = new Date()) {
+  const parts = new Intl.DateTimeFormat('sv-SE', {
+    timeZone: 'Asia/Shanghai',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).formatToParts(date);
+  const getPart = (type) => parts.find((part) => part.type === type)?.value || '00';
+
+  return `${getPart('year')}-${getPart('month')}-${getPart('day')}`;
+}
+
+const banner = (await readFile('scripts/userscript.header.txt', 'utf8'))
+  .replace('__BUILD_UPDATED_AT__', formatBuildUpdatedAt())
+  .trimEnd();
 
 await build({
   entryPoints: ['src/main.js'],

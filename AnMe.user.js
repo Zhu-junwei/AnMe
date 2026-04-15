@@ -2,6 +2,7 @@
 // @name         AnMe
 // @author       zjw
 // @version      10.0.5
+// @updated      2026-04-15
 // @namespace    https://github.com/Zhu-junwei/AnMe
 // @description  通用多网站多账号切换器
 // @description:zh  通用多网站多账号切换器
@@ -24,7 +25,26 @@
 // @updateURL https://update.greasyfork.org/scripts/563142/AnMe.meta.js
 // ==/UserScript==
 (() => {
+  // src/app/meta.js
+  function extractUserscriptMetadataValue(scriptMetaStr, fieldName) {
+    const normalizedMetaStr = String(scriptMetaStr || "");
+    const normalizedFieldName = String(fieldName || "").trim();
+    if (!normalizedMetaStr || !normalizedFieldName) return "";
+    const escapedFieldName = normalizedFieldName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const match = normalizedMetaStr.match(new RegExp(`^//\\s*@${escapedFieldName}\\s+(.+)$`, "m"));
+    return match ? match[1].trim() : "";
+  }
+  function resolveScriptUpdatedAt(gmInfo = globalThis.GM_info) {
+    const scriptMetaStr = typeof gmInfo?.scriptMetaStr === "string" ? gmInfo.scriptMetaStr : "";
+    const updatedFromHeader = extractUserscriptMetadataValue(scriptMetaStr, "updated");
+    if (updatedFromHeader) {
+      return updatedFromHeader;
+    }
+    return typeof gmInfo?.script?.updated === "string" ? gmInfo.script.updated.trim() : "";
+  }
+
   // src/app/config.js
+  var SCRIPT_UPDATED_AT = resolveScriptUpdatedAt();
   var CONST = {
     PREFIX: "acc_stable_",
     ORDER_PREFIX: "acc_order_",
@@ -43,6 +63,7 @@
     META: {
       NAME: GM_info.script.name,
       VERSION: GM_info.script.version,
+      UPDATED_AT: SCRIPT_UPDATED_AT,
       AUTHOR: GM_info.script.author,
       LINKS: {
         PROJECT: "https://github.com/Zhu-junwei/AnMe",
@@ -73,12 +94,14 @@
     }
   };
   var I18N_DATA = {
-    zh: { _name: "简体中文", nav_set: "高级设置", nav_notice: "使用声明", nav_about: "关于脚本", back_current_host: "返回当前网站账号", open_site: "打开网站", edit_site_name: "编辑站点名字", search_site: "搜索网站...", search_accounts: "搜索账号", close_search_accounts: "关闭搜索", search_accounts_placeholder: "搜索当前网站账号...", account_settings: "账号设置", site_name: "站点名称", account_name: "账号名称", save_changes: "保存修改", btn_delete_account: "删除该账号", danger_zone: "危险操作", rename_conflict: "该名称已存在，请换一个名称。", confirm_delete: "确定要删除该账号记录吗？", placeholder_site_name: "给当前网站命名...", placeholder_name: "给新账号命名...", tip_help: "切换登录失败？尝试勾选 LocalStorage 和 SessionStorage。", tip_lock: "为保证正常读取Cookie，请在篡改猴高级模式下，设置允许脚本访问 Cookie: ALL", btn_save: "保存当前账号", confirm_overwrite: "⚠️ 该名称已存在，确定要覆盖原有记录吗？", btn_clean: "切换新环境 (清空本站痕迹)", save_empty_err: "⚠️ 没有检测到可保存的数据", copy_account_name: "复制账号名", copy_failed: "复制失败，请手动复制。", toast_saved: "账号已保存", toast_renamed: "账号名称已更新", toast_deleted: "账号已删除", toast_copied: "账号名已复制", toast_site_name_updated: "站点名称已更新", set_fab_mode: "悬浮球显示模式", fab_auto: "智能", fab_show: "常驻", fab_hide: "隐藏", fab_auto_title: "有账号记录时自动显示，无记录时隐藏", fab_show_title: "始终显示悬浮球", fab_hide_title: "平时不显示，仅能通过菜单唤起", set_lang: "语言设置 / Language", set_host_display_mode: "站点列表显示模式", host_display_mode_site_name: "站点名字", host_display_mode_domain: "域名", set_backup: "数据备份与还原", btn_exp_curr: "导出当前网站数据", btn_exp_all: "导出全部网站数据", btn_imp: "导入备份文件", donate: "支持作者", btn_clear_all: "清空脚本所有数据 (慎用)", notice_title: "《使用声明与免责条款》", back: "← 返回上一级", no_data: "🍃 暂无账号记录", confirm_clean: "确定清空当前网站所有痕迹并开启新环境？", confirm_clear_all: "⚠️ 警告：这将删除本脚本保存的所有网站的所有账号数据！且无法恢复！", import_ok: "✅ 成功导入/更新 {count} 个账号！", import_err: "❌ 导入失败：文件格式错误", export_err: "⚠️ 没有可导出的数据", menu_open: "🚀 开启账号管理", dlg_ok: "确定", dlg_cancel: "取消", about_desc: "通用多网站多账号切换器", notice_content: `<h4>1. 脚本功能说明</h4><p>本脚本通过篡改猴插件提供的存储API，将当前网站的 Cookie、LocalStorage 和 SessionStorage 进行快照保存。当您点击切换时，脚本会清空当前痕迹并还原选中的快照数据，从而实现多账号快速登录。</p><h4>2. 数据存储与联网说明</h4><p>账号数据默认存储在您浏览器的篡改猴插件内部管理器中（GM_setValue）。脚本默认不会主动联网或上传数据；只有在您手动配置并使用 WebDAV 云同步功能时，脚本才会按您的操作访问您指定的远程服务并上传或下载备份文件。</p><h4>3. 风险提示</h4><p>由于浏览器环境的开放性，本脚本无法阻止同域名下的其他恶意脚本通过篡改猴 API 或存储机制尝试获取这些数据。请勿在公共电脑或不可信的设备环境中使用本脚本保存重要账号。</p><h4>4. 免责声明</h4><p>本脚本仅供学习交流使用。因使用本脚本导致的账号被封禁、数据泄露或任何形式的损失，作者不承担任何法律责任。</p>` },
+    zh: { _name: "简体中文", nav_set: "设置", nav_notice: "使用声明", nav_about: "关于脚本", back_current_host: "返回当前网站账号", open_site: "打开网站", edit_site_name: "编辑站点名字", search_site: "搜索网站...", search_accounts: "搜索账号", close_search_accounts: "关闭搜索", search_accounts_placeholder: "搜索当前网站账号...", account_settings: "账号设置", site_name: "站点名称", account_name: "账号名称", save_changes: "保存修改", btn_delete_account: "删除该账号", danger_zone: "危险操作", rename_conflict: "该名称已存在，请换一个名称。", confirm_delete: "确定要删除该账号记录吗？", placeholder_site_name: "给当前网站命名...", placeholder_name: "给新账号命名...", tip_help: "切换登录失败？尝试勾选 LocalStorage 和 SessionStorage。", tip_lock: "为保证正常读取Cookie，请在篡改猴高级模式下，设置允许脚本访问 Cookie: ALL", btn_save: "保存当前账号", confirm_overwrite: "⚠️ 该名称已存在，确定要覆盖原有记录吗？", btn_clean: "切换新环境 (清空本站痕迹)", save_empty_err: "⚠️ 没有检测到可保存的数据", copy_account_name: "复制账号名", copy_failed: "复制失败，请手动复制。", toast_saved: "账号已保存", toast_renamed: "账号名称已更新", toast_deleted: "账号已删除", toast_copied: "账号名已复制", toast_site_name_updated: "站点名称已更新", set_fab_mode: "悬浮球显示模式", fab_auto: "智能", fab_show: "常驻", fab_hide: "隐藏", fab_auto_title: "有账号记录时自动显示，无记录时隐藏", fab_show_title: "始终显示悬浮球", fab_hide_title: "平时不显示，仅能通过菜单唤起", set_lang: "语言设置 / Language", set_host_display_mode: "站点列表显示模式", host_display_mode_site_name: "站点名字", host_display_mode_domain: "域名", set_backup: "数据备份与还原", btn_exp_curr: "导出当前网站数据", btn_exp_all: "导出全部网站数据", btn_imp: "导入备份文件", donate: "支持作者", btn_clear_all: "清空脚本所有数据 (慎用)", notice_title: "《使用声明与免责条款》", back: "← 返回上一级", no_data: "🍃 暂无账号记录", confirm_clean: "确定清空当前网站所有痕迹并开启新环境？", confirm_clear_all: "⚠️ 警告：这将删除本脚本保存的所有网站的所有账号数据！且无法恢复！", import_ok: "✅ 成功导入/更新 {count} 个账号！", import_err: "❌ 导入失败：文件格式错误", export_err: "⚠️ 没有可导出的数据", menu_open: "🚀 开启账号管理", dlg_ok: "确定", dlg_cancel: "取消", about_desc: "通用多网站多账号切换器", notice_content: `<h4>1. 脚本功能说明</h4><p>本脚本通过篡改猴插件提供的存储API，将当前网站的 Cookie、LocalStorage 和 SessionStorage 进行快照保存。当您点击切换时，脚本会清空当前痕迹并还原选中的快照数据，从而实现多账号快速登录。</p><h4>2. 数据存储与联网说明</h4><p>账号数据默认存储在您浏览器的篡改猴插件内部管理器中（GM_setValue）。脚本默认不会主动联网或上传数据；只有在您手动配置并使用 WebDAV 云同步功能时，脚本才会按您的操作访问您指定的远程服务并上传或下载备份文件。</p><h4>3. 风险提示</h4><p>由于浏览器环境的开放性，本脚本无法阻止同域名下的其他恶意脚本通过篡改猴 API 或存储机制尝试获取这些数据。请勿在公共电脑或不可信的设备环境中使用本脚本保存重要账号。</p><h4>4. 免责声明</h4><p>本脚本仅供学习交流使用。因使用本脚本导致的账号被封禁、数据泄露或任何形式的损失，作者不承担任何法律责任。</p>` },
     en: { _name: "English", nav_set: "Settings", nav_notice: "Disclaimer", nav_about: "About", back_current_host: "Back to current site", open_site: "Open site", edit_site_name: "Edit site name", search_site: "Search sites...", search_accounts: "Search accounts", close_search_accounts: "Close search", search_accounts_placeholder: "Search accounts on this site...", account_settings: "Account Settings", site_name: "Site Name", account_name: "Account Name", save_changes: "Save Changes", btn_delete_account: "Delete Account", danger_zone: "Danger Zone", rename_conflict: "This name already exists. Please choose another one.", confirm_delete: "Are you sure you want to delete this account?", placeholder_site_name: "Name this site...", placeholder_name: "Name this account...", tip_help: "Switch failed? Try checking LocalStorage/SessionStorage.", tip_lock: "To ensure cookies can be read correctly, open Tampermonkey’s Advanced Settings and change “Allow scripts to access cookies” to “ALL”.", btn_save: "Save Current", confirm_overwrite: "⚠️ Name already exists. Do you want to overwrite it?", btn_clean: "Switch to a new environment (clear all data for this site)", save_empty_err: "⚠️ No data detected to save", copy_account_name: "Copy account name", copy_failed: "Copy failed. Please copy it manually.", toast_saved: "Account saved", toast_renamed: "Account name updated", toast_deleted: "Account deleted", toast_copied: "Account name copied", toast_site_name_updated: "Site name updated", set_fab_mode: "Float Button Mode", fab_auto: "Auto", fab_show: "Show", fab_hide: "Hide", fab_auto_title: "Automatically show when accounts exist, hide when none", fab_show_title: "Always show the floating button", fab_hide_title: "Hidden by default, can only be activated via the menu", set_lang: "语言设置 / Language", set_host_display_mode: "Site List Display", host_display_mode_site_name: "Site Name", host_display_mode_domain: "Domain", set_backup: "Backup & Restore", btn_exp_curr: "Export Current Site", btn_exp_all: "Export All Sites Data", btn_imp: "Import Backup", donate: "Buy me a coffee", btn_clear_all: "Clear all script data (use with caution)", notice_title: "Disclaimer & Terms", back: "← Back", no_data: "🍃 No accounts", confirm_clean: "Are you sure you want to clear all traces of the current website and start a new environment?", confirm_clear_all: "⚠️ Warning: This will delete all account data for all websites saved by this script, and cannot be undone!", import_ok: "✅ Successfully imported/updated {count} account(s)!", import_err: "❌ Invalid format", export_err: "⚠️ No data", menu_open: "🚀 Open Manager", dlg_ok: "OK", dlg_cancel: "Cancel", about_desc: "Universal Multi-Site Account Switcher", notice_content: `<h4>1. Script Functionality</h4><p>This script utilizes the storage API provided by Tampermonkey to take snapshots of the current website's Cookies, LocalStorage, and SessionStorage. When switching accounts, the script clears current session data and restores the selected snapshot, enabling rapid multi-account login.</p><h4>2. Data Storage & Network Access</h4><p>Account data is stored locally in your browser's Tampermonkey extension manager (via GM_setValue) by default. The script does not proactively upload data or access remote services unless you explicitly configure and use the WebDAV sync feature; only then will it connect to the WebDAV server you specified to upload or download backup files.</p><h4>3. Risk Warning</h4><p>Due to the open nature of browser environments, this script cannot prevent other malicious scripts on the same domain from attempting to access data via storage mechanisms. Please avoid using this script to save sensitive accounts on public or untrusted devices.</p><h4>4. Disclaimer</h4><p>This script is intended for educational and exchange purposes only. The author shall not be held legally responsible for any account bans, data breaches, or any form of loss resulting from the use of this script.</p>` },
     es: { _name: "Español", nav_set: "Configuración", nav_notice: "Aviso legal", nav_about: "Acerca de", back_current_host: "Volver al sitio actual", open_site: "Abrir sitio", edit_site_name: "Editar nombre del sitio", search_site: "Buscar sitios...", search_accounts: "Buscar cuentas", close_search_accounts: "Cerrar búsqueda", search_accounts_placeholder: "Buscar cuentas en este sitio...", account_settings: "Configuración de la cuenta", site_name: "Nombre del sitio", account_name: "Nombre de la cuenta", save_changes: "Guardar cambios", btn_delete_account: "Eliminar cuenta", danger_zone: "Zona peligrosa", rename_conflict: "Ese nombre ya existe. Usa otro nombre.", confirm_delete: "¿Estás seguro de que deseas eliminar esta cuenta?", placeholder_site_name: "Nombre para este sitio...", placeholder_name: "Nombre para esta cuenta...", tip_help: "¿Falló el cambio de cuenta? Intenta marcar LocalStorage y SessionStorage.", tip_lock: "Para garantizar la correcta lectura de cookies, abre la configuración avanzada de Tampermonkey y establece “Permitir que los scripts accedan a cookies” en “ALL”.", btn_save: "Guardar cuenta actual", confirm_overwrite: "⚠️ El nombre ya existe. ¿Deseas sobrescribirlo?", btn_clean: "Cambiar a un nuevo entorno (borrar datos del sitio)", save_empty_err: "⚠️ No se detectaron datos para guardar", copy_account_name: "Copiar nombre de la cuenta", copy_failed: "No se pudo copiar. Cópialo manualmente.", toast_saved: "Cuenta guardada", toast_renamed: "Nombre de cuenta actualizado", toast_deleted: "Cuenta eliminada", toast_copied: "Nombre de cuenta copiado", toast_site_name_updated: "Nombre del sitio actualizado", set_fab_mode: "Modo del botón flotante", fab_auto: "Automático", fab_show: "Siempre visible", fab_hide: "Oculto", fab_auto_title: "Se muestra automáticamente cuando hay cuentas guardadas; se oculta si no hay ninguna", fab_show_title: "El botón flotante se muestra siempre", fab_hide_title: "Oculto por defecto, solo accesible desde el menú", set_lang: "Idioma / Language", set_host_display_mode: "Modo de lista de sitios", host_display_mode_site_name: "Nombre del sitio", host_display_mode_domain: "Dominio", set_backup: "Copia de seguridad y restauración", btn_exp_curr: "Exportar datos del sitio actual", btn_exp_all: "Exportar todos los datos de los sitios", btn_imp: "Importar archivo de respaldo", donate: "Apoyar al autor", btn_clear_all: "Borrar todos los datos del script (usar con precaución)", notice_title: "Términos de uso y descargo de responsabilidad", back: "← Volver", no_data: "🍃 No hay cuentas", confirm_clean: "¿Seguro que deseas borrar todos los rastros del sitio actual y comenzar un nuevo entorno?", confirm_clear_all: "⚠️ Advertencia: Esto eliminará todos los datos de cuentas de todos los sitios guardados por este script. ¡Esta acción no se puede deshacer!", import_ok: "✅ Se importaron/actualizaron correctamente {count} cuenta(s)", import_err: "❌ Error de importación: formato de archivo inválido", export_err: "⚠️ No hay datos para exportar", menu_open: "🚀 Abrir gestor de cuentas", dlg_ok: "Aceptar", dlg_cancel: "Cancelar", about_desc: "Conmutador universal de múltiples cuentas para múltiples sitios", notice_content: `<h4>1. Funcionalidad del script</h4><p>Este script utiliza la API de almacenamiento proporcionada por Tampermonkey para guardar instantáneas de las Cookies, LocalStorage y SessionStorage del sitio web actual. Al cambiar de cuenta, el script borra los datos actuales y restaura la instantánea seleccionada, permitiendo un inicio de sesión rápido con múltiples cuentas.</p><h4>2. Almacenamiento y acceso de red</h4><p>Los datos de las cuentas se almacenan localmente en el administrador interno de Tampermonkey (mediante GM_setValue) de forma predeterminada. El script no sube datos ni accede a servicios remotos por iniciativa propia; solo se conectará al servidor WebDAV que configures cuando habilites y utilices explícitamente la función de sincronización para subir o descargar copias de seguridad.</p><h4>3. Advertencia de riesgo</h4><p>Debido a la naturaleza abierta del entorno del navegador, este script no puede impedir que otros scripts maliciosos bajo el mismo dominio intenten acceder a estos datos mediante mecanismos de almacenamiento. Evita guardar cuentas sensibles en equipos públicos o no confiables.</p><h4>4. Descargo de responsabilidad</h4><p>Este script se proporciona únicamente con fines educativos y de intercambio. El autor no asume ninguna responsabilidad legal por bloqueos de cuentas, fugas de datos o cualquier tipo de pérdida derivada del uso de este script.</p>` }
   };
   Object.assign(I18N_DATA.zh, {
     nav_webdav: "WebDAV 同步",
+    about_version: "版本",
+    about_updated: "更新时间",
     default_account_prefix: "账号",
     account_note: "备注",
     placeholder_note: "给该账号添加备注（可选）...",
@@ -129,6 +152,8 @@
   });
   Object.assign(I18N_DATA.en, {
     nav_webdav: "WebDAV Sync",
+    about_version: "Version",
+    about_updated: "Updated",
     default_account_prefix: "Account",
     account_note: "Note",
     placeholder_note: "Add an optional note for this account...",
@@ -179,6 +204,8 @@
   });
   Object.assign(I18N_DATA.es, {
     nav_webdav: "Sincronización WebDAV",
+    about_version: "Versión",
+    about_updated: "Actualizado",
     default_account_prefix: "Cuenta",
     account_note: "Nota",
     placeholder_note: "Agrega una nota opcional para esta cuenta...",
@@ -378,7 +405,7 @@
         .acc-switch-note-btn:hover,
         .acc-switch-note-btn:active,
         .acc-switch-note-btn:focus-visible { color:#2196F3; border-color:#2196F3; background:#e3f2fd; outline:none; }
-        .acc-floating-note-tooltip { position:fixed; left:0; top:0; min-width:180px; max-width:280px; padding:8px 10px; border:1px solid #d7e5f5; border-radius:10px; background:rgba(255,255,255,0.98); color:#36506b; box-shadow:0 10px 24px rgba(15, 23, 42, 0.14); font-size:12px; line-height:1.45; opacity:0; visibility:hidden; transform:translateX(4px); transition:all 0.15s ease; pointer-events:auto; user-select:text; cursor:text; z-index:2000011; --acc-note-arrow-top:18px; overflow:visible; }
+        .acc-floating-note-tooltip { position:fixed; left:0; top:0; width:max-content; min-width:0; max-width:min(280px, calc(100vw - 40px)); padding:8px 10px; border:1px solid #d7e5f5; border-radius:10px; background:rgba(255,255,255,0.98); color:#36506b; box-shadow:0 10px 24px rgba(15, 23, 42, 0.14); font-size:12px; line-height:1.45; opacity:0; visibility:hidden; transform:translateX(4px); transition:all 0.15s ease; pointer-events:auto; user-select:text; cursor:text; z-index:2000011; --acc-note-arrow-top:18px; overflow:visible; }
         .acc-floating-note-tooltip.show { opacity:1; visibility:visible; transform:translateX(0); }
         .acc-floating-note-tooltip-content { max-height:220px; overflow-y:auto; overflow-x:hidden; scrollbar-gutter:stable; white-space:pre-wrap; word-break:break-word; padding-right:2px; }
         .acc-floating-note-tooltip::before,
@@ -406,7 +433,7 @@
         .acc-click-tag:hover { background: #2196F3; color: white; border-color: #1976D2; z-index: 2; }
 
         .acc-row-btn { display: flex; gap: 8px; align-items: center; margin-bottom:3px}
-        .acc-input-text { flex: 1; width:100%; padding: 8px; margin-bottom:8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; box-sizing: border-box; background: #fff; color: #333; outline: none; transition: all 0.2s; }
+        .acc-input-text { flex: 1; width:100%; padding: 8px; margin-bottom:8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; font-family: inherit; line-height: inherit; box-sizing: border-box; background: #fff; color: #333; outline: none; transition: all 0.2s; }
         .acc-input-text:focus { border-color: #2196F3; box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2); }
         .acc-password-mask-input { -webkit-text-security: disc; }
         .acc-input-note { min-height:72px; resize:vertical; line-height:1.45; overflow-y:auto; overflow-x:hidden; overscroll-behavior:contain; }
@@ -756,9 +783,10 @@
                   <div class="acc-about-header">
                       <div class="acc-about-logo">${constants.ICONS.LOGO}</div>
                       <div class="acc-about-name">${constants.META.NAME}</div>
-                      <div class="acc-about-ver">Version ${constants.META.VERSION}</div>
                       <div style="margin:3px 0; color:#666;">${utils.t("about_desc")}</div>
                   </div>
+                  <div class="acc-about-item"><span class="acc-about-label">Version</span><span>${constants.META.VERSION}</span></div>
+                  ${constants.META.UPDATED_AT ? `<div class="acc-about-item"><span class="acc-about-label">Updated</span><span>${utils.escapeHtml(constants.META.UPDATED_AT)}</span></div>` : ""}
                   <div class="acc-about-item"><span class="acc-about-label">Author</span><span>${constants.META.AUTHOR}</span></div>
                   <div class="acc-about-item"><span class="acc-about-label">License</span><span>MIT</span></div>
                   <div class="acc-about-item"><span class="acc-about-label">Github</span><a href="${constants.META.LINKS.PROJECT}" target="_blank" style="color:#2196F3">View Repo</a></div>
@@ -2334,6 +2362,77 @@
   }
 
   // src/app/ui/feedback.js
+  function createSaveNoteSyncState(syncState = {}) {
+    return {
+      lastMatchedKey: "",
+      lastAutoFilledNote: "",
+      lockedKey: "",
+      ...syncState
+    };
+  }
+  function syncSaveNoteFromMatchedAccount({
+    name,
+    currentNote,
+    syncState,
+    getExistingAccount,
+    normalizeName,
+    normalizeNote
+  }) {
+    const nextState = createSaveNoteSyncState(syncState);
+    const normalizedName = normalizeName(name);
+    const normalizedCurrentNote = normalizeNote(currentNote);
+    const shouldClearAutoFilledNote = nextState.lastMatchedKey && nextState.lockedKey !== nextState.lastMatchedKey && normalizedCurrentNote === nextState.lastAutoFilledNote;
+    if (!normalizedName) {
+      return {
+        nextNote: shouldClearAutoFilledNote ? "" : currentNote,
+        nextState: {
+          ...nextState,
+          lastMatchedKey: "",
+          lastAutoFilledNote: shouldClearAutoFilledNote ? "" : nextState.lastAutoFilledNote
+        }
+      };
+    }
+    const existingAccount = getExistingAccount(normalizedName);
+    if (!existingAccount) {
+      return {
+        nextNote: shouldClearAutoFilledNote ? "" : currentNote,
+        nextState: {
+          ...nextState,
+          lastMatchedKey: "",
+          lastAutoFilledNote: shouldClearAutoFilledNote ? "" : nextState.lastAutoFilledNote
+        }
+      };
+    }
+    const existingKey = existingAccount.key || normalizedName;
+    if (nextState.lockedKey === existingKey) {
+      return {
+        nextNote: currentNote,
+        nextState: {
+          ...nextState,
+          lastMatchedKey: existingKey
+        }
+      };
+    }
+    const existingNote = normalizeNote(existingAccount.note);
+    return {
+      nextNote: existingNote,
+      nextState: {
+        lastMatchedKey: existingKey,
+        lastAutoFilledNote: existingNote,
+        lockedKey: ""
+      }
+    };
+  }
+  function trackSaveNoteManualEdit({ currentNote, syncState, normalizeNote }) {
+    const nextState = createSaveNoteSyncState(syncState);
+    if (!nextState.lastMatchedKey) {
+      return nextState;
+    }
+    return {
+      ...nextState,
+      lockedKey: normalizeNote(currentNote) === nextState.lastAutoFilledNote ? "" : nextState.lastMatchedKey
+    };
+  }
   function createFeedbackMethods({ state, constants, utils, core, ui }) {
     return {
       async copyText(text) {
@@ -2545,8 +2644,27 @@
             const nameInput = qs("#form-acc-name");
             const siteNameInput = qs("#form-site-name");
             const noteInput = qs("#form-acc-note");
+            let saveNoteSyncState = createSaveNoteSyncState();
             siteNameInput.value = utils.suggestSiteName(utils.getPageTitle(), constants.HOST);
             nameInput.value = utils.suggestAccountName(constants.HOST);
+            const syncExistingAccountNote = () => {
+              const { nextNote, nextState } = syncSaveNoteFromMatchedAccount({
+                name: nameInput.value,
+                currentNote: noteInput.value,
+                syncState: saveNoteSyncState,
+                getExistingAccount: (accountName) => {
+                  const key = utils.makeKey(accountName);
+                  const storedAccount = GM_getValue(key);
+                  return storedAccount ? { key, note: storedAccount.note } : null;
+                },
+                normalizeName: (value) => utils.normalizeText(value),
+                normalizeNote: (value) => utils.normalizeNoteText(value)
+              });
+              saveNoteSyncState = nextState;
+              if (noteInput.value !== nextNote) {
+                noteInput.value = nextNote;
+              }
+            };
             const toggleAvailability = (selector, available) => {
               const input = qs(selector);
               const label = input?.closest(".acc-chk-label");
@@ -2566,7 +2684,18 @@
               qs(selector)?.addEventListener("change", updateState);
             });
             siteNameInput.addEventListener("input", updateState);
-            nameInput.addEventListener("input", updateState);
+            nameInput.addEventListener("input", () => {
+              syncExistingAccountNote();
+              updateState();
+            });
+            nameInput.addEventListener("blur", syncExistingAccountNote);
+            noteInput.addEventListener("input", () => {
+              saveNoteSyncState = trackSaveNoteManualEdit({
+                currentNote: noteInput.value,
+                syncState: saveNoteSyncState,
+                normalizeNote: (value) => utils.normalizeNoteText(value)
+              });
+            });
             nameInput.addEventListener("keydown", (event) => {
               if (event.key !== "Enter" || submitBtn.disabled) return;
               event.preventDefault();
@@ -2597,6 +2726,7 @@
             toggleAvailability("#form-c-ck", availableSources.ck);
             toggleAvailability("#form-c-ls", availableSources.ls);
             toggleAvailability("#form-c-ss", availableSources.ss);
+            syncExistingAccountNote();
             updateState();
             if (utils.getSortedKeysByHost(constants.HOST).length > 0) {
               nameInput.focus();

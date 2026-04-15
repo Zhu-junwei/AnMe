@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { createUtils } from '../src/app/utils.js';
+import { syncSaveNoteFromMatchedAccount, trackSaveNoteManualEdit } from '../src/app/ui/feedback.js';
 
 const constants = {
   PREFIX: 'acc_stable_',
@@ -100,4 +101,79 @@ test('getHostDisplayName switches between site name and domain mode', () => {
 
   assert.equal(utils.getHostDisplayName('current.test', 'siteName'), siteName);
   assert.equal(utils.getHostDisplayName('current.test', 'domain'), 'current.test');
+});
+
+test('save modal note autofill reuses the stored note for an existing account name', () => {
+  const utils = createTestUtils();
+  const getExistingAccount = (name) =>
+    name === 'Alpha'
+      ? { key: 'acc_stable_current.test::Alpha', note: 'Existing note' }
+      : null;
+
+  const result = syncSaveNoteFromMatchedAccount({
+    name: ' Alpha ',
+    currentNote: '',
+    syncState: {},
+    getExistingAccount,
+    normalizeName: (value) => utils.normalizeText(value),
+    normalizeNote: (value) => utils.normalizeNoteText(value)
+  });
+
+  assert.equal(result.nextNote, 'Existing note');
+  assert.deepEqual(result.nextState, {
+    lastMatchedKey: 'acc_stable_current.test::Alpha',
+    lastAutoFilledNote: 'Existing note',
+    lockedKey: ''
+  });
+});
+
+test('save modal stops overwriting the note after the user edits the auto-filled remark', () => {
+  const utils = createTestUtils();
+  const getExistingAccount = (name) =>
+    name === 'Alpha'
+      ? { key: 'acc_stable_current.test::Alpha', note: 'Existing note' }
+      : name === 'Beta'
+        ? { key: 'acc_stable_current.test::Beta', note: 'Second note' }
+        : null;
+
+  const initial = syncSaveNoteFromMatchedAccount({
+    name: 'Alpha',
+    currentNote: '',
+    syncState: {},
+    getExistingAccount,
+    normalizeName: (value) => utils.normalizeText(value),
+    normalizeNote: (value) => utils.normalizeNoteText(value)
+  });
+
+  const editedState = trackSaveNoteManualEdit({
+    currentNote: 'Existing note updated',
+    syncState: initial.nextState,
+    normalizeNote: (value) => utils.normalizeNoteText(value)
+  });
+
+  const sameAccountResult = syncSaveNoteFromMatchedAccount({
+    name: 'Alpha',
+    currentNote: 'Existing note updated',
+    syncState: editedState,
+    getExistingAccount,
+    normalizeName: (value) => utils.normalizeText(value),
+    normalizeNote: (value) => utils.normalizeNoteText(value)
+  });
+  assert.equal(sameAccountResult.nextNote, 'Existing note updated');
+  assert.equal(sameAccountResult.nextState.lockedKey, 'acc_stable_current.test::Alpha');
+
+  const otherAccountResult = syncSaveNoteFromMatchedAccount({
+    name: 'Beta',
+    currentNote: 'Existing note updated',
+    syncState: sameAccountResult.nextState,
+    getExistingAccount,
+    normalizeName: (value) => utils.normalizeText(value),
+    normalizeNote: (value) => utils.normalizeNoteText(value)
+  });
+  assert.equal(otherAccountResult.nextNote, 'Second note');
+  assert.deepEqual(otherAccountResult.nextState, {
+    lastMatchedKey: 'acc_stable_current.test::Beta',
+    lastAutoFilledNote: 'Second note',
+    lockedKey: ''
+  });
 });
