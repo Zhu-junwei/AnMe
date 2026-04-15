@@ -2,7 +2,11 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { createUtils } from '../src/app/utils.js';
-import { syncSaveNoteFromMatchedAccount, trackSaveNoteManualEdit } from '../src/app/ui/feedback.js';
+import {
+  resolveWebDavPasswordForSubmit,
+  syncSaveNoteFromMatchedAccount,
+  trackSaveNoteManualEdit
+} from '../src/app/ui/feedback.js';
 
 const constants = {
   PREFIX: 'acc_stable_',
@@ -176,4 +180,28 @@ test('save modal stops overwriting the note after the user edits the auto-filled
     lastAutoFilledNote: 'Second note',
     lockedKey: ''
   });
+});
+
+test('webdav config submit keeps the newly typed password after logout', () => {
+  assert.equal(
+    resolveWebDavPasswordForSubmit({
+      hasSavedPassword: false,
+      passwordDirty: false,
+      passwordInputValue: 'new-password',
+      savedPassword: ''
+    }),
+    'new-password'
+  );
+});
+
+test('webdav config submit keeps the saved password when the masked field was not edited', () => {
+  assert.equal(
+    resolveWebDavPasswordForSubmit({
+      hasSavedPassword: true,
+      passwordDirty: false,
+      passwordInputValue: '******',
+      savedPassword: 'saved-password'
+    }),
+    'saved-password'
+  );
 });

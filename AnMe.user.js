@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AnMe
 // @author       zjw
-// @version      10.0.5
+// @version      10.0.6
 // @updated      2026-04-15
 // @namespace    https://github.com/Zhu-junwei/AnMe
 // @description  通用多网站多账号切换器
@@ -2433,6 +2433,20 @@
       lockedKey: normalizeNote(currentNote) === nextState.lastAutoFilledNote ? "" : nextState.lastMatchedKey
     };
   }
+  function resolveWebDavPasswordForSubmit({
+    hasSavedPassword,
+    passwordDirty,
+    passwordInputValue,
+    savedPassword
+  }) {
+    if (!hasSavedPassword) {
+      return String(passwordInputValue || "");
+    }
+    if (!passwordDirty) {
+      return String(savedPassword || "");
+    }
+    return String(passwordInputValue || "");
+  }
   function createFeedbackMethods({ state, constants, utils, core, ui }) {
     return {
       async copyText(text) {
@@ -2805,7 +2819,12 @@
               const nextConfig = {
                 url: urlInput.value.trim(),
                 username: usernameInput.value.trim(),
-                password: passwordDirty && passwordInput.value ? passwordInput.value : config.password
+                password: resolveWebDavPasswordForSubmit({
+                  hasSavedPassword,
+                  passwordDirty,
+                  passwordInputValue: passwordInput.value,
+                  savedPassword: config.password
+                })
               };
               try {
                 setSavingState(true);

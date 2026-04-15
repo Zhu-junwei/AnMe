@@ -81,6 +81,23 @@ export function trackSaveNoteManualEdit({ currentNote, syncState, normalizeNote 
   };
 }
 
+export function resolveWebDavPasswordForSubmit({
+  hasSavedPassword,
+  passwordDirty,
+  passwordInputValue,
+  savedPassword
+}) {
+  if (!hasSavedPassword) {
+    return String(passwordInputValue || '');
+  }
+
+  if (!passwordDirty) {
+    return String(savedPassword || '');
+  }
+
+  return String(passwordInputValue || '');
+}
+
 export function createFeedbackMethods({ state, constants, utils, core, ui }) {
   return {
     async copyText(text) {
@@ -489,7 +506,12 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
             const nextConfig = {
               url: urlInput.value.trim(),
               username: usernameInput.value.trim(),
-              password: passwordDirty && passwordInput.value ? passwordInput.value : config.password
+              password: resolveWebDavPasswordForSubmit({
+                hasSavedPassword,
+                passwordDirty,
+                passwordInputValue: passwordInput.value,
+                savedPassword: config.password
+              })
             };
             try {
               setSavingState(true);
