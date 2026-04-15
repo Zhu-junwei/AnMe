@@ -1,3 +1,103 @@
+function createSaveNoteSyncState(syncState = {}) {
+  return {
+    lastMatchedKey: '',
+    lastAutoFilledNote: '',
+    lockedKey: '',
+    ...syncState
+  };
+}
+
+export function syncSaveNoteFromMatchedAccount({
+  name,
+  currentNote,
+  syncState,
+  getExistingAccount,
+  normalizeName,
+  normalizeNote
+}) {
+  const nextState = createSaveNoteSyncState(syncState);
+  const normalizedName = normalizeName(name);
+  const normalizedCurrentNote = normalizeNote(currentNote);
+  const shouldClearAutoFilledNote =
+    nextState.lastMatchedKey &&
+    nextState.lockedKey !== nextState.lastMatchedKey &&
+    normalizedCurrentNote === nextState.lastAutoFilledNote;
+
+  if (!normalizedName) {
+    return {
+      nextNote: shouldClearAutoFilledNote ? '' : currentNote,
+      nextState: {
+        ...nextState,
+        lastMatchedKey: '',
+        lastAutoFilledNote: shouldClearAutoFilledNote ? '' : nextState.lastAutoFilledNote
+      }
+    };
+  }
+
+  const existingAccount = getExistingAccount(normalizedName);
+  if (!existingAccount) {
+    return {
+      nextNote: shouldClearAutoFilledNote ? '' : currentNote,
+      nextState: {
+        ...nextState,
+        lastMatchedKey: '',
+        lastAutoFilledNote: shouldClearAutoFilledNote ? '' : nextState.lastAutoFilledNote
+      }
+    };
+  }
+
+  const existingKey = existingAccount.key || normalizedName;
+  if (nextState.lockedKey === existingKey) {
+    return {
+      nextNote: currentNote,
+      nextState: {
+        ...nextState,
+        lastMatchedKey: existingKey
+      }
+    };
+  }
+
+  const existingNote = normalizeNote(existingAccount.note);
+  return {
+    nextNote: existingNote,
+    nextState: {
+      lastMatchedKey: existingKey,
+      lastAutoFilledNote: existingNote,
+      lockedKey: ''
+    }
+  };
+}
+
+export function trackSaveNoteManualEdit({ currentNote, syncState, normalizeNote }) {
+  const nextState = createSaveNoteSyncState(syncState);
+  if (!nextState.lastMatchedKey) {
+    return nextState;
+  }
+
+  return {
+    ...nextState,
+    lockedKey:
+      normalizeNote(currentNote) === nextState.lastAutoFilledNote ? '' : nextState.lastMatchedKey
+  };
+}
+
+export function resolveWebDavPasswordForSubmit({
+  hasSavedPassword,
+  passwordDirty,
+  passwordInputValue,
+  savedPassword
+}) {
+  if (!hasSavedPassword) {
+    return String(passwordInputValue || '');
+  }
+
+  if (!passwordDirty) {
+    return String(savedPassword || '');
+  }
+
+  return String(passwordInputValue || '');
+}
+
 export function createFeedbackMethods({ state, constants, utils, core, ui }) {
   return {
     async copyText(text) {
@@ -223,8 +323,28 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
           const nameInput = qs('#form-acc-name');
           const siteNameInput = qs('#form-site-name');
           const noteInput = qs('#form-acc-note');
+          let saveNoteSyncState = createSaveNoteSyncState();
           siteNameInput.value = utils.suggestSiteName(utils.getPageTitle(), constants.HOST);
           nameInput.value = utils.suggestAccountName(constants.HOST);
+
+          const syncExistingAccountNote = () => {
+            const { nextNote, nextState } = syncSaveNoteFromMatchedAccount({
+              name: nameInput.value,
+              currentNote: noteInput.value,
+              syncState: saveNoteSyncState,
+              getExistingAccount: (accountName) => {
+                const key = utils.makeKey(accountName);
+                const storedAccount = GM_getValue(key);
+                return storedAccount ? { key, note: storedAccount.note } : null;
+              },
+              normalizeName: (value) => utils.normalizeText(value),
+              normalizeNote: (value) => utils.normalizeNoteText(value)
+            });
+            saveNoteSyncState = nextState;
+            if (noteInput.value !== nextNote) {
+              noteInput.value = nextNote;
+            }
+          };
 
           const toggleAvailability = (selector, available) => {
             const input = qs(selector);
@@ -250,7 +370,18 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
           });
 
           siteNameInput.addEventListener('input', updateState);
-          nameInput.addEventListener('input', updateState);
+          nameInput.addEventListener('input', () => {
+            syncExistingAccountNote();
+            updateState();
+          });
+          nameInput.addEventListener('blur', syncExistingAccountNote);
+          noteInput.addEventListener('input', () => {
+            saveNoteSyncState = trackSaveNoteManualEdit({
+              currentNote: noteInput.value,
+              syncState: saveNoteSyncState,
+              normalizeNote: (value) => utils.normalizeNoteText(value)
+            });
+          });
           nameInput.addEventListener('keydown', (event) => {
             if (event.key !== 'Enter' || submitBtn.disabled) return;
             event.preventDefault();
@@ -286,6 +417,7 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
           toggleAvailability('#form-c-ck', availableSources.ck);
           toggleAvailability('#form-c-ls', availableSources.ls);
           toggleAvailability('#form-c-ss', availableSources.ss);
+          syncExistingAccountNote();
           updateState();
 
           if (utils.getSortedKeysByHost(constants.HOST).length > 0) {
@@ -374,7 +506,12 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
             const nextConfig = {
               url: urlInput.value.trim(),
               username: usernameInput.value.trim(),
-              password: passwordDirty && passwordInput.value ? passwordInput.value : config.password
+              password: resolveWebDavPasswordForSubmit({
+                hasSavedPassword,
+                passwordDirty,
+                passwordInputValue: passwordInput.value,
+                savedPassword: config.password
+              })
             };
             try {
               setSavingState(true);

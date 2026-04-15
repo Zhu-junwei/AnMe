@@ -91,9 +91,10 @@ export function createTemplates({ state, constants, i18nData, utils }) {
                   <div class="acc-about-header">
                       <div class="acc-about-logo">${constants.ICONS.LOGO}</div>
                       <div class="acc-about-name">${constants.META.NAME}</div>
-                      <div class="acc-about-ver">Version ${constants.META.VERSION}</div>
                       <div style="margin:3px 0; color:#666;">${utils.t('about_desc')}</div>
                   </div>
+                  <div class="acc-about-item"><span class="acc-about-label">Version</span><span>${constants.META.VERSION}</span></div>
+                  ${constants.META.UPDATED_AT ? `<div class="acc-about-item"><span class="acc-about-label">Updated</span><span>${utils.escapeHtml(constants.META.UPDATED_AT)}</span></div>` : ''}
                   <div class="acc-about-item"><span class="acc-about-label">Author</span><span>${constants.META.AUTHOR}</span></div>
                   <div class="acc-about-item"><span class="acc-about-label">License</span><span>MIT</span></div>
                   <div class="acc-about-item"><span class="acc-about-label">Github</span><a href="${constants.META.LINKS.PROJECT}" target="_blank" style="color:#2196F3">View Repo</a></div>
