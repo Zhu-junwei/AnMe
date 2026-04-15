@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AnMe
 // @author       zjw
-// @version      10.0.6
+// @version      10.0.7
 // @updated      2026-04-15
 // @namespace    https://github.com/Zhu-junwei/AnMe
 // @description  通用多网站多账号切换器
@@ -1337,6 +1337,14 @@
     const separator = url.includes("?") ? "&" : "?";
     return `${url}${separator}_=${Date.now()}`;
   }
+  function formatLocalTimestampForFileName(date = /* @__PURE__ */ new Date()) {
+    const value = date instanceof Date ? date : new Date(date);
+    const pad = (part, length = 2) => String(part).padStart(length, "0");
+    return [
+      `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}`,
+      `${pad(value.getHours())}-${pad(value.getMinutes())}-${pad(value.getSeconds())}-${pad(value.getMilliseconds(), 3)}`
+    ].join("T");
+  }
   function toRemoteUrl(config) {
     const baseUrl = normalizeBaseUrl(config.url);
     const directory = normalizeDirectory(config.directory);
@@ -1607,7 +1615,7 @@
         }
         const remoteUrl = toRemoteUrl(config);
         const archiveBytes = await encodeBackupPayload(exportObj, constants);
-        const timestamp = (/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-");
+        const timestamp = formatLocalTimestampForFileName();
         const fileName = `${constants.META.NAME}_Sync_${timestamp}${getBackupExtension(constants)}`;
         await request(config, {
           method: "PUT",
