@@ -2,6 +2,30 @@ import { isFullscreenPlaybackActive } from '../fullscreen.js';
 
 export function createPanelMethods({ state, constants, utils, templates, styleCss, ui }) {
   return {
+    setFabPosition(left, top, { persist = false } = {}) {
+      if (!state.fab) return;
+
+      const fabWidth = state.fab.offsetWidth || 44;
+      const fabHeight = state.fab.offsetHeight || 44;
+      const nextLeft = Math.min(Math.max(0, Number(left) || 0), Math.max(0, window.innerWidth - fabWidth));
+      const nextTop = Math.min(Math.max(0, Number(top) || 0), Math.max(0, window.innerHeight - fabHeight));
+
+      state.fab.style.left = `${nextLeft}px`;
+      state.fab.style.top = `${nextTop}px`;
+      state.fab.style.bottom = 'auto';
+      state.fab.style.right = 'auto';
+
+      if (state.panel && state.panel.classList.contains('show')) {
+        ui.syncPanelPos();
+      }
+
+      if (persist) {
+        GM_setValue(constants.CFG.FAB_POS, {
+          left: Math.round(nextLeft),
+          top: Math.round(nextTop)
+        });
+      }
+    },
     isFullscreenPlaybackActive() {
       return isFullscreenPlaybackActive();
     },
@@ -168,15 +192,13 @@ export function createPanelMethods({ state, constants, utils, templates, styleCs
 
       const savedPos = GM_getValue(constants.CFG.FAB_POS);
       if (savedPos && savedPos.left !== undefined) {
-        state.fab.style.left = `${Math.max(0, Math.min(savedPos.left, window.innerWidth - 44))}px`;
-        state.fab.style.top = `${Math.max(0, Math.min(savedPos.top, window.innerHeight - 44))}px`;
-        state.fab.style.bottom = 'auto';
-        state.fab.style.right = 'auto';
+        ui.setFabPosition(savedPos.left, savedPos.top);
       }
 
       let isDrag = false;
       const dragThreshold = 4;
       state.fab.onmousedown = (event) => {
+        if (event.button !== 0) return;
         isDrag = false;
         const startX = event.clientX;
         const startY = event.clientY;
@@ -191,23 +213,14 @@ export function createPanelMethods({ state, constants, utils, templates, styleCs
           }
 
           isDrag = true;
-          const newLeft = Math.max(0, Math.min(baseX + moveEvent.clientX - startX, window.innerWidth - 44));
-          const newTop = Math.max(0, Math.min(baseY + moveEvent.clientY - startY, window.innerHeight - 44));
-          state.fab.style.left = `${newLeft}px`;
-          state.fab.style.top = `${newTop}px`;
-          state.fab.style.bottom = 'auto';
-          state.fab.style.right = 'auto';
-          if (state.panel && state.panel.classList.contains('show')) ui.syncPanelPos();
+          ui.setFabPosition(baseX + moveEvent.clientX - startX, baseY + moveEvent.clientY - startY);
         };
 
         const up = () => {
           document.removeEventListener('mousemove', move);
           document.removeEventListener('mouseup', up);
           if (isDrag) {
-            GM_setValue(constants.CFG.FAB_POS, {
-              left: parseInt(state.fab.style.left, 10),
-              top: parseInt(state.fab.style.top, 10)
-            });
+            ui.setFabPosition(state.fab.offsetLeft, state.fab.offsetTop, { persist: true });
           }
         };
 
@@ -245,6 +258,50 @@ export function createPanelMethods({ state, constants, utils, templates, styleCs
       utils.setHTML(state.panel, templates.panel());
       state.uiRoot.appendChild(state.panel);
       ui.bindPanelEvents();
+
+      const header = state.panel.querySelector('.acc-header');
+      if (header) {
+        const dragThreshold = 4;
+        header.onmousedown = (event) => {
+          if (event.button !== 0 || !state.panel?.classList.contains('show')) return;
+          if (event.target.closest('button, a, input, select, textarea, label')) return;
+          if (!state.fab) return;
+
+          let isDrag = false;
+          const startX = event.clientX;
+          const startY = event.clientY;
+          const baseX = state.fab.offsetLeft;
+          const baseY = state.fab.offsetTop;
+          header.classList.remove('is-dragging');
+
+          const move = (moveEvent) => {
+            const deltaX = moveEvent.clientX - startX;
+            const deltaY = moveEvent.clientY - startY;
+            if (!isDrag && Math.hypot(deltaX, deltaY) < dragThreshold) {
+              return;
+            }
+
+            isDrag = true;
+            header.classList.add('is-dragging');
+            ui.hideNoteTooltip?.();
+            ui.setFabPosition(baseX + deltaX, baseY + deltaY);
+          };
+
+          const up = () => {
+            document.removeEventListener('mousemove', move);
+            document.removeEventListener('mouseup', up);
+            header.classList.remove('is-dragging');
+            if (isDrag) {
+              ui.setFabPosition(state.fab.offsetLeft, state.fab.offsetTop, { persist: true });
+            }
+          };
+
+          event.preventDefault();
+          event.stopPropagation();
+          document.addEventListener('mousemove', move);
+          document.addEventListener('mouseup', up);
+        };
+      }
     }
   };
 }

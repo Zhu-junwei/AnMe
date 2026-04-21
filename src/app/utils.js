@@ -110,6 +110,14 @@ export function createUtils({ state, constants, i18nData }) {
       if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
       return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
     },
+    countExpiredCookies(cookies) {
+      if (!Array.isArray(cookies) || cookies.length === 0) return 0;
+      const now = Date.now();
+      return cookies.filter((cookie) => {
+        const expirationDate = Number(cookie?.expirationDate);
+        return Number.isFinite(expirationDate) && expirationDate > 0 && expirationDate * 1000 <= now;
+      }).length;
+    },
     normalizeSiteName(siteName, host = constants.HOST) {
       return this.normalizeText(siteName) || host;
     },

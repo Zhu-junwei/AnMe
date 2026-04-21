@@ -81,6 +81,25 @@ export function createSwitchingMethods({ state, constants, utils, templates, cor
       if (!container) return;
       const scrollArea = container.closest('.acc-scroll-area');
 
+      const ensureGlobalGrabCursorStyle = () => {
+        if (document.getElementById('anme-global-grab-cursor-style')) return;
+        const styleEl = document.createElement('style');
+        styleEl.id = 'anme-global-grab-cursor-style';
+        styleEl.textContent = `
+          html.anme-force-grabbing,
+          html.anme-force-grabbing * {
+            cursor: grabbing !important;
+          }
+        `;
+        document.head.appendChild(styleEl);
+      };
+
+      const setGlobalGrabCursor = (active) => {
+        ensureGlobalGrabCursorStyle();
+        document.documentElement.classList.toggle('anme-force-grabbing', active);
+        state.uiRoot?.host?.classList.toggle('anme-force-grabbing', active);
+      };
+
       if (container._psCleanup) {
         container._psCleanup();
       }
@@ -142,6 +161,7 @@ export function createSwitchingMethods({ state, constants, utils, templates, cor
         if (!dragState) return;
         const { ghost, container: dragContainer, item } = dragState;
         stopAutoScroll();
+        setGlobalGrabCursor(false);
         item.classList.remove('dragging-source');
         if (dragContainer) {
           dragContainer.classList.remove('acc-switch-list-sorting');
@@ -206,6 +226,7 @@ export function createSwitchingMethods({ state, constants, utils, templates, cor
 
         item.classList.add('dragging-source');
         container.classList.add('acc-switch-list-sorting');
+        setGlobalGrabCursor(true);
 
         dragState = {
           container,
