@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AnMe
 // @author       zjw
-// @version      10.0.7
-// @updated      2026-04-15
+// @version      10.0.8
+// @updated      2026-04-21
 // @namespace    https://github.com/Zhu-junwei/AnMe
 // @description  通用多网站多账号切换器
 // @description:zh  通用多网站多账号切换器
@@ -102,6 +102,10 @@
     nav_webdav: "WebDAV 同步",
     about_version: "版本",
     about_updated: "更新时间",
+    cookie_tag_title: "Cookie",
+    cookie_expired_count: "{count} 个已过期 Cookie",
+    local_storage_tag_title: "LocalStorage",
+    session_storage_tag_title: "SessionStorage",
     default_account_prefix: "账号",
     account_note: "备注",
     placeholder_note: "给该账号添加备注（可选）...",
@@ -154,6 +158,10 @@
     nav_webdav: "WebDAV Sync",
     about_version: "Version",
     about_updated: "Updated",
+    cookie_tag_title: "Cookie",
+    cookie_expired_count: "{count} expired cookie(s)",
+    local_storage_tag_title: "LocalStorage",
+    session_storage_tag_title: "SessionStorage",
     default_account_prefix: "Account",
     account_note: "Note",
     placeholder_note: "Add an optional note for this account...",
@@ -206,6 +214,10 @@
     nav_webdav: "Sincronización WebDAV",
     about_version: "Versión",
     about_updated: "Actualizado",
+    cookie_tag_title: "Cookie",
+    cookie_expired_count: "{count} cookie(s) caducada(s)",
+    local_storage_tag_title: "LocalStorage",
+    session_storage_tag_title: "SessionStorage",
     default_account_prefix: "Cuenta",
     account_note: "Nota",
     placeholder_note: "Agrega una nota opcional para esta cuenta...",
@@ -264,15 +276,18 @@
         a { text-decoration:none; }
 
         #acc-mgr-fab, .acc-panel, .acc-dialog-mask, .acc-floating-note-tooltip { pointer-events: auto; }
+        :host(.anme-force-grabbing), :host(.anme-force-grabbing) * { cursor: grabbing !important; }
         #acc-mgr-fab { padding: 10px;position: fixed; bottom: 100px; right: 30px; width: 44px; height: 44px; background: #2196F3; color: white; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 20px; cursor: move; z-index: 1000000; box-shadow: 0 8px 30px rgba(0,0,0,0.25); user-select: none; border: none; touch-action: none; transition: transform 0.1s; }
         #acc-mgr-fab:active { transform: scale(0.95); }
 
-        .acc-panel { position: fixed; width: 340px; background: white; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.25); z-index: 1000001; display: flex; flex-direction: column; font-family: inherit; border: 1px solid #ddd; overflow: hidden; height: 480px; overscroll-behavior: none !important; opacity: 0; visibility: hidden; transition: opacity 0.12s ease, visibility 0.12s ease; pointer-events: none; }
+        .acc-panel { position: fixed; width: 340px; background: white; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.25); z-index: 1000001; display: flex; flex-direction: column; font-family: inherit; border: 1px solid #ddd; overflow: hidden; height: 480px; overscroll-behavior: none !important; opacity: 0; visibility: hidden; transition: opacity 0.12s ease, visibility 0.12s ease; pointer-events: none; outline: none; }
         .acc-panel.show { opacity: 1; visibility: visible; pointer-events: auto; }
-        .acc-header { display: flex; align-items: center; justify-content: center; padding: 8px 15px; border-bottom: 1px solid #eee; background: #fff; position: relative; flex-shrink: 0; min-height: 44px; }
+        .acc-header { display: flex; align-items: center; justify-content: center; padding: 8px 15px; border-bottom: 1px solid #eee; background: #fff; position: relative; flex-shrink: 0; min-height: 44px; cursor: move; user-select: none; }
+        .acc-header.is-dragging { cursor: grabbing; }
         .acc-header-actions { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); display: none; gap: 6px; align-items: center; }
         .acc-header-right-actions { position:absolute; right:15px; top:50%; transform:translateY(-50%); display:flex; gap:6px; align-items:center; }
         .acc-header-title { font-size: 14px; font-weight: bold; color: #333; text-align: center; }
+        .acc-header .acc-toolbar-btn { cursor: pointer; }
         .acc-tab-content { flex: 1; display: none; padding: 15px 15px 0 15px; overflow: hidden; flex-direction: column; background: #fff; }
         .acc-tab-content.active { display: flex; }
         .acc-mgr-toolbar { display:flex; gap:8px; margin-bottom:10px; align-items:center; min-height:30px; }
@@ -624,6 +639,14 @@
         if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
         return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
       },
+      countExpiredCookies(cookies) {
+        if (!Array.isArray(cookies) || cookies.length === 0) return 0;
+        const now = Date.now();
+        return cookies.filter((cookie) => {
+          const expirationDate = Number(cookie?.expirationDate);
+          return Number.isFinite(expirationDate) && expirationDate > 0 && expirationDate * 1e3 <= now;
+        }).length;
+      },
       normalizeSiteName(siteName, host = constants.HOST) {
         return this.normalizeText(siteName) || host;
       },
@@ -785,8 +808,8 @@
                       <div class="acc-about-name">${constants.META.NAME}</div>
                       <div style="margin:3px 0; color:#666;">${utils.t("about_desc")}</div>
                   </div>
-                  <div class="acc-about-item"><span class="acc-about-label">Version</span><span>${constants.META.VERSION}</span></div>
-                  ${constants.META.UPDATED_AT ? `<div class="acc-about-item"><span class="acc-about-label">Updated</span><span>${utils.escapeHtml(constants.META.UPDATED_AT)}</span></div>` : ""}
+                  <div class="acc-about-item"><span class="acc-about-label">${utils.t("about_version")}</span><span>${constants.META.VERSION}</span></div>
+                  ${constants.META.UPDATED_AT ? `<div class="acc-about-item"><span class="acc-about-label">${utils.t("about_updated")}</span><span>${utils.escapeHtml(constants.META.UPDATED_AT)}</span></div>` : ""}
                   <div class="acc-about-item"><span class="acc-about-label">Author</span><span>${constants.META.AUTHOR}</span></div>
                   <div class="acc-about-item"><span class="acc-about-label">License</span><span>MIT</span></div>
                   <div class="acc-about-item"><span class="acc-about-label">Github</span><a href="${constants.META.LINKS.PROJECT}" target="_blank" style="color:#2196F3">View Repo</a></div>
@@ -856,6 +879,8 @@
         const escapedAccountName = utils.escapeHtml(accountName);
         const accountNote = utils.normalizeNoteText(data?.note);
         const escapedAccountNote = utils.escapeHtml(accountNote);
+        const expiredCookieCount = utils.countExpiredCookies(data?.cookies);
+        const cookieTitle = expiredCookieCount ? `${utils.t("cookie_tag_title")} (${utils.t("cookie_expired_count").replace("{count}", expiredCookieCount)})` : utils.t("cookie_tag_title");
         return `
       <div class="acc-switch-item" data-key="${key}" draggable="false">
           <span class="acc-switch-handle" aria-hidden="true"><span>::</span><span>::</span></span>
@@ -872,9 +897,9 @@
                   </div>
                   <div class="acc-card-meta">
                       <span class="acc-mini-tag">${utils.formatTime(data.time)}</span>
-                      ${data.cookies?.length || 0 ? `<span class="acc-mini-tag acc-click-tag" title="Cookie" data-type="cookies">CK: ${data.cookies.length}</span>` : ""}
-                      ${Object.keys(data.localStorage || {}).length ? `<span class="acc-mini-tag acc-click-tag" title="LocalStorage" data-type="localStorage">LS: ${Object.keys(data.localStorage).length}</span>` : ""}
-                      ${Object.keys(data.sessionStorage || {}).length ? `<span class="acc-mini-tag acc-click-tag" title="SessionStorage" data-type="sessionStorage">SS: ${Object.keys(data.sessionStorage).length}</span>` : ""}
+                      ${data.cookies?.length || 0 ? `<span class="acc-mini-tag acc-click-tag" title="${utils.escapeHtml(cookieTitle)}" data-type="cookies">CK: ${data.cookies.length}</span>` : ""}
+                      ${Object.keys(data.localStorage || {}).length ? `<span class="acc-mini-tag acc-click-tag" title="${utils.t("local_storage_tag_title")}" data-type="localStorage">LS: ${Object.keys(data.localStorage).length}</span>` : ""}
+                      ${Object.keys(data.sessionStorage || {}).length ? `<span class="acc-mini-tag acc-click-tag" title="${utils.t("session_storage_tag_title")}" data-type="sessionStorage">SS: ${Object.keys(data.sessionStorage).length}</span>` : ""}
                   </div>
               </div>
           </div>
@@ -2902,6 +2927,26 @@
   // src/app/ui/panel.js
   function createPanelMethods({ state, constants, utils, templates, styleCss, ui }) {
     return {
+      setFabPosition(left, top, { persist = false } = {}) {
+        if (!state.fab) return;
+        const fabWidth = state.fab.offsetWidth || 44;
+        const fabHeight = state.fab.offsetHeight || 44;
+        const nextLeft = Math.min(Math.max(0, Number(left) || 0), Math.max(0, window.innerWidth - fabWidth));
+        const nextTop = Math.min(Math.max(0, Number(top) || 0), Math.max(0, window.innerHeight - fabHeight));
+        state.fab.style.left = `${nextLeft}px`;
+        state.fab.style.top = `${nextTop}px`;
+        state.fab.style.bottom = "auto";
+        state.fab.style.right = "auto";
+        if (state.panel && state.panel.classList.contains("show")) {
+          ui.syncPanelPos();
+        }
+        if (persist) {
+          GM_setValue(constants.CFG.FAB_POS, {
+            left: Math.round(nextLeft),
+            top: Math.round(nextTop)
+          });
+        }
+      },
       isFullscreenPlaybackActive() {
         return isFullscreenPlaybackActive();
       },
@@ -3049,14 +3094,12 @@
         state.uiRoot.appendChild(state.fab);
         const savedPos = GM_getValue(constants.CFG.FAB_POS);
         if (savedPos && savedPos.left !== void 0) {
-          state.fab.style.left = `${Math.max(0, Math.min(savedPos.left, window.innerWidth - 44))}px`;
-          state.fab.style.top = `${Math.max(0, Math.min(savedPos.top, window.innerHeight - 44))}px`;
-          state.fab.style.bottom = "auto";
-          state.fab.style.right = "auto";
+          ui.setFabPosition(savedPos.left, savedPos.top);
         }
         let isDrag = false;
         const dragThreshold = 4;
         state.fab.onmousedown = (event) => {
+          if (event.button !== 0) return;
           isDrag = false;
           const startX = event.clientX;
           const startY = event.clientY;
@@ -3069,22 +3112,13 @@
               return;
             }
             isDrag = true;
-            const newLeft = Math.max(0, Math.min(baseX + moveEvent.clientX - startX, window.innerWidth - 44));
-            const newTop = Math.max(0, Math.min(baseY + moveEvent.clientY - startY, window.innerHeight - 44));
-            state.fab.style.left = `${newLeft}px`;
-            state.fab.style.top = `${newTop}px`;
-            state.fab.style.bottom = "auto";
-            state.fab.style.right = "auto";
-            if (state.panel && state.panel.classList.contains("show")) ui.syncPanelPos();
+            ui.setFabPosition(baseX + moveEvent.clientX - startX, baseY + moveEvent.clientY - startY);
           };
           const up = () => {
             document.removeEventListener("mousemove", move);
             document.removeEventListener("mouseup", up);
             if (isDrag) {
-              GM_setValue(constants.CFG.FAB_POS, {
-                left: parseInt(state.fab.style.left, 10),
-                top: parseInt(state.fab.style.top, 10)
-              });
+              ui.setFabPosition(state.fab.offsetLeft, state.fab.offsetTop, { persist: true });
             }
           };
           document.addEventListener("mousemove", move);
@@ -3119,6 +3153,44 @@
         utils.setHTML(state.panel, templates.panel());
         state.uiRoot.appendChild(state.panel);
         ui.bindPanelEvents();
+        const header = state.panel.querySelector(".acc-header");
+        if (header) {
+          const dragThreshold = 4;
+          header.onmousedown = (event) => {
+            if (event.button !== 0 || !state.panel?.classList.contains("show")) return;
+            if (event.target.closest("button, a, input, select, textarea, label")) return;
+            if (!state.fab) return;
+            let isDrag = false;
+            const startX = event.clientX;
+            const startY = event.clientY;
+            const baseX = state.fab.offsetLeft;
+            const baseY = state.fab.offsetTop;
+            header.classList.remove("is-dragging");
+            const move = (moveEvent) => {
+              const deltaX = moveEvent.clientX - startX;
+              const deltaY = moveEvent.clientY - startY;
+              if (!isDrag && Math.hypot(deltaX, deltaY) < dragThreshold) {
+                return;
+              }
+              isDrag = true;
+              header.classList.add("is-dragging");
+              ui.hideNoteTooltip?.();
+              ui.setFabPosition(baseX + deltaX, baseY + deltaY);
+            };
+            const up = () => {
+              document.removeEventListener("mousemove", move);
+              document.removeEventListener("mouseup", up);
+              header.classList.remove("is-dragging");
+              if (isDrag) {
+                ui.setFabPosition(state.fab.offsetLeft, state.fab.offsetTop, { persist: true });
+              }
+            };
+            event.preventDefault();
+            event.stopPropagation();
+            document.addEventListener("mousemove", move);
+            document.addEventListener("mouseup", up);
+          };
+        }
       }
     };
   }
@@ -3194,6 +3266,23 @@
         const container = ui.qs(containerSelector);
         if (!container) return;
         const scrollArea = container.closest(".acc-scroll-area");
+        const ensureGlobalGrabCursorStyle = () => {
+          if (document.getElementById("anme-global-grab-cursor-style")) return;
+          const styleEl = document.createElement("style");
+          styleEl.id = "anme-global-grab-cursor-style";
+          styleEl.textContent = `
+          html.anme-force-grabbing,
+          html.anme-force-grabbing * {
+            cursor: grabbing !important;
+          }
+        `;
+          document.head.appendChild(styleEl);
+        };
+        const setGlobalGrabCursor = (active) => {
+          ensureGlobalGrabCursorStyle();
+          document.documentElement.classList.toggle("anme-force-grabbing", active);
+          state.uiRoot?.host?.classList.toggle("anme-force-grabbing", active);
+        };
         if (container._psCleanup) {
           container._psCleanup();
         }
@@ -3245,6 +3334,7 @@
           if (!dragState) return;
           const { ghost, container: dragContainer, item } = dragState;
           stopAutoScroll();
+          setGlobalGrabCursor(false);
           item.classList.remove("dragging-source");
           if (dragContainer) {
             dragContainer.classList.remove("acc-switch-list-sorting");
@@ -3297,6 +3387,7 @@
           state.uiRoot.appendChild(ghost);
           item.classList.add("dragging-source");
           container.classList.add("acc-switch-list-sorting");
+          setGlobalGrabCursor(true);
           dragState = {
             container,
             ghost,
@@ -3536,8 +3627,7 @@
     window.addEventListener("resize", () => {
       if (!state.fab) return;
       if (state.fab.style.left) {
-        state.fab.style.left = `${Math.min(Math.max(0, parseFloat(state.fab.style.left)), window.innerWidth - 44)}px`;
-        state.fab.style.top = `${Math.min(Math.max(0, parseFloat(state.fab.style.top)), window.innerHeight - 44)}px`;
+        ui.setFabPosition(parseFloat(state.fab.style.left), parseFloat(state.fab.style.top));
       }
       if (state.panel && state.panel.classList.contains("show")) {
         ui.syncPanelPos();
@@ -3552,7 +3642,17 @@
     document.addEventListener("click", (event) => {
       if (!state.panel || !state.panel.classList.contains("show")) return;
       const path = event.composedPath();
-      const isInsideNoteTooltip = Boolean(state.noteTooltipEl) && (path.includes(state.noteTooltipEl) || path.some((node) => typeof state.noteTooltipEl?.contains === "function" && state.noteTooltipEl.contains(node)));
+      const isNode = (value) => value instanceof Node;
+      const isTooltipVisible = Boolean(state.noteTooltipEl?.classList.contains("show"));
+      const isInsideNoteTooltip = Boolean(state.noteTooltipEl) && (path.includes(state.noteTooltipEl) || path.some(
+        (node) => isNode(node) && typeof state.noteTooltipEl?.contains === "function" && state.noteTooltipEl.contains(node)
+      ));
+      const isInsideTooltipTrigger = Boolean(state.noteTooltipTarget) && (path.includes(state.noteTooltipTarget) || path.some(
+        (node) => isNode(node) && typeof state.noteTooltipTarget?.contains === "function" && state.noteTooltipTarget.contains(node)
+      ));
+      if (isTooltipVisible && !isInsideNoteTooltip && !isInsideTooltipTrigger && !path.includes(state.dialogMask)) {
+        ui.hideNoteTooltip();
+      }
       if (!path.includes(state.panel) && !path.includes(state.fab) && !path.includes(state.dialogMask) && !isInsideNoteTooltip) {
         ui.closePanel();
       }

@@ -93,8 +93,8 @@ export function createTemplates({ state, constants, i18nData, utils }) {
                       <div class="acc-about-name">${constants.META.NAME}</div>
                       <div style="margin:3px 0; color:#666;">${utils.t('about_desc')}</div>
                   </div>
-                  <div class="acc-about-item"><span class="acc-about-label">Version</span><span>${constants.META.VERSION}</span></div>
-                  ${constants.META.UPDATED_AT ? `<div class="acc-about-item"><span class="acc-about-label">Updated</span><span>${utils.escapeHtml(constants.META.UPDATED_AT)}</span></div>` : ''}
+                  <div class="acc-about-item"><span class="acc-about-label">${utils.t('about_version')}</span><span>${constants.META.VERSION}</span></div>
+                  ${constants.META.UPDATED_AT ? `<div class="acc-about-item"><span class="acc-about-label">${utils.t('about_updated')}</span><span>${utils.escapeHtml(constants.META.UPDATED_AT)}</span></div>` : ''}
                   <div class="acc-about-item"><span class="acc-about-label">Author</span><span>${constants.META.AUTHOR}</span></div>
                   <div class="acc-about-item"><span class="acc-about-label">License</span><span>MIT</span></div>
                   <div class="acc-about-item"><span class="acc-about-label">Github</span><a href="${constants.META.LINKS.PROJECT}" target="_blank" style="color:#2196F3">View Repo</a></div>
@@ -164,6 +164,10 @@ export function createTemplates({ state, constants, i18nData, utils }) {
       const escapedAccountName = utils.escapeHtml(accountName);
       const accountNote = utils.normalizeNoteText(data?.note);
       const escapedAccountNote = utils.escapeHtml(accountNote);
+      const expiredCookieCount = utils.countExpiredCookies(data?.cookies);
+      const cookieTitle = expiredCookieCount
+        ? `${utils.t('cookie_tag_title')} (${utils.t('cookie_expired_count').replace('{count}', expiredCookieCount)})`
+        : utils.t('cookie_tag_title');
       return `
       <div class="acc-switch-item" data-key="${key}" draggable="false">
           <span class="acc-switch-handle" aria-hidden="true"><span>::</span><span>::</span></span>
@@ -180,9 +184,9 @@ export function createTemplates({ state, constants, i18nData, utils }) {
                   </div>
                   <div class="acc-card-meta">
                       <span class="acc-mini-tag">${utils.formatTime(data.time)}</span>
-                      ${(data.cookies?.length || 0) ? `<span class="acc-mini-tag acc-click-tag" title="Cookie" data-type="cookies">CK: ${data.cookies.length}</span>` : ''}
-                      ${Object.keys(data.localStorage || {}).length ? `<span class="acc-mini-tag acc-click-tag" title="LocalStorage" data-type="localStorage">LS: ${Object.keys(data.localStorage).length}</span>` : ''}
-                      ${Object.keys(data.sessionStorage || {}).length ? `<span class="acc-mini-tag acc-click-tag" title="SessionStorage" data-type="sessionStorage">SS: ${Object.keys(data.sessionStorage).length}</span>` : ''}
+                      ${(data.cookies?.length || 0) ? `<span class="acc-mini-tag acc-click-tag" title="${utils.escapeHtml(cookieTitle)}" data-type="cookies">CK: ${data.cookies.length}</span>` : ''}
+                      ${Object.keys(data.localStorage || {}).length ? `<span class="acc-mini-tag acc-click-tag" title="${utils.t('local_storage_tag_title')}" data-type="localStorage">LS: ${Object.keys(data.localStorage).length}</span>` : ''}
+                      ${Object.keys(data.sessionStorage || {}).length ? `<span class="acc-mini-tag acc-click-tag" title="${utils.t('session_storage_tag_title')}" data-type="sessionStorage">SS: ${Object.keys(data.sessionStorage).length}</span>` : ''}
                   </div>
               </div>
           </div>

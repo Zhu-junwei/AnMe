@@ -35,8 +35,7 @@ import { createUI } from './app/ui.js';
     if (!state.fab) return;
 
     if (state.fab.style.left) {
-      state.fab.style.left = `${Math.min(Math.max(0, parseFloat(state.fab.style.left)), window.innerWidth - 44)}px`;
-      state.fab.style.top = `${Math.min(Math.max(0, parseFloat(state.fab.style.top)), window.innerHeight - 44)}px`;
+      ui.setFabPosition(parseFloat(state.fab.style.left), parseFloat(state.fab.style.top));
     }
     if (state.panel && state.panel.classList.contains('show')) {
       ui.syncPanelPos();
@@ -53,10 +52,33 @@ import { createUI } from './app/ui.js';
   document.addEventListener('click', (event) => {
     if (!state.panel || !state.panel.classList.contains('show')) return;
     const path = event.composedPath();
+    const isNode = (value) => value instanceof Node;
+    const isTooltipVisible = Boolean(state.noteTooltipEl?.classList.contains('show'));
     const isInsideNoteTooltip =
       Boolean(state.noteTooltipEl) &&
       (path.includes(state.noteTooltipEl) ||
-        path.some((node) => typeof state.noteTooltipEl?.contains === 'function' && state.noteTooltipEl.contains(node)));
+        path.some(
+          (node) => isNode(node) && typeof state.noteTooltipEl?.contains === 'function' && state.noteTooltipEl.contains(node)
+        ));
+    const isInsideTooltipTrigger =
+      Boolean(state.noteTooltipTarget) &&
+      (path.includes(state.noteTooltipTarget) ||
+        path.some(
+          (node) =>
+            isNode(node) &&
+            typeof state.noteTooltipTarget?.contains === 'function' &&
+            state.noteTooltipTarget.contains(node)
+        ));
+
+    if (
+      isTooltipVisible &&
+      !isInsideNoteTooltip &&
+      !isInsideTooltipTrigger &&
+      !path.includes(state.dialogMask)
+    ) {
+      ui.hideNoteTooltip();
+    }
+
     if (
       !path.includes(state.panel) &&
       !path.includes(state.fab) &&

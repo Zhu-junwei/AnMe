@@ -61,6 +61,10 @@ Object.assign(I18N_DATA.zh, {
     nav_webdav: "WebDAV 同步",
     about_version: "版本",
     about_updated: "更新时间",
+     cookie_tag_title: "Cookie",
+     cookie_expired_count: "{count} 个已过期 Cookie",
+     local_storage_tag_title: "LocalStorage",
+     session_storage_tag_title: "SessionStorage",
     default_account_prefix: "账号",
     account_note: "备注",
     placeholder_note: "给该账号添加备注（可选）...",
@@ -114,6 +118,10 @@ Object.assign(I18N_DATA.en, {
     nav_webdav: "WebDAV Sync",
     about_version: "Version",
     about_updated: "Updated",
+     cookie_tag_title: "Cookie",
+     cookie_expired_count: "{count} expired cookie(s)",
+     local_storage_tag_title: "LocalStorage",
+     session_storage_tag_title: "SessionStorage",
     default_account_prefix: "Account",
     account_note: "Note",
     placeholder_note: "Add an optional note for this account...",
@@ -167,6 +175,10 @@ Object.assign(I18N_DATA.es, {
     nav_webdav: "Sincronización WebDAV",
     about_version: "Versión",
     about_updated: "Actualizado",
+     cookie_tag_title: "Cookie",
+     cookie_expired_count: "{count} cookie(s) caducada(s)",
+     local_storage_tag_title: "LocalStorage",
+     session_storage_tag_title: "SessionStorage",
     default_account_prefix: "Cuenta",
     account_note: "Nota",
     placeholder_note: "Agrega una nota opcional para esta cuenta...",
@@ -228,15 +240,18 @@ export const STYLE_CSS = `
         a { text-decoration:none; }
 
         #acc-mgr-fab, .acc-panel, .acc-dialog-mask, .acc-floating-note-tooltip { pointer-events: auto; }
+        :host(.anme-force-grabbing), :host(.anme-force-grabbing) * { cursor: grabbing !important; }
         #acc-mgr-fab { padding: 10px;position: fixed; bottom: 100px; right: 30px; width: 44px; height: 44px; background: #2196F3; color: white; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 20px; cursor: move; z-index: 1000000; box-shadow: 0 8px 30px rgba(0,0,0,0.25); user-select: none; border: none; touch-action: none; transition: transform 0.1s; }
         #acc-mgr-fab:active { transform: scale(0.95); }
 
-        .acc-panel { position: fixed; width: 340px; background: white; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.25); z-index: 1000001; display: flex; flex-direction: column; font-family: inherit; border: 1px solid #ddd; overflow: hidden; height: 480px; overscroll-behavior: none !important; opacity: 0; visibility: hidden; transition: opacity 0.12s ease, visibility 0.12s ease; pointer-events: none; }
+        .acc-panel { position: fixed; width: 340px; background: white; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.25); z-index: 1000001; display: flex; flex-direction: column; font-family: inherit; border: 1px solid #ddd; overflow: hidden; height: 480px; overscroll-behavior: none !important; opacity: 0; visibility: hidden; transition: opacity 0.12s ease, visibility 0.12s ease; pointer-events: none; outline: none; }
         .acc-panel.show { opacity: 1; visibility: visible; pointer-events: auto; }
-        .acc-header { display: flex; align-items: center; justify-content: center; padding: 8px 15px; border-bottom: 1px solid #eee; background: #fff; position: relative; flex-shrink: 0; min-height: 44px; }
+        .acc-header { display: flex; align-items: center; justify-content: center; padding: 8px 15px; border-bottom: 1px solid #eee; background: #fff; position: relative; flex-shrink: 0; min-height: 44px; cursor: move; user-select: none; }
+        .acc-header.is-dragging { cursor: grabbing; }
         .acc-header-actions { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); display: none; gap: 6px; align-items: center; }
         .acc-header-right-actions { position:absolute; right:15px; top:50%; transform:translateY(-50%); display:flex; gap:6px; align-items:center; }
         .acc-header-title { font-size: 14px; font-weight: bold; color: #333; text-align: center; }
+        .acc-header .acc-toolbar-btn { cursor: pointer; }
         .acc-tab-content { flex: 1; display: none; padding: 15px 15px 0 15px; overflow: hidden; flex-direction: column; background: #fff; }
         .acc-tab-content.active { display: flex; }
         .acc-mgr-toolbar { display:flex; gap:8px; margin-bottom:10px; align-items:center; min-height:30px; }
