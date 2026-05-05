@@ -290,11 +290,13 @@ export function createPanelMethods({ state, constants, utils, templates, styleCs
         }
       };
 
-      state.fab.onmousedown = (event) => {
+      state.fab.addEventListener('pointerdown', (event) => {
         if (event.button !== 0) return;
         event.preventDefault();
         event.stopPropagation();
         event.stopImmediatePropagation?.();
+        state.fab.setPointerCapture?.(event.pointerId);
+        state.fab.classList.add('is-pressed');
         isDrag = false;
         const startX = event.clientX;
         const startY = event.clientY;
@@ -302,32 +304,41 @@ export function createPanelMethods({ state, constants, utils, templates, styleCs
         const baseY = state.fab.offsetTop;
 
         const move = (moveEvent) => {
+          if (moveEvent.pointerId !== event.pointerId) return;
           const deltaX = moveEvent.clientX - startX;
           const deltaY = moveEvent.clientY - startY;
           if (!isDrag && Math.hypot(deltaX, deltaY) < dragThreshold) {
             return;
           }
 
+          moveEvent.preventDefault();
+          moveEvent.stopPropagation();
+          moveEvent.stopImmediatePropagation?.();
           isDrag = true;
           ui.setFabPosition(baseX + moveEvent.clientX - startX, baseY + moveEvent.clientY - startY);
         };
 
         const up = (upEvent) => {
-          document.removeEventListener('mousemove', move, true);
-          document.removeEventListener('mouseup', up, true);
+          if (upEvent.pointerId !== event.pointerId) return;
+          document.removeEventListener('pointermove', move, true);
+          document.removeEventListener('pointerup', up, true);
+          document.removeEventListener('pointercancel', up, true);
+          state.fab.releasePointerCapture?.(event.pointerId);
+          state.fab.classList.remove('is-pressed');
           upEvent.preventDefault();
           upEvent.stopPropagation();
           upEvent.stopImmediatePropagation?.();
-          if (isDrag) {
+          if (isDrag || upEvent.type === 'pointercancel') {
             ui.setFabPosition(state.fab.offsetLeft, state.fab.offsetTop, { persist: true });
             return;
           }
           togglePanel();
         };
 
-        document.addEventListener('mousemove', move, true);
-        document.addEventListener('mouseup', up, true);
-      };
+        document.addEventListener('pointermove', move, true);
+        document.addEventListener('pointerup', up, true);
+        document.addEventListener('pointercancel', up, true);
+      });
 
       state.fab.onclick = (event) => {
         event.preventDefault();

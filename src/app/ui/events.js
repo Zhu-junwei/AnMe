@@ -212,6 +212,11 @@ export function createEventMethods({ state, constants, utils, core, ui }) {
         const noteBtn = event.target.closest('.acc-switch-note-btn');
         if (noteBtn) {
           event.stopPropagation();
+          if (state.noteTooltipTarget === noteBtn && state.noteTooltipEl?.classList.contains('show')) {
+            ui.hideNoteTooltip();
+          } else {
+            ui.showNoteTooltip(noteBtn);
+          }
           return;
         }
 

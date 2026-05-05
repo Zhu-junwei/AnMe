@@ -278,7 +278,8 @@
         #acc-mgr-fab, .acc-panel, .acc-dialog-mask, .acc-floating-note-tooltip { pointer-events: auto; }
         :host(.anme-force-grabbing), :host(.anme-force-grabbing) * { cursor: grabbing !important; }
         #acc-mgr-fab { padding: 10px;position: fixed; bottom: 13%; right: 3%; width: 44px; height: 44px; background: #2196F3; color: white; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 20px; cursor: move; z-index: 1000000; box-shadow: 0 8px 30px rgba(0,0,0,0.25); user-select: none; border: none; touch-action: none; transition: transform 0.1s; }
-        #acc-mgr-fab:active { transform: scale(0.95); }
+        #acc-mgr-fab:active,
+        #acc-mgr-fab.is-pressed { transform: scale(0.95); }
 
         .acc-panel { position: fixed; width: 340px; background: white; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.25); z-index: 1000001; display: flex; flex-direction: column; font-family: inherit; border: 1px solid #ddd; overflow: hidden; height: 480px; overscroll-behavior: none !important; opacity: 0; visibility: hidden; transition: opacity 0.12s ease, visibility 0.12s ease; pointer-events: none; outline: none; }
         .acc-panel.show { opacity: 1; visibility: visible; pointer-events: auto; }
@@ -439,6 +440,10 @@
         .acc-switch-settings-btn:hover,
         .acc-switch-settings-btn:active,
         .acc-switch-settings-btn:focus-visible { color:#2196F3; border-color:#2196F3; background:#e3f2fd; }
+        @media (hover: none) {
+          .acc-switch-note-wrap { opacity:1; visibility:visible; pointer-events:auto; }
+          .acc-switch-settings-btn { opacity:1; visibility:visible; }
+        }
         .acc-card-body { flex:1; min-width:0; }
         .acc-card-name { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 6px; margin-bottom: 6px; color: #333; min-width:0; }
         .acc-card-name-icon { flex-shrink:0; display:flex; align-items:center; justify-content:center; color:inherit; background:transparent; border:none; padding:0; cursor:pointer; transition:color 0.15s ease; }
@@ -2108,6 +2113,11 @@
           const noteBtn = event.target.closest(".acc-switch-note-btn");
           if (noteBtn) {
             event.stopPropagation();
+            if (state.noteTooltipTarget === noteBtn && state.noteTooltipEl?.classList.contains("show")) {
+              ui.hideNoteTooltip();
+            } else {
+              ui.showNoteTooltip(noteBtn);
+            }
             return;
           }
           const tag = event.target.closest(".acc-click-tag");
@@ -3240,40 +3250,51 @@
             ui.refresh();
           }
         };
-        state.fab.onmousedown = (event) => {
+        state.fab.addEventListener("pointerdown", (event) => {
           if (event.button !== 0) return;
           event.preventDefault();
           event.stopPropagation();
           event.stopImmediatePropagation?.();
+          state.fab.setPointerCapture?.(event.pointerId);
+          state.fab.classList.add("is-pressed");
           isDrag = false;
           const startX = event.clientX;
           const startY = event.clientY;
           const baseX = state.fab.offsetLeft;
           const baseY = state.fab.offsetTop;
           const move = (moveEvent) => {
+            if (moveEvent.pointerId !== event.pointerId) return;
             const deltaX = moveEvent.clientX - startX;
             const deltaY = moveEvent.clientY - startY;
             if (!isDrag && Math.hypot(deltaX, deltaY) < dragThreshold) {
               return;
             }
+            moveEvent.preventDefault();
+            moveEvent.stopPropagation();
+            moveEvent.stopImmediatePropagation?.();
             isDrag = true;
             ui.setFabPosition(baseX + moveEvent.clientX - startX, baseY + moveEvent.clientY - startY);
           };
           const up = (upEvent) => {
-            document.removeEventListener("mousemove", move, true);
-            document.removeEventListener("mouseup", up, true);
+            if (upEvent.pointerId !== event.pointerId) return;
+            document.removeEventListener("pointermove", move, true);
+            document.removeEventListener("pointerup", up, true);
+            document.removeEventListener("pointercancel", up, true);
+            state.fab.releasePointerCapture?.(event.pointerId);
+            state.fab.classList.remove("is-pressed");
             upEvent.preventDefault();
             upEvent.stopPropagation();
             upEvent.stopImmediatePropagation?.();
-            if (isDrag) {
+            if (isDrag || upEvent.type === "pointercancel") {
               ui.setFabPosition(state.fab.offsetLeft, state.fab.offsetTop, { persist: true });
               return;
             }
             togglePanel();
           };
-          document.addEventListener("mousemove", move, true);
-          document.addEventListener("mouseup", up, true);
-        };
+          document.addEventListener("pointermove", move, true);
+          document.addEventListener("pointerup", up, true);
+          document.addEventListener("pointercancel", up, true);
+        });
         state.fab.onclick = (event) => {
           event.preventDefault();
           event.stopPropagation();
