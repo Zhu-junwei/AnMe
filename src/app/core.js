@@ -45,6 +45,54 @@ export function createCore({ state, constants, utils }) {
       }
     });
 
+  const scoreIconSize = (sizes) => {
+    const normalizedSizes = String(sizes || '').toLowerCase();
+    if (normalizedSizes.includes('any')) return 36;
+
+    const iconSizes = [...normalizedSizes.matchAll(/(\d+)\s*x\s*(\d+)/g)]
+      .map((match) => Math.min(Number(match[1]), Number(match[2])))
+      .filter((size) => Number.isFinite(size) && size > 0);
+
+    if (!iconSizes.length) return 8;
+
+    return iconSizes.reduce((bestScore, size) => {
+      const score = Math.max(0, 32 - Math.abs(size - 32));
+      return Math.max(bestScore, score);
+    }, 0);
+  };
+
+  const scoreIconSource = ({ element, value, fallback = false }) => {
+    if (fallback) return 70;
+
+    const rel = String(element?.getAttribute('rel') || '').toLowerCase();
+    const relTokens = new Set(rel.split(/\s+/).filter(Boolean));
+    const type = String(element?.getAttribute('type') || '').toLowerCase();
+    const sizes = String(element?.getAttribute('sizes') || '').toLowerCase();
+    const href = String(value || '').split(/[?#]/)[0].toLowerCase();
+    const isStandardIcon = relTokens.has('icon') || rel.includes('shortcut icon');
+    const isAppleIcon = rel.includes('apple-touch-icon');
+    const isMaskIcon = rel.includes('mask-icon');
+    const isSvg = type === 'image/svg+xml' || href.endsWith('.svg') || sizes.includes('any');
+
+    let score = 0;
+    if (isMaskIcon) {
+      score -= 100;
+    } else if (isAppleIcon) {
+      score += 20;
+    } else if (isStandardIcon) {
+      score += 100;
+    } else {
+      score += 50;
+    }
+
+    score += isSvg ? 36 : scoreIconSize(sizes);
+    if (/^image\/(png|x-icon|vnd\.microsoft\.icon)$/.test(type)) score += 6;
+    if (type === 'image/svg+xml') score += 6;
+    if (!type) score += 2;
+
+    return score;
+  };
+
   const buildCurrentHostIconSources = () => {
     const sources = [];
     if (typeof document !== 'undefined') {
@@ -54,13 +102,23 @@ export function createCore({ state, constants, utils }) {
           if (!rawHref) return;
 
           if (/^data:/i.test(rawHref)) {
-            sources.push({ type: 'inline', value: rawHref });
+            sources.push({
+              type: 'inline',
+              value: rawHref,
+              score: scoreIconSource({ element, value: rawHref }),
+              order: sources.length
+            });
             return;
           }
 
           const iconUrl = new URL(rawHref, location.href);
           if (iconUrl.protocol === 'http:' || iconUrl.protocol === 'https:') {
-            sources.push({ type: 'request', value: iconUrl.href });
+            sources.push({
+              type: 'request',
+              value: iconUrl.href,
+              score: scoreIconSource({ element, value: iconUrl.href }),
+              order: sources.length
+            });
           }
         } catch (_) {
           return;
@@ -68,9 +126,26 @@ export function createCore({ state, constants, utils }) {
       });
     }
 
-    sources.push({ type: 'request', value: new URL('/favicon.ico', location.origin).href });
+    sources.push({
+      type: 'request',
+      value: new URL('/favicon.ico', location.origin).href,
+      score: scoreIconSource({ fallback: true }),
+      order: sources.length
+    });
 
-    return [...new Map(sources.filter((source) => source?.value).map((source) => [source.value, source])).values()];
+    const dedupedSources = new Map();
+    sources
+      .filter((source) => source?.value)
+      .forEach((source) => {
+        const existingSource = dedupedSources.get(source.value);
+        if (!existingSource || source.score > existingSource.score) {
+          dedupedSources.set(source.value, source);
+        }
+      });
+
+    return [...dedupedSources.values()]
+      .sort((a, b) => b.score - a.score || a.order - b.order)
+      .map(({ type, value }) => ({ type, value }));
   };
 
   const requestHostIcon = (url) =>

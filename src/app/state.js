@@ -31,6 +31,7 @@ export function createState({ constants, i18nData }) {
     webdavBackups: [],
     uiRoot: null,
     fab: null,
+    fabPosition: null,
     panel: null,
     isFullscreenHidden: false,
     dialogMask: null,

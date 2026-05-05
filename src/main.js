@@ -34,9 +34,7 @@ import { createUI } from './app/ui.js';
   window.addEventListener('resize', () => {
     if (!state.fab) return;
 
-    if (state.fab.style.left) {
-      ui.setFabPosition(parseFloat(state.fab.style.left), parseFloat(state.fab.style.top));
-    }
+    ui.syncFabPosition?.();
     if (state.panel && state.panel.classList.contains('show')) {
       ui.syncPanelPos();
     }
@@ -100,9 +98,5 @@ import { createUI } from './app/ui.js';
     ui.refresh();
   });
 
-  if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    start();
-  } else {
-    window.addEventListener('DOMContentLoaded', start);
-  }
+  start();
 })();

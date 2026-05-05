@@ -18,7 +18,6 @@ export function createTemplates({ state, constants, i18nData, utils }) {
           </div>
           <div class="acc-header-title" id="acc-header-text"></div>
           <div class="acc-header-right-actions">
-              <button class="acc-toolbar-btn" id="btn-open-project" title="GitHub">${constants.ICONS.GITHUB}</button>
               <button class="acc-toolbar-btn" id="btn-open-webdav" title="${utils.t('nav_webdav')}">${constants.ICONS.CLOUD}</button>
               <button class="acc-toolbar-btn" id="btn-open-settings" title="${utils.t('nav_set')}">${constants.ICONS.SETTINGS}</button>
               <button class="acc-toolbar-btn" id="acc-close-btn" title="${utils.t('dlg_cancel')}" type="button">${constants.ICONS.CLOSE}</button>
@@ -97,7 +96,7 @@ export function createTemplates({ state, constants, i18nData, utils }) {
                   ${constants.META.UPDATED_AT ? `<div class="acc-about-item"><span class="acc-about-label">${utils.t('about_updated')}</span><span>${utils.escapeHtml(constants.META.UPDATED_AT)}</span></div>` : ''}
                   <div class="acc-about-item"><span class="acc-about-label">Author</span><span>${constants.META.AUTHOR}</span></div>
                   <div class="acc-about-item"><span class="acc-about-label">License</span><span>MIT</span></div>
-                  <div class="acc-about-item"><span class="acc-about-label">Github</span><a href="${constants.META.LINKS.PROJECT}" target="_blank" style="color:#2196F3">View Repo</a></div>
+                  <div class="acc-about-item"><span class="acc-about-label">Github</span><a class="acc-about-github-link" href="${constants.META.LINKS.PROJECT}" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub">${constants.ICONS.GITHUB}</a></div>
                   <div style="text-align:center;margin-top:20px;">
                       <a href="${constants.META.LINKS.DONATE}" target="_blank" class="acc-btn acc-btn-blue" style="display:inline-flex; width:80%;">${constants.ICONS.DONATE} ${utils.t('donate')}</a>
                   </div>

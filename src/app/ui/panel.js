@@ -1,30 +1,113 @@
 import { isFullscreenPlaybackActive } from '../fullscreen.js';
 
+const DEFAULT_FAB_POSITION = {
+  rightPercent: 3,
+  bottomPercent: 13
+};
+
+function clampNumber(value, min, max) {
+  const normalizedValue = Number(value);
+  if (!Number.isFinite(normalizedValue)) return min;
+  return Math.min(Math.max(normalizedValue, min), max);
+}
+
+function roundPercent(value) {
+  return Math.round(value * 10000) / 10000;
+}
+
+function getFabTravelBounds(fab) {
+  const fabWidth = fab.offsetWidth || 44;
+  const fabHeight = fab.offsetHeight || 44;
+
+  return {
+    maxLeft: Math.max(0, window.innerWidth - fabWidth),
+    maxTop: Math.max(0, window.innerHeight - fabHeight)
+  };
+}
+
+function getFabPositionFromPixels(fab, left, top) {
+  const { maxLeft, maxTop } = getFabTravelBounds(fab);
+  const nextLeft = clampNumber(left, 0, maxLeft);
+  const nextTop = clampNumber(top, 0, maxTop);
+
+  return {
+    left: nextLeft,
+    top: nextTop,
+    rightPercent: maxLeft > 0 ? ((maxLeft - nextLeft) / maxLeft) * 100 : 0,
+    bottomPercent: maxTop > 0 ? ((maxTop - nextTop) / maxTop) * 100 : 0
+  };
+}
+
+function getFabPositionFromPercent(fab, rightPercent, bottomPercent) {
+  const { maxLeft, maxTop } = getFabTravelBounds(fab);
+  const nextRightPercent = clampNumber(rightPercent, 0, 100);
+  const nextBottomPercent = clampNumber(bottomPercent, 0, 100);
+
+  return {
+    left: maxLeft - (maxLeft * nextRightPercent) / 100,
+    top: maxTop - (maxTop * nextBottomPercent) / 100,
+    rightPercent: nextRightPercent,
+    bottomPercent: nextBottomPercent
+  };
+}
+
 export function createPanelMethods({ state, constants, utils, templates, styleCss, ui }) {
   return {
-    setFabPosition(left, top, { persist = false } = {}) {
-      if (!state.fab) return;
+    applyFabPosition(position, { persist = false } = {}) {
+      if (!state.fab || !position) return;
 
-      const fabWidth = state.fab.offsetWidth || 44;
-      const fabHeight = state.fab.offsetHeight || 44;
-      const nextLeft = Math.min(Math.max(0, Number(left) || 0), Math.max(0, window.innerWidth - fabWidth));
-      const nextTop = Math.min(Math.max(0, Number(top) || 0), Math.max(0, window.innerHeight - fabHeight));
-
-      state.fab.style.left = `${nextLeft}px`;
-      state.fab.style.top = `${nextTop}px`;
+      state.fab.style.left = `${position.left}px`;
+      state.fab.style.top = `${position.top}px`;
       state.fab.style.bottom = 'auto';
       state.fab.style.right = 'auto';
+      state.fabPosition = {
+        rightPercent: roundPercent(position.rightPercent),
+        bottomPercent: roundPercent(position.bottomPercent)
+      };
 
       if (state.panel && state.panel.classList.contains('show')) {
         ui.syncPanelPos();
       }
 
       if (persist) {
-        GM_setValue(constants.CFG.FAB_POS, {
-          left: Math.round(nextLeft),
-          top: Math.round(nextTop)
-        });
+        GM_setValue(constants.CFG.FAB_POS, state.fabPosition);
       }
+    },
+    setFabPosition(left, top, { persist = false } = {}) {
+      if (!state.fab) return;
+
+      ui.applyFabPosition(getFabPositionFromPixels(state.fab, left, top), { persist });
+    },
+    setFabPositionByPercent(rightPercent, bottomPercent, { persist = false } = {}) {
+      if (!state.fab) return;
+
+      ui.applyFabPosition(getFabPositionFromPercent(state.fab, rightPercent, bottomPercent), { persist });
+    },
+    restoreFabPosition(savedPosition) {
+      if (!state.fab) return;
+
+      if (savedPosition && typeof savedPosition === 'object') {
+        if (savedPosition.rightPercent !== undefined || savedPosition.bottomPercent !== undefined) {
+          ui.setFabPositionByPercent(
+            savedPosition.rightPercent ?? DEFAULT_FAB_POSITION.rightPercent,
+            savedPosition.bottomPercent ?? DEFAULT_FAB_POSITION.bottomPercent
+          );
+          return;
+        }
+
+        if (savedPosition.left !== undefined || savedPosition.top !== undefined) {
+          ui.setFabPosition(savedPosition.left, savedPosition.top, { persist: true });
+          return;
+        }
+      }
+
+      ui.setFabPositionByPercent(DEFAULT_FAB_POSITION.rightPercent, DEFAULT_FAB_POSITION.bottomPercent);
+    },
+    syncFabPosition() {
+      if (!state.fab) return;
+
+      const position = state.fabPosition || DEFAULT_FAB_POSITION;
+      ui.setFabPositionByPercent(position.rightPercent, position.bottomPercent);
     },
     isFullscreenPlaybackActive() {
       return isFullscreenPlaybackActive();
@@ -76,13 +159,11 @@ export function createPanelMethods({ state, constants, utils, templates, styleCs
       const cleanBtn = ui.qs('#btn-clean-env');
       const saveBtn = ui.qs('#btn-open-save-modal');
       const settingsBtn = ui.qs('#btn-open-settings');
-      const projectBtn = ui.qs('#btn-open-project');
       const webdavBtn = ui.qs('#btn-open-webdav');
 
       if (backBtn) backBtn.style.display = isSetActive || isNoticeActive || isAboutActive || isAccountSettingsActive || isWebDavActive ? 'flex' : 'none';
       if (homeBtn) homeBtn.style.display = isSwitchActive && !canOperateCurrentHost ? 'flex' : 'none';
       if (settingsBtn) settingsBtn.style.display = isSwitchActive ? 'flex' : 'none';
-      if (projectBtn) projectBtn.style.display = isSwitchActive ? 'flex' : 'none';
       if (webdavBtn) webdavBtn.style.display = isSwitchActive ? 'flex' : 'none';
       if (cleanBtn) cleanBtn.style.display = isSwitchActive && canOperateCurrentHost ? 'flex' : 'none';
       if (saveBtn) saveBtn.style.display = isSwitchActive && canOperateCurrentHost ? 'flex' : 'none';
@@ -190,15 +271,30 @@ export function createPanelMethods({ state, constants, utils, templates, styleCs
       utils.setHTML(state.fab, constants.ICONS.LOGO);
       state.uiRoot.appendChild(state.fab);
 
-      const savedPos = GM_getValue(constants.CFG.FAB_POS);
-      if (savedPos && savedPos.left !== undefined) {
-        ui.setFabPosition(savedPos.left, savedPos.top);
-      }
+      ui.restoreFabPosition(GM_getValue(constants.CFG.FAB_POS));
 
       let isDrag = false;
       const dragThreshold = 4;
+      const togglePanel = () => {
+        if (isDrag || !state.panel) return;
+        const willOpen = !state.panel.classList.contains('show');
+        if (willOpen) {
+          ui.refresh();
+          ui.syncPanelPos();
+          state.panel.classList.add('show');
+          state.panel.focus();
+        } else {
+          state.panel.classList.remove('show');
+          state.isForcedShow = false;
+          ui.refresh();
+        }
+      };
+
       state.fab.onmousedown = (event) => {
         if (event.button !== 0) return;
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation?.();
         isDrag = false;
         const startX = event.clientX;
         const startY = event.clientY;
@@ -216,32 +312,27 @@ export function createPanelMethods({ state, constants, utils, templates, styleCs
           ui.setFabPosition(baseX + moveEvent.clientX - startX, baseY + moveEvent.clientY - startY);
         };
 
-        const up = () => {
-          document.removeEventListener('mousemove', move);
-          document.removeEventListener('mouseup', up);
+        const up = (upEvent) => {
+          document.removeEventListener('mousemove', move, true);
+          document.removeEventListener('mouseup', up, true);
+          upEvent.preventDefault();
+          upEvent.stopPropagation();
+          upEvent.stopImmediatePropagation?.();
           if (isDrag) {
             ui.setFabPosition(state.fab.offsetLeft, state.fab.offsetTop, { persist: true });
+            return;
           }
+          togglePanel();
         };
 
-        document.addEventListener('mousemove', move);
-        document.addEventListener('mouseup', up);
+        document.addEventListener('mousemove', move, true);
+        document.addEventListener('mouseup', up, true);
       };
 
       state.fab.onclick = (event) => {
-        if (isDrag || !state.panel) return;
+        event.preventDefault();
         event.stopPropagation();
-        const willOpen = !state.panel.classList.contains('show');
-        if (willOpen) {
-          ui.refresh();
-          ui.syncPanelPos();
-          state.panel.classList.add('show');
-          state.panel.focus();
-        } else {
-          state.panel.classList.remove('show');
-          state.isForcedShow = false;
-          ui.refresh();
-        }
+        event.stopImmediatePropagation?.();
       };
     },
     createPanel() {

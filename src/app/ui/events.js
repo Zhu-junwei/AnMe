@@ -1,4 +1,11 @@
 export function createEventMethods({ state, constants, utils, core, ui }) {
+  const isolatedPanelEvents = ['keydown', 'keyup', 'keypress', 'beforeinput', 'input', 'paste', 'copy', 'cut', 'contextmenu', 'wheel'];
+
+  const stopScriptUiEvent = (event) => {
+    event.stopPropagation();
+    event.stopImmediatePropagation?.();
+  };
+
   return {
     ensureNoteTooltip() {
       if (state.noteTooltipEl || !state.uiRoot) return state.noteTooltipEl;
@@ -106,11 +113,11 @@ export function createEventMethods({ state, constants, utils, core, ui }) {
       }
     },
     bindPanelShellEvents({ $, $$ }) {
-      ['keydown', 'keyup', 'keypress', 'input', 'contextmenu', 'wheel'].forEach((eventName) => {
+      isolatedPanelEvents.forEach((eventName) => {
         state.panel.addEventListener(
           eventName,
           (event) => {
-            event.stopPropagation();
+            stopScriptUiEvent(event);
             if (eventName === 'wheel') {
               const scrollArea = event.target.closest('.acc-scroll-area, .acc-host-menu, .acc-host-list, .acc-floating-note-tooltip-content, .acc-input-note');
               if (ui.shouldPreventWheelLeak(scrollArea, event.deltaY)) {
@@ -406,10 +413,6 @@ export function createEventMethods({ state, constants, utils, core, ui }) {
           state.settingsReturnPage = state.activePage;
         }
         ui.activatePage('pg-set', utils.t('nav_set'));
-      };
-
-      $('#btn-open-project').onclick = () => {
-        window.open(constants.META.LINKS.PROJECT, '_blank', 'noopener,noreferrer');
       };
 
       $('#btn-open-webdav').onclick = () => {

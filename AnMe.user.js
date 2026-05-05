@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AnMe
 // @author       zjw
-// @version      10.0.8
-// @updated      2026-04-21
+// @version      10.0.9
+// @updated      2026-05-05
 // @namespace    https://github.com/Zhu-junwei/AnMe
 // @description  通用多网站多账号切换器
 // @description:zh  通用多网站多账号切换器
@@ -277,7 +277,7 @@
 
         #acc-mgr-fab, .acc-panel, .acc-dialog-mask, .acc-floating-note-tooltip { pointer-events: auto; }
         :host(.anme-force-grabbing), :host(.anme-force-grabbing) * { cursor: grabbing !important; }
-        #acc-mgr-fab { padding: 10px;position: fixed; bottom: 100px; right: 30px; width: 44px; height: 44px; background: #2196F3; color: white; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 20px; cursor: move; z-index: 1000000; box-shadow: 0 8px 30px rgba(0,0,0,0.25); user-select: none; border: none; touch-action: none; transition: transform 0.1s; }
+        #acc-mgr-fab { padding: 10px;position: fixed; bottom: 13%; right: 3%; width: 44px; height: 44px; background: #2196F3; color: white; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 20px; cursor: move; z-index: 1000000; box-shadow: 0 8px 30px rgba(0,0,0,0.25); user-select: none; border: none; touch-action: none; transition: transform 0.1s; }
         #acc-mgr-fab:active { transform: scale(0.95); }
 
         .acc-panel { position: fixed; width: 340px; background: white; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.25); z-index: 1000001; display: flex; flex-direction: column; font-family: inherit; border: 1px solid #ddd; overflow: hidden; height: 480px; overscroll-behavior: none !important; opacity: 0; visibility: hidden; transition: opacity 0.12s ease, visibility 0.12s ease; pointer-events: none; outline: none; }
@@ -369,6 +369,9 @@
         .acc-about-ver { color: #999 !important; font-size: 12px !important; }
         .acc-about-item { display: flex !important; justify-content: space-between !important; padding: 3px 0 !important; border-bottom: 1px solid #f5f5f5 !important; }
         .acc-about-label { color: #888 !important; font-weight: bold !important; }
+        .acc-about-github-link { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; color:#555; text-decoration:none; transition:color 0.15s ease; }
+        .acc-about-github-link:hover,
+        .acc-about-github-link:focus-visible { color:#2196F3; outline:none; }
 
         /* Custom Dialog UI */
         .acc-dialog-mask { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 2000007; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
@@ -536,6 +539,7 @@
       webdavBackups: [],
       uiRoot: null,
       fab: null,
+      fabPosition: null,
       panel: null,
       isFullscreenHidden: false,
       dialogMask: null,
@@ -733,7 +737,6 @@
           </div>
           <div class="acc-header-title" id="acc-header-text"></div>
           <div class="acc-header-right-actions">
-              <button class="acc-toolbar-btn" id="btn-open-project" title="GitHub">${constants.ICONS.GITHUB}</button>
               <button class="acc-toolbar-btn" id="btn-open-webdav" title="${utils.t("nav_webdav")}">${constants.ICONS.CLOUD}</button>
               <button class="acc-toolbar-btn" id="btn-open-settings" title="${utils.t("nav_set")}">${constants.ICONS.SETTINGS}</button>
               <button class="acc-toolbar-btn" id="acc-close-btn" title="${utils.t("dlg_cancel")}" type="button">${constants.ICONS.CLOSE}</button>
@@ -812,7 +815,7 @@
                   ${constants.META.UPDATED_AT ? `<div class="acc-about-item"><span class="acc-about-label">${utils.t("about_updated")}</span><span>${utils.escapeHtml(constants.META.UPDATED_AT)}</span></div>` : ""}
                   <div class="acc-about-item"><span class="acc-about-label">Author</span><span>${constants.META.AUTHOR}</span></div>
                   <div class="acc-about-item"><span class="acc-about-label">License</span><span>MIT</span></div>
-                  <div class="acc-about-item"><span class="acc-about-label">Github</span><a href="${constants.META.LINKS.PROJECT}" target="_blank" style="color:#2196F3">View Repo</a></div>
+                  <div class="acc-about-item"><span class="acc-about-label">Github</span><a class="acc-about-github-link" href="${constants.META.LINKS.PROJECT}" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub">${constants.ICONS.GITHUB}</a></div>
                   <div style="text-align:center;margin-top:20px;">
                       <a href="${constants.META.LINKS.DONATE}" target="_blank" class="acc-btn acc-btn-blue" style="display:inline-flex; width:80%;">${constants.ICONS.DONATE} ${utils.t("donate")}</a>
                   </div>
@@ -1730,6 +1733,43 @@
         reject(error);
       }
     });
+    const scoreIconSize = (sizes) => {
+      const normalizedSizes = String(sizes || "").toLowerCase();
+      if (normalizedSizes.includes("any")) return 36;
+      const iconSizes = [...normalizedSizes.matchAll(/(\d+)\s*x\s*(\d+)/g)].map((match) => Math.min(Number(match[1]), Number(match[2]))).filter((size) => Number.isFinite(size) && size > 0);
+      if (!iconSizes.length) return 8;
+      return iconSizes.reduce((bestScore, size) => {
+        const score = Math.max(0, 32 - Math.abs(size - 32));
+        return Math.max(bestScore, score);
+      }, 0);
+    };
+    const scoreIconSource = ({ element, value, fallback = false }) => {
+      if (fallback) return 70;
+      const rel = String(element?.getAttribute("rel") || "").toLowerCase();
+      const relTokens = new Set(rel.split(/\s+/).filter(Boolean));
+      const type = String(element?.getAttribute("type") || "").toLowerCase();
+      const sizes = String(element?.getAttribute("sizes") || "").toLowerCase();
+      const href = String(value || "").split(/[?#]/)[0].toLowerCase();
+      const isStandardIcon = relTokens.has("icon") || rel.includes("shortcut icon");
+      const isAppleIcon = rel.includes("apple-touch-icon");
+      const isMaskIcon = rel.includes("mask-icon");
+      const isSvg = type === "image/svg+xml" || href.endsWith(".svg") || sizes.includes("any");
+      let score = 0;
+      if (isMaskIcon) {
+        score -= 100;
+      } else if (isAppleIcon) {
+        score += 20;
+      } else if (isStandardIcon) {
+        score += 100;
+      } else {
+        score += 50;
+      }
+      score += isSvg ? 36 : scoreIconSize(sizes);
+      if (/^image\/(png|x-icon|vnd\.microsoft\.icon)$/.test(type)) score += 6;
+      if (type === "image/svg+xml") score += 6;
+      if (!type) score += 2;
+      return score;
+    };
     const buildCurrentHostIconSources = () => {
       const sources = [];
       if (typeof document !== "undefined") {
@@ -1738,20 +1778,42 @@
             const rawHref = String(element.getAttribute("href") || "").trim();
             if (!rawHref) return;
             if (/^data:/i.test(rawHref)) {
-              sources.push({ type: "inline", value: rawHref });
+              sources.push({
+                type: "inline",
+                value: rawHref,
+                score: scoreIconSource({ element, value: rawHref }),
+                order: sources.length
+              });
               return;
             }
             const iconUrl = new URL(rawHref, location.href);
             if (iconUrl.protocol === "http:" || iconUrl.protocol === "https:") {
-              sources.push({ type: "request", value: iconUrl.href });
+              sources.push({
+                type: "request",
+                value: iconUrl.href,
+                score: scoreIconSource({ element, value: iconUrl.href }),
+                order: sources.length
+              });
             }
           } catch (_) {
             return;
           }
         });
       }
-      sources.push({ type: "request", value: new URL("/favicon.ico", location.origin).href });
-      return [...new Map(sources.filter((source) => source?.value).map((source) => [source.value, source])).values()];
+      sources.push({
+        type: "request",
+        value: new URL("/favicon.ico", location.origin).href,
+        score: scoreIconSource({ fallback: true }),
+        order: sources.length
+      });
+      const dedupedSources = /* @__PURE__ */ new Map();
+      sources.filter((source) => source?.value).forEach((source) => {
+        const existingSource = dedupedSources.get(source.value);
+        if (!existingSource || source.score > existingSource.score) {
+          dedupedSources.set(source.value, source);
+        }
+      });
+      return [...dedupedSources.values()].sort((a, b) => b.score - a.score || a.order - b.order).map(({ type, value }) => ({ type, value }));
     };
     const requestHostIcon = (url) => new Promise((resolve, reject) => {
       const xhr = GM_xmlhttpRequest({
@@ -1852,6 +1914,11 @@
 
   // src/app/ui/events.js
   function createEventMethods({ state, constants, utils, core, ui }) {
+    const isolatedPanelEvents = ["keydown", "keyup", "keypress", "beforeinput", "input", "paste", "copy", "cut", "contextmenu", "wheel"];
+    const stopScriptUiEvent = (event) => {
+      event.stopPropagation();
+      event.stopImmediatePropagation?.();
+    };
     return {
       ensureNoteTooltip() {
         if (state.noteTooltipEl || !state.uiRoot) return state.noteTooltipEl;
@@ -1951,11 +2018,11 @@
         }
       },
       bindPanelShellEvents({ $, $$ }) {
-        ["keydown", "keyup", "keypress", "input", "contextmenu", "wheel"].forEach((eventName) => {
+        isolatedPanelEvents.forEach((eventName) => {
           state.panel.addEventListener(
             eventName,
             (event) => {
-              event.stopPropagation();
+              stopScriptUiEvent(event);
               if (eventName === "wheel") {
                 const scrollArea = event.target.closest(".acc-scroll-area, .acc-host-menu, .acc-host-list, .acc-floating-note-tooltip-content, .acc-input-note");
                 if (ui.shouldPreventWheelLeak(scrollArea, event.deltaY)) {
@@ -2218,9 +2285,6 @@
             state.settingsReturnPage = state.activePage;
           }
           ui.activatePage("pg-set", utils.t("nav_set"));
-        };
-        $("#btn-open-project").onclick = () => {
-          window.open(constants.META.LINKS.PROJECT, "_blank", "noopener,noreferrer");
         };
         $("#btn-open-webdav").onclick = () => {
           state.settingsReturnPage = state.activePage || "pg-switch";
@@ -2925,27 +2989,96 @@
   }
 
   // src/app/ui/panel.js
+  var DEFAULT_FAB_POSITION = {
+    rightPercent: 3,
+    bottomPercent: 13
+  };
+  function clampNumber(value, min, max) {
+    const normalizedValue = Number(value);
+    if (!Number.isFinite(normalizedValue)) return min;
+    return Math.min(Math.max(normalizedValue, min), max);
+  }
+  function roundPercent(value) {
+    return Math.round(value * 1e4) / 1e4;
+  }
+  function getFabTravelBounds(fab) {
+    const fabWidth = fab.offsetWidth || 44;
+    const fabHeight = fab.offsetHeight || 44;
+    return {
+      maxLeft: Math.max(0, window.innerWidth - fabWidth),
+      maxTop: Math.max(0, window.innerHeight - fabHeight)
+    };
+  }
+  function getFabPositionFromPixels(fab, left, top) {
+    const { maxLeft, maxTop } = getFabTravelBounds(fab);
+    const nextLeft = clampNumber(left, 0, maxLeft);
+    const nextTop = clampNumber(top, 0, maxTop);
+    return {
+      left: nextLeft,
+      top: nextTop,
+      rightPercent: maxLeft > 0 ? (maxLeft - nextLeft) / maxLeft * 100 : 0,
+      bottomPercent: maxTop > 0 ? (maxTop - nextTop) / maxTop * 100 : 0
+    };
+  }
+  function getFabPositionFromPercent(fab, rightPercent, bottomPercent) {
+    const { maxLeft, maxTop } = getFabTravelBounds(fab);
+    const nextRightPercent = clampNumber(rightPercent, 0, 100);
+    const nextBottomPercent = clampNumber(bottomPercent, 0, 100);
+    return {
+      left: maxLeft - maxLeft * nextRightPercent / 100,
+      top: maxTop - maxTop * nextBottomPercent / 100,
+      rightPercent: nextRightPercent,
+      bottomPercent: nextBottomPercent
+    };
+  }
   function createPanelMethods({ state, constants, utils, templates, styleCss, ui }) {
     return {
-      setFabPosition(left, top, { persist = false } = {}) {
-        if (!state.fab) return;
-        const fabWidth = state.fab.offsetWidth || 44;
-        const fabHeight = state.fab.offsetHeight || 44;
-        const nextLeft = Math.min(Math.max(0, Number(left) || 0), Math.max(0, window.innerWidth - fabWidth));
-        const nextTop = Math.min(Math.max(0, Number(top) || 0), Math.max(0, window.innerHeight - fabHeight));
-        state.fab.style.left = `${nextLeft}px`;
-        state.fab.style.top = `${nextTop}px`;
+      applyFabPosition(position, { persist = false } = {}) {
+        if (!state.fab || !position) return;
+        state.fab.style.left = `${position.left}px`;
+        state.fab.style.top = `${position.top}px`;
         state.fab.style.bottom = "auto";
         state.fab.style.right = "auto";
+        state.fabPosition = {
+          rightPercent: roundPercent(position.rightPercent),
+          bottomPercent: roundPercent(position.bottomPercent)
+        };
         if (state.panel && state.panel.classList.contains("show")) {
           ui.syncPanelPos();
         }
         if (persist) {
-          GM_setValue(constants.CFG.FAB_POS, {
-            left: Math.round(nextLeft),
-            top: Math.round(nextTop)
-          });
+          GM_setValue(constants.CFG.FAB_POS, state.fabPosition);
         }
+      },
+      setFabPosition(left, top, { persist = false } = {}) {
+        if (!state.fab) return;
+        ui.applyFabPosition(getFabPositionFromPixels(state.fab, left, top), { persist });
+      },
+      setFabPositionByPercent(rightPercent, bottomPercent, { persist = false } = {}) {
+        if (!state.fab) return;
+        ui.applyFabPosition(getFabPositionFromPercent(state.fab, rightPercent, bottomPercent), { persist });
+      },
+      restoreFabPosition(savedPosition) {
+        if (!state.fab) return;
+        if (savedPosition && typeof savedPosition === "object") {
+          if (savedPosition.rightPercent !== void 0 || savedPosition.bottomPercent !== void 0) {
+            ui.setFabPositionByPercent(
+              savedPosition.rightPercent ?? DEFAULT_FAB_POSITION.rightPercent,
+              savedPosition.bottomPercent ?? DEFAULT_FAB_POSITION.bottomPercent
+            );
+            return;
+          }
+          if (savedPosition.left !== void 0 || savedPosition.top !== void 0) {
+            ui.setFabPosition(savedPosition.left, savedPosition.top, { persist: true });
+            return;
+          }
+        }
+        ui.setFabPositionByPercent(DEFAULT_FAB_POSITION.rightPercent, DEFAULT_FAB_POSITION.bottomPercent);
+      },
+      syncFabPosition() {
+        if (!state.fab) return;
+        const position = state.fabPosition || DEFAULT_FAB_POSITION;
+        ui.setFabPositionByPercent(position.rightPercent, position.bottomPercent);
       },
       isFullscreenPlaybackActive() {
         return isFullscreenPlaybackActive();
@@ -2990,12 +3123,10 @@
         const cleanBtn = ui.qs("#btn-clean-env");
         const saveBtn = ui.qs("#btn-open-save-modal");
         const settingsBtn = ui.qs("#btn-open-settings");
-        const projectBtn = ui.qs("#btn-open-project");
         const webdavBtn = ui.qs("#btn-open-webdav");
         if (backBtn) backBtn.style.display = isSetActive || isNoticeActive || isAboutActive || isAccountSettingsActive || isWebDavActive ? "flex" : "none";
         if (homeBtn) homeBtn.style.display = isSwitchActive && !canOperateCurrentHost ? "flex" : "none";
         if (settingsBtn) settingsBtn.style.display = isSwitchActive ? "flex" : "none";
-        if (projectBtn) projectBtn.style.display = isSwitchActive ? "flex" : "none";
         if (webdavBtn) webdavBtn.style.display = isSwitchActive ? "flex" : "none";
         if (cleanBtn) cleanBtn.style.display = isSwitchActive && canOperateCurrentHost ? "flex" : "none";
         if (saveBtn) saveBtn.style.display = isSwitchActive && canOperateCurrentHost ? "flex" : "none";
@@ -3092,14 +3223,28 @@
         state.fab.id = "acc-mgr-fab";
         utils.setHTML(state.fab, constants.ICONS.LOGO);
         state.uiRoot.appendChild(state.fab);
-        const savedPos = GM_getValue(constants.CFG.FAB_POS);
-        if (savedPos && savedPos.left !== void 0) {
-          ui.setFabPosition(savedPos.left, savedPos.top);
-        }
+        ui.restoreFabPosition(GM_getValue(constants.CFG.FAB_POS));
         let isDrag = false;
         const dragThreshold = 4;
+        const togglePanel = () => {
+          if (isDrag || !state.panel) return;
+          const willOpen = !state.panel.classList.contains("show");
+          if (willOpen) {
+            ui.refresh();
+            ui.syncPanelPos();
+            state.panel.classList.add("show");
+            state.panel.focus();
+          } else {
+            state.panel.classList.remove("show");
+            state.isForcedShow = false;
+            ui.refresh();
+          }
+        };
         state.fab.onmousedown = (event) => {
           if (event.button !== 0) return;
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation?.();
           isDrag = false;
           const startX = event.clientX;
           const startY = event.clientY;
@@ -3114,30 +3259,25 @@
             isDrag = true;
             ui.setFabPosition(baseX + moveEvent.clientX - startX, baseY + moveEvent.clientY - startY);
           };
-          const up = () => {
-            document.removeEventListener("mousemove", move);
-            document.removeEventListener("mouseup", up);
+          const up = (upEvent) => {
+            document.removeEventListener("mousemove", move, true);
+            document.removeEventListener("mouseup", up, true);
+            upEvent.preventDefault();
+            upEvent.stopPropagation();
+            upEvent.stopImmediatePropagation?.();
             if (isDrag) {
               ui.setFabPosition(state.fab.offsetLeft, state.fab.offsetTop, { persist: true });
+              return;
             }
+            togglePanel();
           };
-          document.addEventListener("mousemove", move);
-          document.addEventListener("mouseup", up);
+          document.addEventListener("mousemove", move, true);
+          document.addEventListener("mouseup", up, true);
         };
         state.fab.onclick = (event) => {
-          if (isDrag || !state.panel) return;
+          event.preventDefault();
           event.stopPropagation();
-          const willOpen = !state.panel.classList.contains("show");
-          if (willOpen) {
-            ui.refresh();
-            ui.syncPanelPos();
-            state.panel.classList.add("show");
-            state.panel.focus();
-          } else {
-            state.panel.classList.remove("show");
-            state.isForcedShow = false;
-            ui.refresh();
-          }
+          event.stopImmediatePropagation?.();
         };
       },
       createPanel() {
@@ -3626,9 +3766,7 @@
     };
     window.addEventListener("resize", () => {
       if (!state.fab) return;
-      if (state.fab.style.left) {
-        ui.setFabPosition(parseFloat(state.fab.style.left), parseFloat(state.fab.style.top));
-      }
+      ui.syncFabPosition?.();
       if (state.panel && state.panel.classList.contains("show")) {
         ui.syncPanelPos();
       }
@@ -3667,10 +3805,6 @@
       }
       ui.refresh();
     });
-    if (document.readyState === "complete" || document.readyState === "interactive") {
-      start();
-    } else {
-      window.addEventListener("DOMContentLoaded", start);
-    }
+    start();
   })();
 })();
