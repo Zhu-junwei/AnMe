@@ -158,6 +158,7 @@ export function createEventMethods({ state, constants, utils, core, ui }) {
         state.fab = null;
         state.dialogMask = null;
         state.saveFormMask = null;
+        state.dataInspectorMask = null;
         state.toastEl = null;
         state.toastTimer = null;
         ui.init();

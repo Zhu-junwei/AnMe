@@ -36,6 +36,7 @@ export function createState({ constants, i18nData }) {
     isFullscreenHidden: false,
     dialogMask: null,
     saveFormMask: null,
+    dataInspectorMask: null,
     noteTooltipEl: null,
     noteTooltipTarget: null,
     noteTooltipItem: null,

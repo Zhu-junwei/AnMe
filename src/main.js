@@ -51,28 +51,23 @@ import { createUI } from './app/ui.js';
     if (!state.panel || !state.panel.classList.contains('show')) return;
     const path = event.composedPath();
     const isNode = (value) => value instanceof Node;
+    const isInside = (target) =>
+      Boolean(target) &&
+      (path.includes(target) ||
+        path.some((node) => isNode(node) && typeof target.contains === 'function' && target.contains(node)));
     const isTooltipVisible = Boolean(state.noteTooltipEl?.classList.contains('show'));
     const isInsideNoteTooltip =
-      Boolean(state.noteTooltipEl) &&
-      (path.includes(state.noteTooltipEl) ||
-        path.some(
-          (node) => isNode(node) && typeof state.noteTooltipEl?.contains === 'function' && state.noteTooltipEl.contains(node)
-        ));
+      Boolean(state.noteTooltipEl) && isInside(state.noteTooltipEl);
     const isInsideTooltipTrigger =
-      Boolean(state.noteTooltipTarget) &&
-      (path.includes(state.noteTooltipTarget) ||
-        path.some(
-          (node) =>
-            isNode(node) &&
-            typeof state.noteTooltipTarget?.contains === 'function' &&
-            state.noteTooltipTarget.contains(node)
-        ));
+      Boolean(state.noteTooltipTarget) && isInside(state.noteTooltipTarget);
+    const isInsideDataInspector = isInside(state.dataInspectorMask);
 
     if (
       isTooltipVisible &&
       !isInsideNoteTooltip &&
       !isInsideTooltipTrigger &&
-      !path.includes(state.dialogMask)
+      !path.includes(state.dialogMask) &&
+      !isInsideDataInspector
     ) {
       ui.hideNoteTooltip();
     }
@@ -81,6 +76,7 @@ import { createUI } from './app/ui.js';
       !path.includes(state.panel) &&
       !path.includes(state.fab) &&
       !path.includes(state.dialogMask) &&
+      !isInsideDataInspector &&
       !isInsideNoteTooltip
     ) {
       ui.closePanel();

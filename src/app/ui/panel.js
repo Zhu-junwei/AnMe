@@ -239,6 +239,7 @@ export function createPanelMethods({ state, constants, utils, templates, styleCs
     },
     closePanel() {
       ui.hideNoteTooltip?.();
+      ui.hideDataInspector?.();
       if (state.panel) state.panel.classList.remove('show');
       state.isForcedShow = false;
       ui.refresh();

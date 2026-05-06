@@ -2,7 +2,7 @@
 // @name         AnMe
 // @author       zjw
 // @version      10.0.9
-// @updated      2026-05-05
+// @updated      2026-05-07
 // @namespace    https://github.com/Zhu-junwei/AnMe
 // @description  通用多网站多账号切换器
 // @description:zh  通用多网站多账号切换器
@@ -77,6 +77,9 @@
       USER: `<svg width="1em" height="1em" viewBox="0 0 24 24"  fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="6" r="4" stroke="currentColor" stroke-width="1.5"/><ellipse cx="12" cy="17" rx="7" ry="4" stroke="currentColor" stroke-width="1.5"/></svg>`,
       SETTINGS: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.84308 3.80211C9.8718 2.6007 10.8862 2 12 2C13.1138 2 14.1282 2.6007 16.1569 3.80211L16.8431 4.20846C18.8718 5.40987 19.8862 6.01057 20.4431 7C21 7.98943 21 9.19084 21 11.5937V12.4063C21 14.8092 21 16.0106 20.4431 17C19.8862 17.9894 18.8718 18.5901 16.8431 19.7915L16.1569 20.1979C14.1282 21.3993 13.1138 22 12 22C10.8862 22 9.8718 21.3993 7.84308 20.1979L7.15692 19.7915C5.1282 18.5901 4.11384 17.9894 3.55692 17C3 16.0106 3 14.8092 3 12.4063V11.5937C3 9.19084 3 7.98943 3.55692 7C4.11384 6.01057 5.1282 5.40987 7.15692 4.20846L7.84308 3.80211Z" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/></svg>`,
       HELP: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.75C12.4142 17.75 12.75 17.4142 12.75 17V11C12.75 10.5858 12.4142 10.25 12 10.25C11.5858 10.25 11.25 10.5858 11.25 11V17C11.25 17.4142 11.5858 17.75 12 17.75Z" fill="currentColor"/><path d="M12 7C12.5523 7 13 7.44772 13 8C13 8.55228 12.5523 9 12 9C11.4477 9 11 8.55228 11 8C11 7.44772 11.4477 7 12 7Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M1.25 12C1.25 6.06294 6.06294 1.25 12 1.25C17.9371 1.25 22.75 6.06294 22.75 12C22.75 17.9371 17.9371 22.75 12 22.75C6.06294 22.75 1.25 17.9371 1.25 12ZM12 2.75C6.89137 2.75 2.75 6.89137 2.75 12C2.75 17.1086 6.89137 21.25 12 21.25C17.1086 21.25 21.25 17.1086 21.25 12C21.25 6.89137 17.1086 2.75 12 2.75Z" fill="currentColor"/></svg>`,
+      EYE: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.25 12S5.75 5.75 12 5.75S21.75 12 21.75 12 18.25 18.25 12 18.25 2.25 12 2.25 12Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/></svg>`,
+      MAXIMIZE: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="5" width="14" height="14" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>`,
+      RESTORE: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 7.5V5.75C8 4.7835 8.7835 4 9.75 4H18.25C19.2165 4 20 4.7835 20 5.75V14.25C20 15.2165 19.2165 16 18.25 16H16.5" stroke="currentColor" stroke-width="1.5"/><rect x="4" y="8" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>`,
       LOCK: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M5.25 9.30277V8C5.25 4.27208 8.27208 1.25 12 1.25C15.7279 1.25 18.75 4.27208 18.75 8V9.30277C18.9768 9.31872 19.1906 9.33948 19.3918 9.36652C20.2919 9.48754 21.0497 9.74643 21.6517 10.3483C22.2536 10.9503 22.5125 11.7081 22.6335 12.6082C22.75 13.4752 22.75 14.5775 22.75 15.9451V16.0549C22.75 17.4225 22.75 18.5248 22.6335 19.3918C22.5125 20.2919 22.2536 21.0497 21.6517 21.6516C21.0497 22.2536 20.2919 22.5125 19.3918 22.6335C18.5248 22.75 17.4225 22.75 16.0549 22.75H7.94513C6.57754 22.75 5.47522 22.75 4.60825 22.6335C3.70814 22.5125 2.95027 22.2536 2.34835 21.6516C1.74643 21.0497 1.48754 20.2919 1.36652 19.3918C1.24996 18.5248 1.24998 17.4225 1.25 16.0549V15.9451C1.24998 14.5775 1.24996 13.4752 1.36652 12.6082C1.48754 11.7081 1.74643 10.9503 2.34835 10.3483C2.95027 9.74643 3.70814 9.48754 4.60825 9.36652C4.80938 9.33948 5.02317 9.31872 5.25 9.30277ZM6.75 8C6.75 5.10051 9.10051 2.75 12 2.75C14.8995 2.75 17.25 5.10051 17.25 8V9.25344C16.8765 9.24999 16.4784 9.24999 16.0549 9.25H7.94513C7.52161 9.24999 7.12353 9.24999 6.75 9.25344V8ZM3.40901 11.409C3.68577 11.1322 4.07435 10.9518 4.80812 10.8531C5.56347 10.7516 6.56459 10.75 8 10.75H16C17.4354 10.75 18.4365 10.7516 19.1919 10.8531C19.9257 10.9518 20.3142 11.1322 20.591 11.409C20.8678 11.6858 21.0482 12.0743 21.1469 12.8081C21.2484 13.5635 21.25 14.5646 21.25 16C21.25 17.4354 21.2484 18.4365 21.1469 19.1919C21.0482 19.9257 20.8678 20.3142 20.591 20.591C20.3142 20.8678 19.9257 21.0482 19.1919 21.1469C18.4365 21.2484 17.4354 21.25 16 21.25H8C6.56459 21.25 5.56347 21.2484 4.80812 21.1469C4.07435 21.0482 3.68577 20.8678 3.40901 20.591C3.13225 20.3142 2.9518 19.9257 2.85315 19.1919C2.75159 18.4365 2.75 17.4354 2.75 16C2.75 14.5646 2.75159 13.5635 2.85315 12.8081C2.9518 12.0743 3.13225 11.6858 3.40901 11.409Z" fill="currentColor"/></svg>`,
       EXPORT: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 15C3 17.8284 3 19.2426 3.87868 20.1213C4.75736 21 6.17157 21 9 21H15C17.8284 21 19.2426 21 20.1213 20.1213C21 19.2426 21 17.8284 21 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 16V3M12 3L16 7.375M12 3L8 7.375" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
       MUTIEXPORT: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17 9.00195C19.175 9.01406 20.3529 9.11051 21.1213 9.8789C22 10.7576 22 12.1718 22 15.0002V16.0002C22 18.8286 22 20.2429 21.1213 21.1215C20.2426 22.0002 18.8284 22.0002 16 22.0002H8C5.17157 22.0002 3.75736 22.0002 2.87868 21.1215C2 20.2429 2 18.8286 2 16.0002L2 15.0002C2 12.1718 2 10.7576 2.87868 9.87889C3.64706 9.11051 4.82497 9.01406 7 9.00195" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M12 15L12 2M12 2L15 5.5M12 2L9 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
@@ -106,6 +109,11 @@
     cookie_expired_count: "{count} 个已过期 Cookie",
     local_storage_tag_title: "LocalStorage",
     session_storage_tag_title: "SessionStorage",
+    inspect_items: "查看明细",
+    maximize_panel: "最大化",
+    restore_panel: "还原",
+    select_all: "全选",
+    select_none: "全不选",
     default_account_prefix: "账号",
     account_note: "备注",
     placeholder_note: "给该账号添加备注（可选）...",
@@ -162,6 +170,11 @@
     cookie_expired_count: "{count} expired cookie(s)",
     local_storage_tag_title: "LocalStorage",
     session_storage_tag_title: "SessionStorage",
+    inspect_items: "Inspect items",
+    maximize_panel: "Maximize",
+    restore_panel: "Restore",
+    select_all: "Select all",
+    select_none: "Select none",
     default_account_prefix: "Account",
     account_note: "Note",
     placeholder_note: "Add an optional note for this account...",
@@ -218,6 +231,11 @@
     cookie_expired_count: "{count} cookie(s) caducada(s)",
     local_storage_tag_title: "LocalStorage",
     session_storage_tag_title: "SessionStorage",
+    inspect_items: "Ver detalles",
+    maximize_panel: "Maximizar",
+    restore_panel: "Restaurar",
+    select_all: "Seleccionar todo",
+    select_none: "No seleccionar",
     default_account_prefix: "Cuenta",
     account_note: "Nota",
     placeholder_note: "Agrega una nota opcional para esta cuenta...",
@@ -275,7 +293,7 @@
         * { box-sizing: border-box; }
         a { text-decoration:none; }
 
-        #acc-mgr-fab, .acc-panel, .acc-dialog-mask, .acc-floating-note-tooltip { pointer-events: auto; }
+        #acc-mgr-fab, .acc-panel, .acc-dialog-mask, .acc-data-mask, .acc-floating-note-tooltip { pointer-events: auto; }
         :host(.anme-force-grabbing), :host(.anme-force-grabbing) * { cursor: grabbing !important; }
         #acc-mgr-fab { padding: 10px;position: fixed; bottom: 13%; right: 3%; width: 44px; height: 44px; background: #2196F3; color: white; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 20px; cursor: move; z-index: 1000000; box-shadow: 0 8px 30px rgba(0,0,0,0.25); user-select: none; border: none; touch-action: none; transition: transform 0.1s; }
         #acc-mgr-fab:active,
@@ -394,6 +412,54 @@
         .acc-form-label { font-size: 12px; font-weight: 700; color: #667085; margin-bottom: -4px; }
         .acc-required { color:#ef4444; margin-left:4px; }
         .acc-form-footer { display: flex; gap: 10px; margin-top: 4px; }
+        .acc-data-mask { position:fixed; inset:0; width:100vw; height:100vh; background:rgba(15,23,42,.35); z-index:2000009; display:none; align-items:center; justify-content:center; backdrop-filter:blur(2px); padding:10px; overscroll-behavior:contain; }
+        .acc-data-box { width:min(1280px, calc(100vw - 20px)); height:min(720px, calc(100vh - 20px)); min-width:min(420px, calc(100vw - 20px)); min-height:min(320px, calc(100vh - 20px)); max-width:calc(100vw - 20px); max-height:calc(100vh - 20px); background:#fff; border-radius:12px; box-shadow:0 14px 32px rgba(15,23,42,.22); display:flex; flex-direction:column; overflow:hidden; resize:both; transition:width .12s ease, height .12s ease, border-radius .12s ease; animation:accPop 0.05s ease-out; }
+        .acc-data-box.is-maximized { width:calc(100vw - 20px) !important; height:calc(100vh - 20px) !important; resize:none; border-radius:10px; }
+        .acc-data-header { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:7px 10px; border-bottom:1px solid #eef2f6; }
+        .acc-data-title { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:13px; font-weight:700; color:#333; }
+        .acc-data-header-actions { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+        .acc-data-header-actions .acc-dialog-btn { flex:0 0 auto; min-width:64px; padding:6px 12px; }
+        .acc-data-close,
+        .acc-data-window-btn { width:28px; height:28px; min-width:28px; }
+        .acc-data-window-btn svg { font-size:14px; }
+        .acc-data-window-btn .acc-restore-icon { display:none; }
+        .acc-data-box.is-maximized .acc-data-window-btn .acc-maximize-icon { display:none; }
+        .acc-data-box.is-maximized .acc-data-window-btn .acc-restore-icon { display:inline-flex; }
+        .acc-data-toolbar { display:flex; align-items:center; gap:8px; padding:5px 10px; border-bottom:1px solid #eef2f6; }
+        .acc-data-count { margin-right:auto; font-size:12px; color:#667085; }
+        .acc-data-tool-btn { border:1px solid #d0d5dd; background:#fff; color:#344054; border-radius:6px; padding:4px 8px; font-size:12px; cursor:pointer; }
+        .acc-data-tool-btn:hover,
+        .acc-data-tool-btn:focus-visible { border-color:#2196F3; color:#2196F3; background:#f5fbff; outline:none; }
+        .acc-data-list { flex:1; min-height:0; overflow:auto; padding:6px; overscroll-behavior:contain; }
+        .acc-cookie-table-wrap::-webkit-scrollbar,
+        .acc-storage-table-wrap::-webkit-scrollbar,
+        .acc-data-list::-webkit-scrollbar { width:10px; height:10px; }
+        .acc-cookie-table-wrap::-webkit-scrollbar-thumb,
+        .acc-storage-table-wrap::-webkit-scrollbar-thumb,
+        .acc-data-list::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:999px; border:2px solid #f8fafc; }
+        .acc-cookie-table-wrap,
+        .acc-storage-table-wrap { height:100%; overflow:auto; border:1px solid #e6ebf1; border-radius:6px; background:#fff; overscroll-behavior:contain; }
+        .acc-cookie-table,
+        .acc-storage-table { width:100%; min-width:100%; border-collapse:collapse; table-layout:fixed; }
+        .acc-cookie-table th,
+        .acc-cookie-table td,
+        .acc-storage-table th,
+        .acc-storage-table td { border-bottom:1px solid #eef2f6; border-right:1px solid #eef2f6; padding:0; text-align:left; vertical-align:top; color:#344054; font-family:"SF Mono", Consolas, monospace; font-size:11px; line-height:1.4; }
+        .acc-cookie-table th,
+        .acc-storage-table th { position:sticky; top:0; z-index:1; background:#f8fafc; color:#667085; font-family:inherit; font-size:11px; font-weight:700; padding:4px 6px; white-space:nowrap; }
+        .acc-cookie-table td:focus-within,
+        .acc-storage-table td:focus-within { outline:1px solid #2196F3; outline-offset:-1px; box-shadow:inset 0 0 0 1px rgba(33,150,243,.2); background:#f5fbff !important; }
+        .acc-cell-input { display:block; width:100%; min-width:0; height:22px; padding:3px 6px; border:none; outline:none; box-shadow:none; background:transparent; color:inherit; font:inherit; line-height:1.4; box-sizing:border-box; cursor:text; user-select:text; }
+        .acc-cell-input[readonly] { -webkit-text-fill-color:currentColor; opacity:1; }
+        .acc-cookie-table tr:nth-child(even) td { background:#fafbfc; }
+        .acc-storage-table tr:nth-child(even) td { background:#fafbfc; }
+        .acc-cookie-check-col,
+        .acc-storage-check-col { width:34px; min-width:34px; text-align:center !important; }
+        .acc-cookie-check-col .acc-custom-chk,
+        .acc-storage-check-col .acc-custom-chk { margin:7px auto !important; display:block !important; }
+        .acc-cookie-value-col { width:36%; }
+        .acc-data-empty { padding:18px; text-align:center; color:#667085; font-size:12px; }
+        .acc-data-footer { display:flex; justify-content:flex-end; gap:8px; padding:10px 12px; border-top:1px solid #eef2f6; }
         .acc-toast { position:absolute; top:12px; left:50%; transform:translateX(-50%) translateY(-8px); display:flex; align-items:center; gap:6px; max-width:260px; padding:7px 10px; border:1px solid #d7e5f5; border-radius:999px; background:rgba(255,255,255,0.96); color:#36506b; box-shadow:0 10px 24px rgba(15, 23, 42, 0.12); font-size:12px; line-height:1; opacity:0; visibility:hidden; transition:opacity 0.18s ease, transform 0.18s ease; z-index:2000012; pointer-events:none; white-space:nowrap; }
         .acc-toast.show { opacity:1; visibility:visible; transform:translateX(-50%) translateY(0); }
         .acc-toast-icon { width:14px; height:14px; display:flex; align-items:center; justify-content:center; color:#2196F3; flex-shrink:0; }
@@ -468,8 +534,8 @@
         .acc-btn-light.is-loading .acc-inline-spinner { border-color: rgba(102,102,102,.2); border-top-color:#666; }
         .acc-btn-danger { width:100%; background:#ffebee; color:#c62828; border:1px solid #ffcdd2; }
         .acc-btn-danger:hover { background:#ffcdd2; border-color:#ef9a9a; }
-        .acc-help-tip, .acc-lock-tip { display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; cursor: help; font-size: 16px; }
-        .acc-help-tip { color:#f5a623; margin-left:10px; margin-right:4px}
+        .acc-help-tip, .acc-lock-tip { display: inline-flex; align-items:center; justify-content:center; width: 16px; height: 16px; line-height: 16px; text-align: center; cursor: help; font-size: 16px; flex-shrink:0; }
+        .acc-help-tip { color:#f5a623; }
         .acc-lock-tip { color: #999; }
         .acc-set-group { margin-bottom: 10px; }
         .acc-set-title { font-size: 12px; font-weight: bold; color: #999; margin-bottom: 8px; }
@@ -481,8 +547,15 @@
         .acc-notice-content h4 { margin: 15px 0 8px 0; color: #333; border-left: 3px solid #2196F3; padding-left: 8px; }
         .acc-link-btn { color: #2196F3; cursor: pointer; font-size: 12px; }
         .acc-select-ui { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; background: #fff; cursor: pointer; outline: none; color: #333; }
-        .acc-chk {display:flex; align-items:center; flex-wrap:wrap; font-size:11px; color:#666; margin:5px 0;-webkit-user-select: none;}
-        .acc-chk-label { display: inline-flex !important; align-items: center !important; cursor: pointer !important; margin-right:4px; font-size: 12px; color: #666; }
+        .acc-chk {display:flex; align-items:center; flex-wrap:nowrap; gap:3px; font-size:11px; color:#666; margin:5px 0;-webkit-user-select: none;}
+        .acc-source-row { display:inline-flex; align-items:center; gap:0; flex-shrink:0; }
+        .acc-source-tips { margin-left:auto; display:inline-flex; align-items:center; gap:5px; flex-shrink:0; padding-left:4px; }
+        .acc-source-eye { width:18px; height:18px; border:none; background:transparent; color:#667085; display:inline-flex; align-items:center; justify-content:center; padding:0; cursor:pointer; border-radius:5px; flex-shrink:0; }
+        .acc-source-eye svg { font-size:13px; }
+        .acc-source-eye:hover,
+        .acc-source-eye:focus-visible { color:#2196F3; background:#e3f2fd; outline:none; }
+        .acc-source-eye:disabled { opacity:.35; cursor:not-allowed; color:#98a2b3; background:transparent; }
+        .acc-chk-label { display: inline-flex !important; align-items: center !important; cursor: pointer !important; margin-right:1px; font-size: 12px; color: #666; }
         .acc-chk-label.disabled { opacity: 0.45; cursor: not-allowed !important; }
         .acc-custom-chk { appearance: none !important; width: 14px !important; height: 14px !important; border: 1px solid #ccc !important; border-radius: 3px !important; margin-right: 4px !important; cursor: pointer !important; position: relative !important; background: #fff; }
         .acc-custom-chk:disabled { cursor: not-allowed !important; background: #f3f4f6 !important; border-color: #d0d5dd !important; }
@@ -549,6 +622,7 @@
       isFullscreenHidden: false,
       dialogMask: null,
       saveFormMask: null,
+      dataInspectorMask: null,
       noteTooltipEl: null,
       noteTooltipTarget: null,
       noteTooltipItem: null,
@@ -921,28 +995,45 @@
   }
 
   // src/app/core/accounts.js
+  var getCookieSelectionKey = (cookie) => [cookie?.name || "", cookie?.domain || "", cookie?.path || ""].join("");
   function createAccountMethods({ constants, utils, getUI, getCore, shared }) {
     return {
-      async detectAvailableSnapshotSources() {
+      async getCurrentSnapshotSources() {
         const cookies = await shared.listCookies();
         return {
-          ck: Array.isArray(cookies) && cookies.length > 0,
-          ls: Object.keys(localStorage || {}).length > 0,
-          ss: Object.keys(sessionStorage || {}).length > 0
+          cookies: Array.isArray(cookies) ? cookies : [],
+          localStorage: { ...localStorage },
+          sessionStorage: { ...sessionStorage }
+        };
+      },
+      async detectAvailableSnapshotSources() {
+        const snapshotSources = await this.getCurrentSnapshotSources();
+        return {
+          ck: snapshotSources.cookies.length > 0,
+          ls: Object.keys(snapshotSources.localStorage).length > 0,
+          ss: Object.keys(snapshotSources.sessionStorage).length > 0
         };
       },
       async saveAccount(name, siteName, options = { ck: true, ls: false, ss: false, note: "" }) {
         const ui = getUI();
+        const localStorageKeys = Array.isArray(options.localStorageKeys) ? new Set(options.localStorageKeys) : null;
+        const sessionStorageKeys = Array.isArray(options.sessionStorageKeys) ? new Set(options.sessionStorageKeys) : null;
         const snapshot = {
           time: Date.now(),
           siteName: utils.normalizeSiteName(siteName),
           note: utils.normalizeNoteText(options.note),
-          localStorage: options.ls ? { ...localStorage } : {},
-          sessionStorage: options.ss ? { ...sessionStorage } : {},
+          localStorage: options.ls ? Object.fromEntries(
+            Object.entries(localStorage).filter(([storageKey]) => !localStorageKeys || localStorageKeys.has(storageKey))
+          ) : {},
+          sessionStorage: options.ss ? Object.fromEntries(
+            Object.entries(sessionStorage).filter(([storageKey]) => !sessionStorageKeys || sessionStorageKeys.has(storageKey))
+          ) : {},
           cookies: []
         };
         if (options.ck) {
-          snapshot.cookies = await shared.listCookies();
+          const cookieKeys = Array.isArray(options.cookieKeys) ? new Set(options.cookieKeys) : null;
+          const cookies = await shared.listCookies();
+          snapshot.cookies = cookieKeys ? (cookies || []).filter((cookie) => cookieKeys.has(getCookieSelectionKey(cookie))) : cookies;
         }
         const hasCookies = snapshot.cookies && snapshot.cookies.length > 0;
         const hasLS = Object.keys(snapshot.localStorage).length > 0;
@@ -1156,7 +1247,7 @@
   }
 
   // src/app/core/inspector.js
-  function createInspectorMethods({ constants, utils }) {
+  function createInspectorMethods({ utils, getUI }) {
     return {
       inspectData(key, type) {
         const data = GM_getValue(key);
@@ -1166,102 +1257,11 @@
         if (type === "localStorage") content = data.localStorage;
         if (type === "sessionStorage") content = data.sessionStorage;
         if (!content) return;
-        const inspectorWindow = window.open("", "_blank");
-        if (!inspectorWindow) return;
-        utils.setHTML(
-          inspectorWindow.document.head,
-          `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(constants.ICONS.LOGO)}">`
-        );
-        const noDataHtml = "<p>No data to display.</p>";
-        const escapeHtml = (value) => {
-          if (value === null || value === void 0) return "";
-          return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-        };
-        const createTable = (headers, dataRows, rowClasses = [], options = {}) => {
-          const wrap = (cellContent, className = "") => `<div class="cell-content${className ? ` ${className}` : ""}">${cellContent}</div>`;
-          const extraClass = headers.length === 2 ? " kv-table" : "";
-          const columnWidths = options.columnWidths || headers.map(() => "");
-          const cellClasses = options.cellClasses || headers.map(() => "");
-          const colGroup = columnWidths.some(Boolean) ? `<colgroup>${columnWidths.map((width) => `<col${width ? ` style="width:${width}"` : ""}>`).join("")}</colgroup>` : "";
-          let table = `<div class="table-container${extraClass}"><table>`;
-          table += colGroup;
-          table += `<thead><tr>${headers.map((header) => `<th>${escapeHtml(header)}</th>`).join("")}</tr></thead>`;
-          table += "<tbody>";
-          table += dataRows.map((row, index) => {
-            const trClass = rowClasses[index] ? ` class="${rowClasses[index]}"` : "";
-            return `<tr${trClass}>${row.map((cell, cellIndex) => {
-              const cellValue = typeof cell === "object" && cell !== null ? cell.value : cell;
-              const cellClassName = [cellClasses[cellIndex], typeof cell === "object" && cell !== null ? cell.className : ""].filter(Boolean).join(" ");
-              return `<td>${wrap(escapeHtml(cellValue), cellClassName)}</td>`;
-            }).join("")}</tr>`;
-          }).join("");
-          table += "</tbody></table></div>";
-          return table;
-        };
-        let inspectorHtml;
-        if (type === "cookies") {
-          if (Array.isArray(content) && content.length > 0) {
-            const originalHeaders = Object.keys(content[0]);
-            const preferredOrder = ["name", "value", "expirationDate"];
-            const headers = [
-              ...preferredOrder,
-              ...originalHeaders.filter((header) => !preferredOrder.includes(header) && header !== "partitionKey")
-            ];
-            const rowClasses = content.map((cookie) => cookie.httpOnly ? "http-only" : "");
-            const dataRows = content.map(
-              (cookie) => headers.map((header) => {
-                const value = cookie[header];
-                if (value === void 0 || value === null) return "";
-                if (header === "expirationDate" && typeof value === "number") {
-                  return {
-                    value: new Date(value * 1e3).toLocaleString(),
-                    className: value * 1e3 < Date.now() ? "cell-expired" : ""
-                  };
-                }
-                return typeof value === "object" ? JSON.stringify(value) : value;
-              })
-            );
-            inspectorHtml = createTable(headers, dataRows, rowClasses, {
-              columnWidths: headers.map((header) => {
-                if (header === "name") return "180px";
-                if (header === "value") return "min(560px, 48vw)";
-                if (header === "expirationDate") return "180px";
-                return "140px";
-              }),
-              cellClasses: headers.map((header) => header === "value" || header === "domain" ? "cell-break" : "")
-            });
-          } else {
-            inspectorHtml = noDataHtml;
-          }
-        } else if (typeof content === "object" && Object.keys(content).length > 0) {
-          inspectorHtml = createTable(["Key", "Value"], Object.entries(content), [], {
-            columnWidths: ["260px", "auto"],
-            cellClasses: ["", "cell-break"]
-          });
-        } else {
-          inspectorHtml = noDataHtml;
-        }
-        inspectorWindow.document.title = "AnMe Inspector";
-        const style = inspectorWindow.document.createElement("style");
-        style.textContent = `
-        body { font-family: system-ui, -apple-system, sans-serif; padding: 20px; background: #f8f9fa; color: #212529; margin: 0; }
-        h3 { color: #212529; border-bottom: 1px solid #dee2e6; padding-bottom: 10px; margin-top: 0; }
-        .table-container { border: 1px solid #dee2e6; border-radius: 8px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); overflow: auto; max-height: 90vh; }
-        table { width: 100%; min-width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th, td { border: 1px solid #e9ecef; text-align: left; vertical-align: top; font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; font-size: 13px; padding: 0; }
-        .cell-content { display: block; width: 100%; min-width: 0; box-sizing: border-box; padding: 12px 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .cell-break { white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; text-overflow: clip; }
-        .cell-expired { color: #d92d20; font-weight: 600; }
-        th { background-color: #f1f3f5; font-weight: 600; position: sticky; top: 0; z-index: 10; text-align: center; padding: 12px 15px; white-space: nowrap; }
-        tr:nth-child(even) { background-color: #f8f9fa; }
-        tr.http-only { background-color: #e2e6ea; border-bottom: 1px solid #d6d8db; }
-        p { margin-top: 20px; }
-      `;
-        inspectorWindow.document.head.appendChild(style);
-        utils.setHTML(inspectorWindow.document.body, `
-        <h3>${utils.extractName(key)} - ${type}</h3>
-        ${inspectorHtml}
-      `);
+        getUI()?.showDataInspector({
+          title: `${utils.extractName(key)} - ${type}`,
+          type,
+          data: content
+        });
       }
     };
   }
@@ -1909,7 +1909,7 @@
       core,
       createAccountMethods({ constants, utils, getUI, getCore, shared }),
       createEnvironmentMethods({ getUI, shared }),
-      createInspectorMethods({ constants, utils }),
+      createInspectorMethods({ utils, getUI }),
       createBackupMethods({ constants, utils, getUI }),
       createWebDavMethods({ constants, utils, getUI, getCore })
     );
@@ -2065,6 +2065,7 @@
           state.fab = null;
           state.dialogMask = null;
           state.saveFormMask = null;
+          state.dataInspectorMask = null;
           state.toastEl = null;
           state.toastTimer = null;
           ui.init();
@@ -2477,6 +2478,141 @@
       ...syncState
     };
   }
+  var getCookieSelectionKey2 = (cookie) => [cookie?.name || "", cookie?.domain || "", cookie?.path || ""].join("");
+  var getStorageEntries = (storageData) => Object.entries(storageData || {}).map(([key, value]) => ({
+    key,
+    title: key,
+    value: value ?? "",
+    meta: ""
+  }));
+  var getCookieEntries = (cookies) => (Array.isArray(cookies) ? cookies : []).map((cookie) => {
+    return {
+      key: getCookieSelectionKey2(cookie),
+      title: cookie.name || "",
+      value: cookie.value ?? "",
+      cookie,
+      isExpired: typeof cookie.expirationDate === "number" && cookie.expirationDate * 1e3 < Date.now()
+    };
+  });
+  var getInspectorEntries = (type, data) => type === "cookies" ? getCookieEntries(data) : getStorageEntries(data);
+  var formatInspectorValue = (value) => {
+    if (value === void 0 || value === null) return "";
+    if (typeof value === "object") return JSON.stringify(value);
+    return String(value);
+  };
+  var getCookieCellValue = (cookie, column) => {
+    if (column === "expirationDate") {
+      return typeof cookie.expirationDate === "number" ? new Date(cookie.expirationDate * 1e3).toLocaleString() : "Session";
+    }
+    return formatInspectorValue(cookie[column]);
+  };
+  var getCookieColumns = (entries) => {
+    const preferredColumns = ["name", "value", "domain", "path", "expirationDate", "httpOnly", "secure", "sameSite"];
+    const actualColumns = /* @__PURE__ */ new Set();
+    entries.forEach((entry) => {
+      Object.keys(entry.cookie || {}).forEach((column) => {
+        if (column !== "partitionKey") {
+          actualColumns.add(column);
+        }
+      });
+    });
+    return [
+      ...preferredColumns.filter((column) => actualColumns.has(column)),
+      ...[...actualColumns].filter((column) => !preferredColumns.includes(column))
+    ];
+  };
+  var getCookieColumnWidth = (column) => {
+    if (column === "value") return 360;
+    if (column === "name") return 160;
+    if (column === "domain" || column === "path") return 140;
+    if (column === "expirationDate") return 150;
+    if (column === "httpOnly" || column === "secure") return 70;
+    if (column === "sameSite") return 96;
+    return 120;
+  };
+  var canScrollInDirection = (element, deltaX, deltaY) => {
+    const isHorizontal = Math.abs(deltaX) > Math.abs(deltaY);
+    if (isHorizontal) {
+      if (element.scrollWidth <= element.clientWidth + 1) return false;
+      return deltaX < 0 ? element.scrollLeft > 0 : element.scrollLeft + element.clientWidth < element.scrollWidth - 1;
+    }
+    if (element.scrollHeight <= element.clientHeight + 1) return false;
+    return deltaY < 0 ? element.scrollTop > 0 : element.scrollTop + element.clientHeight < element.scrollHeight - 1;
+  };
+  var canScrollInside = (target, boundary, deltaX, deltaY) => {
+    let element = target instanceof Element ? target : target?.parentElement;
+    while (element && element !== boundary) {
+      if (canScrollInDirection(element, deltaX, deltaY)) {
+        return true;
+      }
+      element = element.parentElement;
+    }
+    return false;
+  };
+  var containDataInspectorWheel = (event, boundary) => {
+    event.stopPropagation();
+    if (!canScrollInside(event.target, boundary, event.deltaX, event.deltaY)) {
+      event.preventDefault();
+    }
+  };
+  var setupCellInputSelectionAssist = (mask) => {
+    mask.__anmeCellInputSelectionCleanup?.();
+    let activeInput = null;
+    let pointerX = 0;
+    let animationFrame = null;
+    const cleanupFns = [];
+    const stop = () => {
+      activeInput = null;
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+        animationFrame = null;
+      }
+    };
+    const step = () => {
+      if (!activeInput) return;
+      const rect = activeInput.getBoundingClientRect();
+      const edgeSize = Math.min(32, Math.max(16, rect.width * 0.18));
+      let speed = 0;
+      if (pointerX < rect.left + edgeSize) {
+        speed = -Math.max(1, (rect.left + edgeSize - pointerX) / edgeSize * 14);
+      } else if (pointerX > rect.right - edgeSize) {
+        speed = Math.max(1, (pointerX - (rect.right - edgeSize)) / edgeSize * 14);
+      }
+      if (speed) {
+        activeInput.scrollLeft += speed;
+      }
+      animationFrame = requestAnimationFrame(step);
+    };
+    const addListener = (target, eventName, listener) => {
+      target.addEventListener(eventName, listener);
+      cleanupFns.push(() => target.removeEventListener(eventName, listener));
+    };
+    mask.querySelectorAll(".acc-cell-input").forEach((input) => {
+      addListener(input, "mousedown", (event) => {
+        if (event.button !== 0 || input.scrollWidth <= input.clientWidth + 1) return;
+        activeInput = input;
+        pointerX = event.clientX;
+        if (!animationFrame) {
+          animationFrame = requestAnimationFrame(step);
+        }
+      });
+    });
+    addListener(mask, "mousemove", (event) => {
+      if (!activeInput) return;
+      if ((event.buttons & 1) !== 1) {
+        stop();
+        return;
+      }
+      pointerX = event.clientX;
+    });
+    addListener(mask, "mouseup", stop);
+    addListener(mask, "mouseleave", stop);
+    mask.__anmeCellInputSelectionCleanup = () => {
+      stop();
+      cleanupFns.forEach((cleanup) => cleanup());
+      mask.__anmeCellInputSelectionCleanup = null;
+    };
+  };
   function syncSaveNoteFromMatchedAccount({
     name,
     currentNote,
@@ -2707,6 +2843,169 @@
           state.saveFormMask.style.display = "none";
         }
       },
+      ensureDataInspectorMask() {
+        if (state.dataInspectorMask) return state.dataInspectorMask;
+        state.dataInspectorMask = document.createElement("div");
+        state.dataInspectorMask.className = "acc-data-mask";
+        state.dataInspectorMask.addEventListener("click", (event) => event.stopPropagation());
+        state.dataInspectorMask.addEventListener(
+          "wheel",
+          (event) => containDataInspectorWheel(event, state.dataInspectorMask),
+          { passive: false }
+        );
+        state.uiRoot.appendChild(state.dataInspectorMask);
+        return state.dataInspectorMask;
+      },
+      hideDataInspector() {
+        if (state.dataInspectorMask) {
+          state.dataInspectorMask.style.display = "none";
+        }
+      },
+      showDataInspector({ title, type, data, selectable = false, selectedKeys = [] }) {
+        return new Promise((resolve) => {
+          const mask = ui.ensureDataInspectorMask();
+          const entries = getInspectorEntries(type, data);
+          const isCookieData = type === "cookies";
+          const cookieColumns = isCookieData ? getCookieColumns(entries) : [];
+          const cookieTableWidth = cookieColumns.reduce(
+            (width, column) => width + getCookieColumnWidth(column),
+            selectable ? 34 : 0
+          );
+          const storageTableWidth = selectable ? 674 : 640;
+          const selectedSet = new Set(selectedKeys);
+          const selectedCountText = () => `${mask.querySelectorAll(".acc-data-check:checked").length}/${entries.length}`;
+          const checkboxHtml = (entry, index) => selectable ? `<input type="checkbox" class="acc-custom-chk acc-data-check" data-index="${index}" ${selectedSet.has(entry.key) ? "checked" : ""}>` : "";
+          const selectAllHtml = selectable ? '<input type="checkbox" class="acc-custom-chk acc-data-check-all" checked>' : "";
+          const renderCookieTable = () => `
+          <div class="acc-cookie-table-wrap">
+            <table class="acc-cookie-table" style="min-width:${cookieTableWidth}px">
+              <colgroup>
+                ${selectable ? `<col class="acc-cookie-check-col" style="width:${34 / cookieTableWidth * 100}%">` : ""}
+                ${cookieColumns.map(
+            (column) => `<col class="${column === "value" ? "acc-cookie-value-col" : ""}" style="width:${getCookieColumnWidth(
+              column
+            ) / cookieTableWidth * 100}%">`
+          ).join("")}
+              </colgroup>
+              <thead>
+                <tr>
+                  ${selectable ? `<th class="acc-cookie-check-col">${selectAllHtml}</th>` : ""}
+                  ${cookieColumns.map((column) => `<th>${utils.escapeHtml(column)}</th>`).join("")}
+                </tr>
+              </thead>
+              <tbody>
+                ${entries.map(
+            (entry, index) => `
+                      <tr>
+                        ${selectable ? `<td class="acc-cookie-check-col">${checkboxHtml(entry, index)}</td>` : ""}
+                        ${cookieColumns.map(
+              (column) => `<td><input type="text" class="acc-cell-input" readonly value="${utils.escapeHtml(
+                getCookieCellValue(entry.cookie || {}, column)
+              )}"></td>`
+            ).join("")}
+                      </tr>
+                    `
+          ).join("")}
+              </tbody>
+            </table>
+          </div>
+        `;
+          const renderStorageList = () => `
+          <div class="acc-storage-table-wrap">
+            <table class="acc-storage-table" style="min-width:${storageTableWidth}px">
+              <colgroup>
+                ${selectable ? '<col class="acc-storage-check-col" style="width:5%">' : ""}
+                <col class="acc-storage-key-col" style="width:${selectable ? 31 : 34}%">
+                <col class="acc-storage-value-col" style="width:${selectable ? 64 : 66}%">
+              </colgroup>
+              <thead>
+                <tr>
+                  ${selectable ? `<th class="acc-storage-check-col">${selectAllHtml}</th>` : ""}
+                  <th>Key</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${entries.map(
+            (entry, index) => `
+                      <tr>
+                        ${selectable ? `<td class="acc-storage-check-col">${checkboxHtml(entry, index)}</td>` : ""}
+                        <td><input type="text" class="acc-cell-input" readonly value="${utils.escapeHtml(entry.title)}"></td>
+                        <td><input type="text" class="acc-cell-input" readonly value="${utils.escapeHtml(formatInspectorValue(entry.value))}"></td>
+                      </tr>
+                    `
+          ).join("")}
+              </tbody>
+            </table>
+          </div>
+        `;
+          utils.setHTML(mask, `
+          <div class="acc-data-box">
+            <div class="acc-data-header">
+              <div class="acc-data-title">${utils.escapeHtml(title || type)}</div>
+              <div class="acc-data-header-actions">
+                <button type="button" class="acc-toolbar-btn acc-data-window-btn acc-data-maximize" title="${utils.t("maximize_panel")}">
+                  <span class="acc-maximize-icon">${constants.ICONS.MAXIMIZE}</span>
+                  <span class="acc-restore-icon">${constants.ICONS.RESTORE}</span>
+                </button>
+                <button type="button" class="acc-dialog-btn acc-dialog-btn-ok acc-data-confirm">${utils.t("dlg_ok")}</button>
+                <button type="button" class="acc-toolbar-btn acc-data-close" title="${utils.t("dlg_cancel")}">${constants.ICONS.CLOSE}</button>
+              </div>
+            </div>
+            ${selectable ? `<div class="acc-data-toolbar">
+                    <span class="acc-data-count"></span>
+                  </div>` : ""}
+            <div class="acc-data-list">
+              ${entries.length ? isCookieData ? renderCookieTable() : renderStorageList() : `<div class="acc-data-empty">${utils.t("no_data")}</div>`}
+            </div>
+          </div>
+        `);
+          mask.style.display = "flex";
+          const updateCount = () => {
+            const count = mask.querySelector(".acc-data-count");
+            if (count) count.textContent = selectedCountText();
+            const checkedCount = mask.querySelectorAll(".acc-data-check:checked").length;
+            const checkAll = mask.querySelector(".acc-data-check-all");
+            if (checkAll) {
+              checkAll.checked = entries.length > 0 && checkedCount === entries.length;
+              checkAll.indeterminate = checkedCount > 0 && checkedCount < entries.length;
+            }
+          };
+          const close = (result) => {
+            mask.__anmeCellInputSelectionCleanup?.();
+            mask.style.display = "none";
+            resolve(result);
+          };
+          mask.querySelector(".acc-data-close").onclick = () => close(null);
+          mask.querySelector(".acc-data-confirm").onclick = () => {
+            close(
+              selectable ? [...mask.querySelectorAll(".acc-data-check:checked")].map((input) => entries[Number(input.dataset.index)]?.key).filter(Boolean) : true
+            );
+          };
+          mask.querySelectorAll(".acc-data-check").forEach((input) => input.addEventListener("change", updateCount));
+          mask.querySelector(".acc-data-check-all")?.addEventListener("change", (event) => {
+            mask.querySelectorAll(".acc-data-check").forEach((input) => {
+              input.checked = event.target.checked;
+            });
+            updateCount();
+          });
+          setupCellInputSelectionAssist(mask);
+          updateCount();
+          const dataBox = mask.querySelector(".acc-data-box");
+          const maximizeBtn = mask.querySelector(".acc-data-maximize");
+          const updateMaximizeState = () => {
+            const isMaximized = Boolean(dataBox?.classList.contains("is-maximized"));
+            maximizeBtn?.setAttribute("title", utils.t(isMaximized ? "restore_panel" : "maximize_panel"));
+            maximizeBtn?.setAttribute("aria-label", utils.t(isMaximized ? "restore_panel" : "maximize_panel"));
+            maximizeBtn?.setAttribute("aria-pressed", String(isMaximized));
+          };
+          maximizeBtn?.addEventListener("click", () => {
+            dataBox?.classList.toggle("is-maximized");
+            updateMaximizeState();
+          });
+          updateMaximizeState();
+        });
+      },
       async showFormModal({ title, contentHtml, submitText, onOpen }) {
         const mask = ui.ensureFormMask();
         utils.setHTML(mask, `
@@ -2748,11 +3047,22 @@
           submitText: utils.t("btn_save"),
           contentHtml: `
           <div class="acc-chk">
-            <label class="acc-chk-label" title="Cookie"><input type="checkbox" id="form-c-ck" class="acc-custom-chk" checked> Cookie</label>
-            <label class="acc-chk-label" title="LocalStorage"><input type="checkbox" id="form-c-ls" class="acc-custom-chk"> LS</label>
-            <label class="acc-chk-label" title="SessionStorage"><input type="checkbox" id="form-c-ss" class="acc-custom-chk"> SS</label>
-            <span class="acc-help-tip" title="${utils.t("tip_help")}">${constants.ICONS.HELP}</span>
-            <span class="acc-lock-tip" title="${utils.t("tip_lock")}">${constants.ICONS.LOCK}</span>
+            <span class="acc-source-row">
+              <label class="acc-chk-label" title="Cookie"><input type="checkbox" id="form-c-ck" class="acc-custom-chk" checked> Cookie</label>
+              <button type="button" class="acc-source-eye" data-type="cookies" title="${utils.t("inspect_items")}">${constants.ICONS.EYE}</button>
+            </span>
+            <span class="acc-source-row">
+              <label class="acc-chk-label" title="LocalStorage"><input type="checkbox" id="form-c-ls" class="acc-custom-chk"> LS</label>
+              <button type="button" class="acc-source-eye" data-type="localStorage" title="${utils.t("inspect_items")}">${constants.ICONS.EYE}</button>
+            </span>
+            <span class="acc-source-row">
+              <label class="acc-chk-label" title="SessionStorage"><input type="checkbox" id="form-c-ss" class="acc-custom-chk"> SS</label>
+              <button type="button" class="acc-source-eye" data-type="sessionStorage" title="${utils.t("inspect_items")}">${constants.ICONS.EYE}</button>
+            </span>
+            <span class="acc-source-tips">
+              <span class="acc-help-tip" title="${utils.t("tip_help")}">${constants.ICONS.HELP}</span>
+              <span class="acc-lock-tip" title="${utils.t("tip_lock")}">${constants.ICONS.LOCK}</span>
+            </span>
           </div>
           <div class="acc-form-label">${utils.t("site_name")}<span class="acc-required">*</span></div>
           <input type="text" id="form-site-name" class="acc-input-text" placeholder="${utils.t("placeholder_site_name")}" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false">
@@ -2766,6 +3076,17 @@
             const siteNameInput = qs("#form-site-name");
             const noteInput = qs("#form-acc-note");
             let saveNoteSyncState = createSaveNoteSyncState();
+            const snapshotSources = await core.getCurrentSnapshotSources();
+            const selectedSourceKeys = {
+              cookies: new Set(getCookieEntries(snapshotSources.cookies).map((entry) => entry.key)),
+              localStorage: new Set(Object.keys(snapshotSources.localStorage)),
+              sessionStorage: new Set(Object.keys(snapshotSources.sessionStorage))
+            };
+            const typeToCheckbox = {
+              cookies: "#form-c-ck",
+              localStorage: "#form-c-ls",
+              sessionStorage: "#form-c-ss"
+            };
             siteNameInput.value = utils.suggestSiteName(utils.getPageTitle(), constants.HOST);
             nameInput.value = utils.suggestAccountName(constants.HOST);
             const syncExistingAccountNote = () => {
@@ -2789,10 +3110,19 @@
             const toggleAvailability = (selector, available) => {
               const input = qs(selector);
               const label = input?.closest(".acc-chk-label");
+              const eyeButton = input?.closest(".acc-source-row")?.querySelector(".acc-source-eye");
               if (!input || !label) return;
               input.disabled = !available;
               input.checked = available && input.id === "form-c-ck";
               label.classList.toggle("disabled", !available);
+              if (eyeButton) {
+                eyeButton.disabled = !available;
+              }
+            };
+            const getSelectedKeys = (type) => [...selectedSourceKeys[type] || /* @__PURE__ */ new Set()];
+            const resetSelectionIfEmpty = (type) => {
+              if (selectedSourceKeys[type]?.size > 0) return;
+              selectedSourceKeys[type] = new Set(getInspectorEntries(type, snapshotSources[type]).map((entry) => entry.key));
             };
             const updateState = () => {
               const ck = qs("#form-c-ck")?.checked;
@@ -2801,8 +3131,36 @@
               const canSave = (ck || ls || ss) && nameInput.value.trim().length > 0 && siteNameInput.value.trim().length > 0;
               submitBtn.disabled = !canSave;
             };
-            ["#form-c-ck", "#form-c-ls", "#form-c-ss"].forEach((selector) => {
-              qs(selector)?.addEventListener("change", updateState);
+            Object.entries(typeToCheckbox).forEach(([type, selector]) => {
+              qs(selector)?.addEventListener("change", (event) => {
+                if (event.target.checked) {
+                  resetSelectionIfEmpty(type);
+                }
+                updateState();
+              });
+            });
+            const openSourceSelector = async (type) => {
+              const selectedKeys = await ui.showDataInspector({
+                title: type,
+                type,
+                data: snapshotSources[type],
+                selectable: true,
+                selectedKeys: getSelectedKeys(type)
+              });
+              if (!selectedKeys) return;
+              selectedSourceKeys[type] = new Set(selectedKeys);
+              const input = qs(typeToCheckbox[type]);
+              if (input) {
+                input.checked = selectedKeys.length > 0;
+              }
+              updateState();
+            };
+            qs(".acc-chk")?.querySelectorAll(".acc-source-eye").forEach((button) => {
+              button.addEventListener("click", (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                openSourceSelector(button.dataset.type);
+              });
             });
             siteNameInput.addEventListener("input", updateState);
             nameInput.addEventListener("input", () => {
@@ -2836,6 +3194,9 @@
                 ck: qs("#form-c-ck").checked,
                 ls: qs("#form-c-ls").checked,
                 ss: qs("#form-c-ss").checked,
+                cookieKeys: getSelectedKeys("cookies"),
+                localStorageKeys: getSelectedKeys("localStorage"),
+                sessionStorageKeys: getSelectedKeys("sessionStorage"),
                 note: noteInput.value
               });
               if (!saved) return;
@@ -2843,7 +3204,11 @@
               ui.refresh();
               ui.showToast(utils.t("toast_saved"));
             };
-            const availableSources = await core.detectAvailableSnapshotSources();
+            const availableSources = {
+              ck: snapshotSources.cookies.length > 0,
+              ls: Object.keys(snapshotSources.localStorage).length > 0,
+              ss: Object.keys(snapshotSources.sessionStorage).length > 0
+            };
             toggleAvailability("#form-c-ck", availableSources.ck);
             toggleAvailability("#form-c-ls", availableSources.ls);
             toggleAvailability("#form-c-ss", availableSources.ss);
@@ -3205,6 +3570,7 @@
       },
       closePanel() {
         ui.hideNoteTooltip?.();
+        ui.hideDataInspector?.();
         if (state.panel) state.panel.classList.remove("show");
         state.isForcedShow = false;
         ui.refresh();
@@ -3802,17 +4168,15 @@
       if (!state.panel || !state.panel.classList.contains("show")) return;
       const path = event.composedPath();
       const isNode = (value) => value instanceof Node;
+      const isInside = (target) => Boolean(target) && (path.includes(target) || path.some((node) => isNode(node) && typeof target.contains === "function" && target.contains(node)));
       const isTooltipVisible = Boolean(state.noteTooltipEl?.classList.contains("show"));
-      const isInsideNoteTooltip = Boolean(state.noteTooltipEl) && (path.includes(state.noteTooltipEl) || path.some(
-        (node) => isNode(node) && typeof state.noteTooltipEl?.contains === "function" && state.noteTooltipEl.contains(node)
-      ));
-      const isInsideTooltipTrigger = Boolean(state.noteTooltipTarget) && (path.includes(state.noteTooltipTarget) || path.some(
-        (node) => isNode(node) && typeof state.noteTooltipTarget?.contains === "function" && state.noteTooltipTarget.contains(node)
-      ));
-      if (isTooltipVisible && !isInsideNoteTooltip && !isInsideTooltipTrigger && !path.includes(state.dialogMask)) {
+      const isInsideNoteTooltip = Boolean(state.noteTooltipEl) && isInside(state.noteTooltipEl);
+      const isInsideTooltipTrigger = Boolean(state.noteTooltipTarget) && isInside(state.noteTooltipTarget);
+      const isInsideDataInspector = isInside(state.dataInspectorMask);
+      if (isTooltipVisible && !isInsideNoteTooltip && !isInsideTooltipTrigger && !path.includes(state.dialogMask) && !isInsideDataInspector) {
         ui.hideNoteTooltip();
       }
-      if (!path.includes(state.panel) && !path.includes(state.fab) && !path.includes(state.dialogMask) && !isInsideNoteTooltip) {
+      if (!path.includes(state.panel) && !path.includes(state.fab) && !path.includes(state.dialogMask) && !isInsideDataInspector && !isInsideNoteTooltip) {
         ui.closePanel();
       }
     });

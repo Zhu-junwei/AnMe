@@ -1,26 +1,51 @@
+const getCookieSelectionKey = (cookie) =>
+  [cookie?.name || '', cookie?.domain || '', cookie?.path || ''].join('\u0001');
+
 export function createAccountMethods({ constants, utils, getUI, getCore, shared }) {
   return {
-    async detectAvailableSnapshotSources() {
+    async getCurrentSnapshotSources() {
       const cookies = await shared.listCookies();
       return {
-        ck: Array.isArray(cookies) && cookies.length > 0,
-        ls: Object.keys(localStorage || {}).length > 0,
-        ss: Object.keys(sessionStorage || {}).length > 0
+        cookies: Array.isArray(cookies) ? cookies : [],
+        localStorage: { ...localStorage },
+        sessionStorage: { ...sessionStorage }
+      };
+    },
+    async detectAvailableSnapshotSources() {
+      const snapshotSources = await this.getCurrentSnapshotSources();
+      return {
+        ck: snapshotSources.cookies.length > 0,
+        ls: Object.keys(snapshotSources.localStorage).length > 0,
+        ss: Object.keys(snapshotSources.sessionStorage).length > 0
       };
     },
     async saveAccount(name, siteName, options = { ck: true, ls: false, ss: false, note: '' }) {
       const ui = getUI();
+      const localStorageKeys = Array.isArray(options.localStorageKeys) ? new Set(options.localStorageKeys) : null;
+      const sessionStorageKeys = Array.isArray(options.sessionStorageKeys) ? new Set(options.sessionStorageKeys) : null;
       const snapshot = {
         time: Date.now(),
         siteName: utils.normalizeSiteName(siteName),
         note: utils.normalizeNoteText(options.note),
-        localStorage: options.ls ? { ...localStorage } : {},
-        sessionStorage: options.ss ? { ...sessionStorage } : {},
+        localStorage: options.ls
+          ? Object.fromEntries(
+              Object.entries(localStorage).filter(([storageKey]) => !localStorageKeys || localStorageKeys.has(storageKey))
+            )
+          : {},
+        sessionStorage: options.ss
+          ? Object.fromEntries(
+              Object.entries(sessionStorage).filter(([storageKey]) => !sessionStorageKeys || sessionStorageKeys.has(storageKey))
+            )
+          : {},
         cookies: []
       };
 
       if (options.ck) {
-        snapshot.cookies = await shared.listCookies();
+        const cookieKeys = Array.isArray(options.cookieKeys) ? new Set(options.cookieKeys) : null;
+        const cookies = await shared.listCookies();
+        snapshot.cookies = cookieKeys
+          ? (cookies || []).filter((cookie) => cookieKeys.has(getCookieSelectionKey(cookie)))
+          : cookies;
       }
 
       const hasCookies = snapshot.cookies && snapshot.cookies.length > 0;

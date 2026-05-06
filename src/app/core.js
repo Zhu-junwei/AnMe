@@ -250,7 +250,7 @@ export function createCore({ state, constants, utils }) {
     core,
     createAccountMethods({ constants, utils, getUI, getCore, shared }),
     createEnvironmentMethods({ getUI, shared }),
-    createInspectorMethods({ constants, utils }),
+    createInspectorMethods({ utils, getUI }),
     createBackupMethods({ constants, utils, getUI }),
     createWebDavMethods({ constants, utils, getUI, getCore })
   );

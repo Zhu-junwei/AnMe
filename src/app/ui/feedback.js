@@ -7,6 +7,172 @@ function createSaveNoteSyncState(syncState = {}) {
   };
 }
 
+const getCookieSelectionKey = (cookie) =>
+  [cookie?.name || '', cookie?.domain || '', cookie?.path || ''].join('\u0001');
+
+const getStorageEntries = (storageData) =>
+  Object.entries(storageData || {}).map(([key, value]) => ({
+    key,
+    title: key,
+    value: value ?? '',
+    meta: ''
+  }));
+
+const getCookieEntries = (cookies) =>
+  (Array.isArray(cookies) ? cookies : []).map((cookie) => {
+    return {
+      key: getCookieSelectionKey(cookie),
+      title: cookie.name || '',
+      value: cookie.value ?? '',
+      cookie,
+      isExpired: typeof cookie.expirationDate === 'number' && cookie.expirationDate * 1000 < Date.now()
+    };
+  });
+
+const getInspectorEntries = (type, data) => (type === 'cookies' ? getCookieEntries(data) : getStorageEntries(data));
+
+const formatInspectorValue = (value) => {
+  if (value === undefined || value === null) return '';
+  if (typeof value === 'object') return JSON.stringify(value);
+  return String(value);
+};
+
+const getCookieCellValue = (cookie, column) => {
+  if (column === 'expirationDate') {
+    return typeof cookie.expirationDate === 'number'
+      ? new Date(cookie.expirationDate * 1000).toLocaleString()
+      : 'Session';
+  }
+  return formatInspectorValue(cookie[column]);
+};
+
+const getCookieColumns = (entries) => {
+  const preferredColumns = ['name', 'value', 'domain', 'path', 'expirationDate', 'httpOnly', 'secure', 'sameSite'];
+  const actualColumns = new Set();
+  entries.forEach((entry) => {
+    Object.keys(entry.cookie || {}).forEach((column) => {
+      if (column !== 'partitionKey') {
+        actualColumns.add(column);
+      }
+    });
+  });
+  return [
+    ...preferredColumns.filter((column) => actualColumns.has(column)),
+    ...[...actualColumns].filter((column) => !preferredColumns.includes(column))
+  ];
+};
+
+const getCookieColumnWidth = (column) => {
+  if (column === 'value') return 360;
+  if (column === 'name') return 160;
+  if (column === 'domain' || column === 'path') return 140;
+  if (column === 'expirationDate') return 150;
+  if (column === 'httpOnly' || column === 'secure') return 70;
+  if (column === 'sameSite') return 96;
+  return 120;
+};
+
+const canScrollInDirection = (element, deltaX, deltaY) => {
+  const isHorizontal = Math.abs(deltaX) > Math.abs(deltaY);
+  if (isHorizontal) {
+    if (element.scrollWidth <= element.clientWidth + 1) return false;
+    return deltaX < 0
+      ? element.scrollLeft > 0
+      : element.scrollLeft + element.clientWidth < element.scrollWidth - 1;
+  }
+
+  if (element.scrollHeight <= element.clientHeight + 1) return false;
+  return deltaY < 0
+    ? element.scrollTop > 0
+    : element.scrollTop + element.clientHeight < element.scrollHeight - 1;
+};
+
+const canScrollInside = (target, boundary, deltaX, deltaY) => {
+  let element = target instanceof Element ? target : target?.parentElement;
+  while (element && element !== boundary) {
+    if (canScrollInDirection(element, deltaX, deltaY)) {
+      return true;
+    }
+    element = element.parentElement;
+  }
+  return false;
+};
+
+const containDataInspectorWheel = (event, boundary) => {
+  event.stopPropagation();
+  if (!canScrollInside(event.target, boundary, event.deltaX, event.deltaY)) {
+    event.preventDefault();
+  }
+};
+
+const setupCellInputSelectionAssist = (mask) => {
+  mask.__anmeCellInputSelectionCleanup?.();
+
+  let activeInput = null;
+  let pointerX = 0;
+  let animationFrame = null;
+  const cleanupFns = [];
+
+  const stop = () => {
+    activeInput = null;
+    if (animationFrame) {
+      cancelAnimationFrame(animationFrame);
+      animationFrame = null;
+    }
+  };
+
+  const step = () => {
+    if (!activeInput) return;
+
+    const rect = activeInput.getBoundingClientRect();
+    const edgeSize = Math.min(32, Math.max(16, rect.width * 0.18));
+    let speed = 0;
+    if (pointerX < rect.left + edgeSize) {
+      speed = -Math.max(1, ((rect.left + edgeSize - pointerX) / edgeSize) * 14);
+    } else if (pointerX > rect.right - edgeSize) {
+      speed = Math.max(1, ((pointerX - (rect.right - edgeSize)) / edgeSize) * 14);
+    }
+
+    if (speed) {
+      activeInput.scrollLeft += speed;
+    }
+    animationFrame = requestAnimationFrame(step);
+  };
+
+  const addListener = (target, eventName, listener) => {
+    target.addEventListener(eventName, listener);
+    cleanupFns.push(() => target.removeEventListener(eventName, listener));
+  };
+
+  mask.querySelectorAll('.acc-cell-input').forEach((input) => {
+    addListener(input, 'mousedown', (event) => {
+      if (event.button !== 0 || input.scrollWidth <= input.clientWidth + 1) return;
+      activeInput = input;
+      pointerX = event.clientX;
+      if (!animationFrame) {
+        animationFrame = requestAnimationFrame(step);
+      }
+    });
+  });
+
+  addListener(mask, 'mousemove', (event) => {
+    if (!activeInput) return;
+    if ((event.buttons & 1) !== 1) {
+      stop();
+      return;
+    }
+    pointerX = event.clientX;
+  });
+  addListener(mask, 'mouseup', stop);
+  addListener(mask, 'mouseleave', stop);
+
+  mask.__anmeCellInputSelectionCleanup = () => {
+    stop();
+    cleanupFns.forEach((cleanup) => cleanup());
+    mask.__anmeCellInputSelectionCleanup = null;
+  };
+};
+
 export function syncSaveNoteFromMatchedAccount({
   name,
   currentNote,
@@ -261,6 +427,202 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
         state.saveFormMask.style.display = 'none';
       }
     },
+    ensureDataInspectorMask() {
+      if (state.dataInspectorMask) return state.dataInspectorMask;
+      state.dataInspectorMask = document.createElement('div');
+      state.dataInspectorMask.className = 'acc-data-mask';
+      state.dataInspectorMask.addEventListener('click', (event) => event.stopPropagation());
+      state.dataInspectorMask.addEventListener(
+        'wheel',
+        (event) => containDataInspectorWheel(event, state.dataInspectorMask),
+        { passive: false }
+      );
+      state.uiRoot.appendChild(state.dataInspectorMask);
+      return state.dataInspectorMask;
+    },
+    hideDataInspector() {
+      if (state.dataInspectorMask) {
+        state.dataInspectorMask.style.display = 'none';
+      }
+    },
+    showDataInspector({ title, type, data, selectable = false, selectedKeys = [] }) {
+      return new Promise((resolve) => {
+        const mask = ui.ensureDataInspectorMask();
+        const entries = getInspectorEntries(type, data);
+        const isCookieData = type === 'cookies';
+        const cookieColumns = isCookieData ? getCookieColumns(entries) : [];
+        const cookieTableWidth = cookieColumns.reduce(
+          (width, column) => width + getCookieColumnWidth(column),
+          selectable ? 34 : 0
+        );
+        const storageTableWidth = selectable ? 674 : 640;
+        const selectedSet = new Set(selectedKeys);
+        const selectedCountText = () => `${mask.querySelectorAll('.acc-data-check:checked').length}/${entries.length}`;
+        const checkboxHtml = (entry, index) =>
+          selectable
+            ? `<input type="checkbox" class="acc-custom-chk acc-data-check" data-index="${index}" ${selectedSet.has(entry.key) ? 'checked' : ''}>`
+            : '';
+        const selectAllHtml = selectable
+          ? '<input type="checkbox" class="acc-custom-chk acc-data-check-all" checked>'
+          : '';
+        const renderCookieTable = () => `
+          <div class="acc-cookie-table-wrap">
+            <table class="acc-cookie-table" style="min-width:${cookieTableWidth}px">
+              <colgroup>
+                ${selectable ? `<col class="acc-cookie-check-col" style="width:${(34 / cookieTableWidth) * 100}%">` : ''}
+                ${cookieColumns
+                  .map(
+                    (column) =>
+                      `<col class="${column === 'value' ? 'acc-cookie-value-col' : ''}" style="width:${(getCookieColumnWidth(
+                        column
+                      ) /
+                        cookieTableWidth) *
+                        100}%">`
+                  )
+                  .join('')}
+              </colgroup>
+              <thead>
+                <tr>
+                  ${selectable ? `<th class="acc-cookie-check-col">${selectAllHtml}</th>` : ''}
+                  ${cookieColumns.map((column) => `<th>${utils.escapeHtml(column)}</th>`).join('')}
+                </tr>
+              </thead>
+              <tbody>
+                ${entries
+                  .map(
+                    (entry, index) => `
+                      <tr>
+                        ${selectable ? `<td class="acc-cookie-check-col">${checkboxHtml(entry, index)}</td>` : ''}
+                        ${cookieColumns
+                          .map(
+                            (column) =>
+                              `<td><input type="text" class="acc-cell-input" readonly value="${utils.escapeHtml(
+                                getCookieCellValue(entry.cookie || {}, column)
+                              )}"></td>`
+                          )
+                          .join('')}
+                      </tr>
+                    `
+                  )
+                  .join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+        const renderStorageList = () => `
+          <div class="acc-storage-table-wrap">
+            <table class="acc-storage-table" style="min-width:${storageTableWidth}px">
+              <colgroup>
+                ${selectable ? '<col class="acc-storage-check-col" style="width:5%">' : ''}
+                <col class="acc-storage-key-col" style="width:${selectable ? 31 : 34}%">
+                <col class="acc-storage-value-col" style="width:${selectable ? 64 : 66}%">
+              </colgroup>
+              <thead>
+                <tr>
+                  ${selectable ? `<th class="acc-storage-check-col">${selectAllHtml}</th>` : ''}
+                  <th>Key</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${entries
+                  .map(
+                    (entry, index) => `
+                      <tr>
+                        ${selectable ? `<td class="acc-storage-check-col">${checkboxHtml(entry, index)}</td>` : ''}
+                        <td><input type="text" class="acc-cell-input" readonly value="${utils.escapeHtml(entry.title)}"></td>
+                        <td><input type="text" class="acc-cell-input" readonly value="${utils.escapeHtml(formatInspectorValue(entry.value))}"></td>
+                      </tr>
+                    `
+                  )
+                  .join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+
+        utils.setHTML(mask, `
+          <div class="acc-data-box">
+            <div class="acc-data-header">
+              <div class="acc-data-title">${utils.escapeHtml(title || type)}</div>
+              <div class="acc-data-header-actions">
+                <button type="button" class="acc-toolbar-btn acc-data-window-btn acc-data-maximize" title="${utils.t('maximize_panel')}">
+                  <span class="acc-maximize-icon">${constants.ICONS.MAXIMIZE}</span>
+                  <span class="acc-restore-icon">${constants.ICONS.RESTORE}</span>
+                </button>
+                <button type="button" class="acc-dialog-btn acc-dialog-btn-ok acc-data-confirm">${utils.t('dlg_ok')}</button>
+                <button type="button" class="acc-toolbar-btn acc-data-close" title="${utils.t('dlg_cancel')}">${constants.ICONS.CLOSE}</button>
+              </div>
+            </div>
+            ${
+              selectable
+                ? `<div class="acc-data-toolbar">
+                    <span class="acc-data-count"></span>
+                  </div>`
+                : ''
+            }
+            <div class="acc-data-list">
+              ${
+                entries.length
+                  ? isCookieData
+                    ? renderCookieTable()
+                    : renderStorageList()
+                  : `<div class="acc-data-empty">${utils.t('no_data')}</div>`
+              }
+            </div>
+          </div>
+        `);
+        mask.style.display = 'flex';
+
+        const updateCount = () => {
+          const count = mask.querySelector('.acc-data-count');
+          if (count) count.textContent = selectedCountText();
+          const checkedCount = mask.querySelectorAll('.acc-data-check:checked').length;
+          const checkAll = mask.querySelector('.acc-data-check-all');
+          if (checkAll) {
+            checkAll.checked = entries.length > 0 && checkedCount === entries.length;
+            checkAll.indeterminate = checkedCount > 0 && checkedCount < entries.length;
+          }
+        };
+        const close = (result) => {
+          mask.__anmeCellInputSelectionCleanup?.();
+          mask.style.display = 'none';
+          resolve(result);
+        };
+
+        mask.querySelector('.acc-data-close').onclick = () => close(null);
+        mask.querySelector('.acc-data-confirm').onclick = () => {
+          close(
+            selectable
+              ? [...mask.querySelectorAll('.acc-data-check:checked')].map((input) => entries[Number(input.dataset.index)]?.key).filter(Boolean)
+              : true
+          );
+        };
+        mask.querySelectorAll('.acc-data-check').forEach((input) => input.addEventListener('change', updateCount));
+        mask.querySelector('.acc-data-check-all')?.addEventListener('change', (event) => {
+          mask.querySelectorAll('.acc-data-check').forEach((input) => {
+            input.checked = event.target.checked;
+          });
+          updateCount();
+        });
+        setupCellInputSelectionAssist(mask);
+        updateCount();
+
+        const dataBox = mask.querySelector('.acc-data-box');
+        const maximizeBtn = mask.querySelector('.acc-data-maximize');
+        const updateMaximizeState = () => {
+          const isMaximized = Boolean(dataBox?.classList.contains('is-maximized'));
+          maximizeBtn?.setAttribute('title', utils.t(isMaximized ? 'restore_panel' : 'maximize_panel'));
+          maximizeBtn?.setAttribute('aria-label', utils.t(isMaximized ? 'restore_panel' : 'maximize_panel'));
+          maximizeBtn?.setAttribute('aria-pressed', String(isMaximized));
+        };
+        maximizeBtn?.addEventListener('click', () => {
+          dataBox?.classList.toggle('is-maximized');
+          updateMaximizeState();
+        });
+        updateMaximizeState();
+      });
+    },
     async showFormModal({ title, contentHtml, submitText, onOpen }) {
       const mask = ui.ensureFormMask();
       utils.setHTML(mask, `
@@ -306,11 +668,22 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
         submitText: utils.t('btn_save'),
         contentHtml: `
           <div class="acc-chk">
-            <label class="acc-chk-label" title="Cookie"><input type="checkbox" id="form-c-ck" class="acc-custom-chk" checked> Cookie</label>
-            <label class="acc-chk-label" title="LocalStorage"><input type="checkbox" id="form-c-ls" class="acc-custom-chk"> LS</label>
-            <label class="acc-chk-label" title="SessionStorage"><input type="checkbox" id="form-c-ss" class="acc-custom-chk"> SS</label>
-            <span class="acc-help-tip" title="${utils.t('tip_help')}">${constants.ICONS.HELP}</span>
-            <span class="acc-lock-tip" title="${utils.t('tip_lock')}">${constants.ICONS.LOCK}</span>
+            <span class="acc-source-row">
+              <label class="acc-chk-label" title="Cookie"><input type="checkbox" id="form-c-ck" class="acc-custom-chk" checked> Cookie</label>
+              <button type="button" class="acc-source-eye" data-type="cookies" title="${utils.t('inspect_items')}">${constants.ICONS.EYE}</button>
+            </span>
+            <span class="acc-source-row">
+              <label class="acc-chk-label" title="LocalStorage"><input type="checkbox" id="form-c-ls" class="acc-custom-chk"> LS</label>
+              <button type="button" class="acc-source-eye" data-type="localStorage" title="${utils.t('inspect_items')}">${constants.ICONS.EYE}</button>
+            </span>
+            <span class="acc-source-row">
+              <label class="acc-chk-label" title="SessionStorage"><input type="checkbox" id="form-c-ss" class="acc-custom-chk"> SS</label>
+              <button type="button" class="acc-source-eye" data-type="sessionStorage" title="${utils.t('inspect_items')}">${constants.ICONS.EYE}</button>
+            </span>
+            <span class="acc-source-tips">
+              <span class="acc-help-tip" title="${utils.t('tip_help')}">${constants.ICONS.HELP}</span>
+              <span class="acc-lock-tip" title="${utils.t('tip_lock')}">${constants.ICONS.LOCK}</span>
+            </span>
           </div>
           <div class="acc-form-label">${utils.t('site_name')}<span class="acc-required">*</span></div>
           <input type="text" id="form-site-name" class="acc-input-text" placeholder="${utils.t('placeholder_site_name')}" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false">
@@ -324,6 +697,17 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
           const siteNameInput = qs('#form-site-name');
           const noteInput = qs('#form-acc-note');
           let saveNoteSyncState = createSaveNoteSyncState();
+          const snapshotSources = await core.getCurrentSnapshotSources();
+          const selectedSourceKeys = {
+            cookies: new Set(getCookieEntries(snapshotSources.cookies).map((entry) => entry.key)),
+            localStorage: new Set(Object.keys(snapshotSources.localStorage)),
+            sessionStorage: new Set(Object.keys(snapshotSources.sessionStorage))
+          };
+          const typeToCheckbox = {
+            cookies: '#form-c-ck',
+            localStorage: '#form-c-ls',
+            sessionStorage: '#form-c-ss'
+          };
           siteNameInput.value = utils.suggestSiteName(utils.getPageTitle(), constants.HOST);
           nameInput.value = utils.suggestAccountName(constants.HOST);
 
@@ -349,11 +733,22 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
           const toggleAvailability = (selector, available) => {
             const input = qs(selector);
             const label = input?.closest('.acc-chk-label');
+            const eyeButton = input?.closest('.acc-source-row')?.querySelector('.acc-source-eye');
             if (!input || !label) return;
 
             input.disabled = !available;
             input.checked = available && input.id === 'form-c-ck';
             label.classList.toggle('disabled', !available);
+            if (eyeButton) {
+              eyeButton.disabled = !available;
+            }
+          };
+
+          const getSelectedKeys = (type) => [...(selectedSourceKeys[type] || new Set())];
+
+          const resetSelectionIfEmpty = (type) => {
+            if (selectedSourceKeys[type]?.size > 0) return;
+            selectedSourceKeys[type] = new Set(getInspectorEntries(type, snapshotSources[type]).map((entry) => entry.key));
           };
 
           const updateState = () => {
@@ -365,8 +760,39 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
             submitBtn.disabled = !canSave;
           };
 
-          ['#form-c-ck', '#form-c-ls', '#form-c-ss'].forEach((selector) => {
-            qs(selector)?.addEventListener('change', updateState);
+          Object.entries(typeToCheckbox).forEach(([type, selector]) => {
+            qs(selector)?.addEventListener('change', (event) => {
+              if (event.target.checked) {
+                resetSelectionIfEmpty(type);
+              }
+              updateState();
+            });
+          });
+
+          const openSourceSelector = async (type) => {
+            const selectedKeys = await ui.showDataInspector({
+              title: type,
+              type,
+              data: snapshotSources[type],
+              selectable: true,
+              selectedKeys: getSelectedKeys(type)
+            });
+            if (!selectedKeys) return;
+
+            selectedSourceKeys[type] = new Set(selectedKeys);
+            const input = qs(typeToCheckbox[type]);
+            if (input) {
+              input.checked = selectedKeys.length > 0;
+            }
+            updateState();
+          };
+
+          qs('.acc-chk')?.querySelectorAll('.acc-source-eye').forEach((button) => {
+            button.addEventListener('click', (event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              openSourceSelector(button.dataset.type);
+            });
           });
 
           siteNameInput.addEventListener('input', updateState);
@@ -404,6 +830,9 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
               ck: qs('#form-c-ck').checked,
               ls: qs('#form-c-ls').checked,
               ss: qs('#form-c-ss').checked,
+              cookieKeys: getSelectedKeys('cookies'),
+              localStorageKeys: getSelectedKeys('localStorage'),
+              sessionStorageKeys: getSelectedKeys('sessionStorage'),
               note: noteInput.value
             });
             if (!saved) return;
@@ -413,7 +842,11 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
             ui.showToast(utils.t('toast_saved'));
           };
 
-          const availableSources = await core.detectAvailableSnapshotSources();
+          const availableSources = {
+            ck: snapshotSources.cookies.length > 0,
+            ls: Object.keys(snapshotSources.localStorage).length > 0,
+            ss: Object.keys(snapshotSources.sessionStorage).length > 0
+          };
           toggleAvailability('#form-c-ck', availableSources.ck);
           toggleAvailability('#form-c-ls', availableSources.ls);
           toggleAvailability('#form-c-ss', availableSources.ss);
