@@ -1,6 +1,18 @@
 const getCookieSelectionKey = (cookie) =>
   [cookie?.name || '', cookie?.domain || '', cookie?.path || ''].join('\u0001');
 
+const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object || {}, key);
+
+const createStorageSnapshot = (storage, selectedKeys, valueOverrides) =>
+  Object.fromEntries(
+    Object.entries(storage)
+      .filter(([storageKey]) => !selectedKeys || selectedKeys.has(storageKey))
+      .map(([storageKey, value]) => [
+        storageKey,
+        hasOwn(valueOverrides, storageKey) ? String(valueOverrides[storageKey] ?? '') : value
+      ])
+  );
+
 export function createAccountMethods({ constants, utils, getUI, getCore, shared }) {
   return {
     async getCurrentSnapshotSources() {
@@ -23,29 +35,42 @@ export function createAccountMethods({ constants, utils, getUI, getCore, shared 
       const ui = getUI();
       const localStorageKeys = Array.isArray(options.localStorageKeys) ? new Set(options.localStorageKeys) : null;
       const sessionStorageKeys = Array.isArray(options.sessionStorageKeys) ? new Set(options.sessionStorageKeys) : null;
+      const localStorageValues = options.localStorageValues || {};
+      const sessionStorageValues = options.sessionStorageValues || {};
+      const hasLocalStorageRows = Array.isArray(options.localStorageRows);
+      const hasSessionStorageRows = Array.isArray(options.sessionStorageRows);
       const snapshot = {
         time: Date.now(),
         siteName: utils.normalizeSiteName(siteName),
         note: utils.normalizeNoteText(options.note),
         localStorage: options.ls
-          ? Object.fromEntries(
-              Object.entries(localStorage).filter(([storageKey]) => !localStorageKeys || localStorageKeys.has(storageKey))
-            )
+          ? hasLocalStorageRows
+            ? Object.fromEntries(options.localStorageRows)
+            : createStorageSnapshot(localStorage, localStorageKeys, localStorageValues)
           : {},
         sessionStorage: options.ss
-          ? Object.fromEntries(
-              Object.entries(sessionStorage).filter(([storageKey]) => !sessionStorageKeys || sessionStorageKeys.has(storageKey))
-            )
+          ? hasSessionStorageRows
+            ? Object.fromEntries(options.sessionStorageRows)
+            : createStorageSnapshot(sessionStorage, sessionStorageKeys, sessionStorageValues)
           : {},
         cookies: []
       };
 
       if (options.ck) {
         const cookieKeys = Array.isArray(options.cookieKeys) ? new Set(options.cookieKeys) : null;
-        const cookies = await shared.listCookies();
-        snapshot.cookies = cookieKeys
-          ? (cookies || []).filter((cookie) => cookieKeys.has(getCookieSelectionKey(cookie)))
-          : cookies;
+        const cookieValues = options.cookieValues || {};
+        if (Array.isArray(options.cookieRows)) {
+          snapshot.cookies = options.cookieRows;
+        } else {
+          const cookies = await shared.listCookies();
+          snapshot.cookies = (cookieKeys
+            ? (cookies || []).filter((cookie) => cookieKeys.has(getCookieSelectionKey(cookie)))
+            : cookies || []
+          ).map((cookie) => {
+            const key = getCookieSelectionKey(cookie);
+            return hasOwn(cookieValues, key) ? { ...cookie, value: String(cookieValues[key] ?? '') } : cookie;
+          });
+        }
       }
 
       const hasCookies = snapshot.cookies && snapshot.cookies.length > 0;

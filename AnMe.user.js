@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AnMe
 // @author       zjw
-// @version      10.0.9
+// @version      10.0.10
 // @updated      2026-05-07
 // @namespace    https://github.com/Zhu-junwei/AnMe
 // @description  通用多网站多账号切换器
@@ -78,6 +78,7 @@
       SETTINGS: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.84308 3.80211C9.8718 2.6007 10.8862 2 12 2C13.1138 2 14.1282 2.6007 16.1569 3.80211L16.8431 4.20846C18.8718 5.40987 19.8862 6.01057 20.4431 7C21 7.98943 21 9.19084 21 11.5937V12.4063C21 14.8092 21 16.0106 20.4431 17C19.8862 17.9894 18.8718 18.5901 16.8431 19.7915L16.1569 20.1979C14.1282 21.3993 13.1138 22 12 22C10.8862 22 9.8718 21.3993 7.84308 20.1979L7.15692 19.7915C5.1282 18.5901 4.11384 17.9894 3.55692 17C3 16.0106 3 14.8092 3 12.4063V11.5937C3 9.19084 3 7.98943 3.55692 7C4.11384 6.01057 5.1282 5.40987 7.15692 4.20846L7.84308 3.80211Z" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/></svg>`,
       HELP: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.75C12.4142 17.75 12.75 17.4142 12.75 17V11C12.75 10.5858 12.4142 10.25 12 10.25C11.5858 10.25 11.25 10.5858 11.25 11V17C11.25 17.4142 11.5858 17.75 12 17.75Z" fill="currentColor"/><path d="M12 7C12.5523 7 13 7.44772 13 8C13 8.55228 12.5523 9 12 9C11.4477 9 11 8.55228 11 8C11 7.44772 11.4477 7 12 7Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M1.25 12C1.25 6.06294 6.06294 1.25 12 1.25C17.9371 1.25 22.75 6.06294 22.75 12C22.75 17.9371 17.9371 22.75 12 22.75C6.06294 22.75 1.25 17.9371 1.25 12ZM12 2.75C6.89137 2.75 2.75 6.89137 2.75 12C2.75 17.1086 6.89137 21.25 12 21.25C17.1086 21.25 21.25 17.1086 21.25 12C21.25 6.89137 17.1086 2.75 12 2.75Z" fill="currentColor"/></svg>`,
       EYE: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.25 12S5.75 5.75 12 5.75S21.75 12 21.75 12 18.25 18.25 12 18.25 2.25 12 2.25 12Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/></svg>`,
+      ADD: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
       MAXIMIZE: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="5" width="14" height="14" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>`,
       RESTORE: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 7.5V5.75C8 4.7835 8.7835 4 9.75 4H18.25C19.2165 4 20 4.7835 20 5.75V14.25C20 15.2165 19.2165 16 18.25 16H16.5" stroke="currentColor" stroke-width="1.5"/><rect x="4" y="8" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>`,
       LOCK: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M5.25 9.30277V8C5.25 4.27208 8.27208 1.25 12 1.25C15.7279 1.25 18.75 4.27208 18.75 8V9.30277C18.9768 9.31872 19.1906 9.33948 19.3918 9.36652C20.2919 9.48754 21.0497 9.74643 21.6517 10.3483C22.2536 10.9503 22.5125 11.7081 22.6335 12.6082C22.75 13.4752 22.75 14.5775 22.75 15.9451V16.0549C22.75 17.4225 22.75 18.5248 22.6335 19.3918C22.5125 20.2919 22.2536 21.0497 21.6517 21.6516C21.0497 22.2536 20.2919 22.5125 19.3918 22.6335C18.5248 22.75 17.4225 22.75 16.0549 22.75H7.94513C6.57754 22.75 5.47522 22.75 4.60825 22.6335C3.70814 22.5125 2.95027 22.2536 2.34835 21.6516C1.74643 21.0497 1.48754 20.2919 1.36652 19.3918C1.24996 18.5248 1.24998 17.4225 1.25 16.0549V15.9451C1.24998 14.5775 1.24996 13.4752 1.36652 12.6082C1.48754 11.7081 1.74643 10.9503 2.34835 10.3483C2.95027 9.74643 3.70814 9.48754 4.60825 9.36652C4.80938 9.33948 5.02317 9.31872 5.25 9.30277ZM6.75 8C6.75 5.10051 9.10051 2.75 12 2.75C14.8995 2.75 17.25 5.10051 17.25 8V9.25344C16.8765 9.24999 16.4784 9.24999 16.0549 9.25H7.94513C7.52161 9.24999 7.12353 9.24999 6.75 9.25344V8ZM3.40901 11.409C3.68577 11.1322 4.07435 10.9518 4.80812 10.8531C5.56347 10.7516 6.56459 10.75 8 10.75H16C17.4354 10.75 18.4365 10.7516 19.1919 10.8531C19.9257 10.9518 20.3142 11.1322 20.591 11.409C20.8678 11.6858 21.0482 12.0743 21.1469 12.8081C21.2484 13.5635 21.25 14.5646 21.25 16C21.25 17.4354 21.2484 18.4365 21.1469 19.1919C21.0482 19.9257 20.8678 20.3142 20.591 20.591C20.3142 20.8678 19.9257 21.0482 19.1919 21.1469C18.4365 21.2484 17.4354 21.25 16 21.25H8C6.56459 21.25 5.56347 21.2484 4.80812 21.1469C4.07435 21.0482 3.68577 20.8678 3.40901 20.591C3.13225 20.3142 2.9518 19.9257 2.85315 19.1919C2.75159 18.4365 2.75 17.4354 2.75 16C2.75 14.5646 2.75159 13.5635 2.85315 12.8081C2.9518 12.0743 3.13225 11.6858 3.40901 11.409Z" fill="currentColor"/></svg>`,
@@ -110,6 +111,10 @@
     local_storage_tag_title: "LocalStorage",
     session_storage_tag_title: "SessionStorage",
     inspect_items: "查看明细",
+    add_item: "新增",
+    confirm_save_changes: "是否保存已修改内容",
+    save_account_title: "保存账号",
+    exit_account_title: "退出账号",
     maximize_panel: "最大化",
     restore_panel: "还原",
     select_all: "全选",
@@ -171,6 +176,10 @@
     local_storage_tag_title: "LocalStorage",
     session_storage_tag_title: "SessionStorage",
     inspect_items: "Inspect items",
+    add_item: "Add",
+    confirm_save_changes: "Save these changes? Unchecked rows will not be kept.",
+    save_account_title: "Save account",
+    exit_account_title: "Exit account",
     maximize_panel: "Maximize",
     restore_panel: "Restore",
     select_all: "Select all",
@@ -232,6 +241,10 @@
     local_storage_tag_title: "LocalStorage",
     session_storage_tag_title: "SessionStorage",
     inspect_items: "Ver detalles",
+    add_item: "Agregar",
+    confirm_save_changes: "¿Guardar estos cambios? Las filas sin marcar no se conservarán.",
+    save_account_title: "Guardar cuenta",
+    exit_account_title: "Salir de la cuenta",
     maximize_panel: "Maximizar",
     restore_panel: "Restaurar",
     select_all: "Seleccionar todo",
@@ -418,15 +431,24 @@
         .acc-data-header { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:7px 10px; border-bottom:1px solid #eef2f6; }
         .acc-data-title { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:13px; font-weight:700; color:#333; }
         .acc-data-header-actions { display:flex; align-items:center; gap:8px; flex-shrink:0; }
-        .acc-data-header-actions .acc-dialog-btn { flex:0 0 auto; min-width:64px; padding:6px 12px; }
+        .acc-data-confirm,
         .acc-data-close,
         .acc-data-window-btn { width:28px; height:28px; min-width:28px; }
+        .acc-data-confirm:disabled { opacity:.35; cursor:not-allowed; background:#fff; border-color:#ddd; color:#98a2b3; }
+        .acc-data-confirm:disabled:hover { background:#fff; border-color:#ddd; color:#98a2b3; }
+        .acc-data-confirm svg { font-size:14px; }
         .acc-data-window-btn svg { font-size:14px; }
         .acc-data-window-btn .acc-restore-icon { display:none; }
         .acc-data-box.is-maximized .acc-data-window-btn .acc-maximize-icon { display:none; }
         .acc-data-box.is-maximized .acc-data-window-btn .acc-restore-icon { display:inline-flex; }
         .acc-data-toolbar { display:flex; align-items:center; gap:8px; padding:5px 10px; border-bottom:1px solid #eef2f6; }
         .acc-data-count { margin-right:auto; font-size:12px; color:#667085; }
+        .acc-data-tabs { display:flex; align-items:flex-end; gap:0; padding:6px 10px 0; border-bottom:1px solid #e6ebf1; background:#f8fafc; }
+        .acc-data-tab { min-width:78px; height:30px; padding:0 12px; border:1px solid transparent; border-bottom:none; border-radius:8px 8px 0 0; background:transparent; color:#667085; font-size:12px; font-weight:700; cursor:pointer; }
+        .acc-data-tab:hover { color:#2196F3; background:#eef7ff; }
+        .acc-data-tab.active { color:#1d4f7a; background:#fff; border-color:#e6ebf1; margin-bottom:-1px; }
+        .acc-data-tab-panel { display:none; height:100%; min-height:0; }
+        .acc-data-tab-panel.active { display:block; }
         .acc-data-tool-btn { border:1px solid #d0d5dd; background:#fff; color:#344054; border-radius:6px; padding:4px 8px; font-size:12px; cursor:pointer; }
         .acc-data-tool-btn:hover,
         .acc-data-tool-btn:focus-visible { border-color:#2196F3; color:#2196F3; background:#f5fbff; outline:none; }
@@ -446,17 +468,29 @@
         .acc-storage-table th,
         .acc-storage-table td { border-bottom:1px solid #eef2f6; border-right:1px solid #eef2f6; padding:0; text-align:left; vertical-align:top; color:#344054; font-family:"SF Mono", Consolas, monospace; font-size:11px; line-height:1.4; }
         .acc-cookie-table th,
-        .acc-storage-table th { position:sticky; top:0; z-index:1; background:#f8fafc; color:#667085; font-family:inherit; font-size:11px; font-weight:700; padding:4px 6px; white-space:nowrap; }
+        .acc-storage-table th { position:sticky; top:0; z-index:1; background:#edf2f7; color:#475467; font-family:inherit; font-size:11px; font-weight:700; padding:2px 3px; white-space:nowrap; text-align:center; vertical-align:middle; }
+        .acc-data-sort-header { position:relative; width:100%; min-width:0; min-height:16px; border:none; background:transparent; color:inherit; padding:0 2px; display:flex; align-items:center; justify-content:center; font:inherit; font-weight:inherit; text-align:center; cursor:pointer; letter-spacing:0; }
+        .acc-data-sort-header:hover,
+        .acc-data-sort-header:focus-visible,
+        .acc-data-sort-header.active { color:#2196F3; outline:none; }
+        .acc-data-sort-label { min-width:0; overflow:visible; text-overflow:clip; white-space:nowrap; }
+        .acc-data-sort-indicator { position:absolute; right:0; bottom:0; width:0; height:0; opacity:0; border-left:2.5px solid transparent; border-right:2.5px solid transparent; border-bottom:4px solid currentColor; transform-origin:center; }
+        .acc-data-sort-header.active .acc-data-sort-indicator { opacity:0.85; }
+        .acc-data-sort-header.active[data-direction="desc"] .acc-data-sort-indicator { transform:rotate(180deg); }
         .acc-cookie-table td:focus-within,
         .acc-storage-table td:focus-within { outline:1px solid #2196F3; outline-offset:-1px; box-shadow:inset 0 0 0 1px rgba(33,150,243,.2); background:#f5fbff !important; }
         .acc-cell-input { display:block; width:100%; min-width:0; height:22px; padding:3px 6px; border:none; outline:none; box-shadow:none; background:transparent; color:inherit; font:inherit; line-height:1.4; box-sizing:border-box; cursor:text; user-select:text; }
         .acc-cell-input[readonly] { -webkit-text-fill-color:currentColor; opacity:1; }
         .acc-cookie-table tr:nth-child(even) td { background:#fafbfc; }
         .acc-storage-table tr:nth-child(even) td { background:#fafbfc; }
+        .acc-cookie-table tr.is-expired td { background:#fff1f2; color:#9f1239; }
+        .acc-cookie-table tr.is-expired td:focus-within { background:#fff7f8 !important; }
         .acc-cookie-check-col,
         .acc-storage-check-col { width:34px; min-width:34px; text-align:center !important; }
         .acc-cookie-check-col .acc-custom-chk,
-        .acc-storage-check-col .acc-custom-chk { margin:7px auto !important; display:block !important; }
+        .acc-storage-check-col .acc-custom-chk,
+        .acc-data-check,
+        .acc-data-check-all { display:block !important; width:14px !important; height:14px !important; min-width:14px !important; min-height:14px !important; margin:7px auto !important; flex:0 0 14px !important; opacity:1 !important; visibility:visible !important; pointer-events:auto !important; }
         .acc-cookie-value-col { width:36%; }
         .acc-data-empty { padding:18px; text-align:center; color:#667085; font-size:12px; }
         .acc-data-footer { display:flex; justify-content:flex-end; gap:8px; padding:10px 12px; border-top:1px solid #eef2f6; }
@@ -548,7 +582,7 @@
         .acc-link-btn { color: #2196F3; cursor: pointer; font-size: 12px; }
         .acc-select-ui { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; background: #fff; cursor: pointer; outline: none; color: #333; }
         .acc-chk {display:flex; align-items:center; flex-wrap:nowrap; gap:3px; font-size:11px; color:#666; margin:5px 0;-webkit-user-select: none;}
-        .acc-source-row { display:inline-flex; align-items:center; gap:0; flex-shrink:0; }
+        .acc-source-row { display:inline-flex; align-items:center; gap:2px; flex-shrink:0; }
         .acc-source-tips { margin-left:auto; display:inline-flex; align-items:center; gap:5px; flex-shrink:0; padding-left:4px; }
         .acc-source-eye { width:18px; height:18px; border:none; background:transparent; color:#667085; display:inline-flex; align-items:center; justify-content:center; padding:0; cursor:pointer; border-radius:5px; flex-shrink:0; }
         .acc-source-eye svg { font-size:13px; }
@@ -561,6 +595,8 @@
         .acc-custom-chk:disabled { cursor: not-allowed !important; background: #f3f4f6 !important; border-color: #d0d5dd !important; }
         .acc-custom-chk:checked { background-color: #2196F3 !important; border-color: #2196F3 !important; }
         .acc-custom-chk:checked::after { content: ''; position: absolute !important; left: 4px !important; top: 1px !important; width: 3px !important; height: 7px !important; border: solid white !important; border-width: 0 2px 2px 0 !important; transform: rotate(45deg) !important; }
+        .acc-custom-chk:indeterminate { background-color: #2196F3 !important; border-color: #2196F3 !important; }
+        .acc-custom-chk:indeterminate::after { content: ''; position: absolute !important; left: 3px !important; top: 5px !important; width: 6px !important; height: 2px !important; background: white !important; border: none !important; transform: none !important; }
 
         .acc-loading-mask{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,.7);backdrop-filter:blur(2px);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:2000010;border-radius:12px}
         .acc-spinner{width:30px;height:30px;border:3px solid #f3f3f3;border-top:3px solid #2196F3;border-radius:50%;animation:acc-spin 1s linear infinite}
@@ -681,6 +717,10 @@
       },
       extractName(key) {
         return key.split("::")[1] || key;
+      },
+      extractHost(key) {
+        const hostPart = String(key || "").split("::")[0] || "";
+        return hostPart.startsWith(constants.PREFIX) ? hostPart.slice(constants.PREFIX.length) : hostPart;
       },
       makeKey(name, host = constants.HOST) {
         return `${constants.PREFIX}${host}::${name}`;
@@ -811,8 +851,8 @@
           <div class="acc-header-actions" id="acc-header-actions">
               <button class="acc-toolbar-btn" id="btn-header-back" title="${utils.t("back")}">${constants.ICONS.BACK}</button>
               <button class="acc-toolbar-btn" id="btn-go-current-host" title="${utils.t("back_current_host")}">${constants.ICONS.HOME}</button>
-              <button class="acc-toolbar-btn" id="btn-open-save-modal" title="${utils.t("btn_save")}">${constants.ICONS.SAVE}</button>
-              <button class="acc-toolbar-btn" id="btn-clean-env" title="${utils.t("btn_clean")}">${constants.ICONS.CLEAN}</button>
+              <button class="acc-toolbar-btn" id="btn-open-save-modal" title="${utils.t("save_account_title")}">${constants.ICONS.SAVE}</button>
+              <button class="acc-toolbar-btn" id="btn-clean-env" title="${utils.t("exit_account_title")}">${constants.ICONS.CLEAN}</button>
           </div>
           <div class="acc-header-title" id="acc-header-text"></div>
           <div class="acc-header-right-actions">
@@ -996,6 +1036,13 @@
 
   // src/app/core/accounts.js
   var getCookieSelectionKey = (cookie) => [cookie?.name || "", cookie?.domain || "", cookie?.path || ""].join("");
+  var hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object || {}, key);
+  var createStorageSnapshot = (storage, selectedKeys, valueOverrides) => Object.fromEntries(
+    Object.entries(storage).filter(([storageKey]) => !selectedKeys || selectedKeys.has(storageKey)).map(([storageKey, value]) => [
+      storageKey,
+      hasOwn(valueOverrides, storageKey) ? String(valueOverrides[storageKey] ?? "") : value
+    ])
+  );
   function createAccountMethods({ constants, utils, getUI, getCore, shared }) {
     return {
       async getCurrentSnapshotSources() {
@@ -1018,22 +1065,30 @@
         const ui = getUI();
         const localStorageKeys = Array.isArray(options.localStorageKeys) ? new Set(options.localStorageKeys) : null;
         const sessionStorageKeys = Array.isArray(options.sessionStorageKeys) ? new Set(options.sessionStorageKeys) : null;
+        const localStorageValues = options.localStorageValues || {};
+        const sessionStorageValues = options.sessionStorageValues || {};
+        const hasLocalStorageRows = Array.isArray(options.localStorageRows);
+        const hasSessionStorageRows = Array.isArray(options.sessionStorageRows);
         const snapshot = {
           time: Date.now(),
           siteName: utils.normalizeSiteName(siteName),
           note: utils.normalizeNoteText(options.note),
-          localStorage: options.ls ? Object.fromEntries(
-            Object.entries(localStorage).filter(([storageKey]) => !localStorageKeys || localStorageKeys.has(storageKey))
-          ) : {},
-          sessionStorage: options.ss ? Object.fromEntries(
-            Object.entries(sessionStorage).filter(([storageKey]) => !sessionStorageKeys || sessionStorageKeys.has(storageKey))
-          ) : {},
+          localStorage: options.ls ? hasLocalStorageRows ? Object.fromEntries(options.localStorageRows) : createStorageSnapshot(localStorage, localStorageKeys, localStorageValues) : {},
+          sessionStorage: options.ss ? hasSessionStorageRows ? Object.fromEntries(options.sessionStorageRows) : createStorageSnapshot(sessionStorage, sessionStorageKeys, sessionStorageValues) : {},
           cookies: []
         };
         if (options.ck) {
           const cookieKeys = Array.isArray(options.cookieKeys) ? new Set(options.cookieKeys) : null;
-          const cookies = await shared.listCookies();
-          snapshot.cookies = cookieKeys ? (cookies || []).filter((cookie) => cookieKeys.has(getCookieSelectionKey(cookie))) : cookies;
+          const cookieValues = options.cookieValues || {};
+          if (Array.isArray(options.cookieRows)) {
+            snapshot.cookies = options.cookieRows;
+          } else {
+            const cookies = await shared.listCookies();
+            snapshot.cookies = (cookieKeys ? (cookies || []).filter((cookie) => cookieKeys.has(getCookieSelectionKey(cookie))) : cookies || []).map((cookie) => {
+              const key = getCookieSelectionKey(cookie);
+              return hasOwn(cookieValues, key) ? { ...cookie, value: String(cookieValues[key] ?? "") } : cookie;
+            });
+          }
         }
         const hasCookies = snapshot.cookies && snapshot.cookies.length > 0;
         const hasLS = Object.keys(snapshot.localStorage).length > 0;
@@ -1247,21 +1302,85 @@
   }
 
   // src/app/core/inspector.js
+  var normalizeStorageRows = (rows) => Object.fromEntries((rows || []).filter(([key]) => key));
+  var getCookieSelectionKey2 = (cookie) => [cookie?.name || "", cookie?.domain || "", cookie?.path || ""].join("");
+  var normalizeForCompare = (value) => {
+    if (Array.isArray(value)) {
+      return value.map(normalizeForCompare).sort((left, right) => JSON.stringify(left).localeCompare(JSON.stringify(right)));
+    }
+    if (value && typeof value === "object") {
+      return Object.fromEntries(
+        Object.keys(value).sort().map((key) => [key, normalizeForCompare(value[key])])
+      );
+    }
+    return value;
+  };
+  var isSameData = (left, right) => JSON.stringify(normalizeForCompare(left)) === JSON.stringify(normalizeForCompare(right));
+  var getSelectedKeys = (type, content) => {
+    if (type === "cookies") {
+      return (Array.isArray(content) ? content : []).map(getCookieSelectionKey2);
+    }
+    return Object.keys(content || {});
+  };
+  var hasContent = (type, content) => type === "cookies" ? (Array.isArray(content) ? content.length : 0) > 0 : Object.keys(content || {}).length > 0;
+  var getContentByType = (data, type) => {
+    if (type === "cookies") return data.cookies;
+    if (type === "localStorage") return data.localStorage;
+    if (type === "sessionStorage") return data.sessionStorage;
+    return null;
+  };
   function createInspectorMethods({ utils, getUI }) {
     return {
-      inspectData(key, type) {
+      async inspectData(key, type) {
         const data = GM_getValue(key);
         if (!data) return;
-        let content = null;
-        if (type === "cookies") content = data.cookies;
-        if (type === "localStorage") content = data.localStorage;
-        if (type === "sessionStorage") content = data.sessionStorage;
+        const content = getContentByType(data, type);
         if (!content) return;
-        getUI()?.showDataInspector({
-          title: `${utils.extractName(key)} - ${type}`,
-          type,
-          data: content
+        const typeTitles = {
+          cookies: "Cookie",
+          localStorage: "LocalStorage",
+          sessionStorage: "SessionStorage"
+        };
+        const tabs = ["cookies", "localStorage", "sessionStorage"].map((tabType) => ({
+          type: tabType,
+          title: typeTitles[tabType],
+          data: getContentByType(data, tabType)
+        })).filter((tab) => hasContent(tab.type, tab.data)).map((tab) => ({
+          ...tab,
+          selectedKeys: getSelectedKeys(tab.type, tab.data)
+        }));
+        if (tabs.length === 0) return;
+        const ui = getUI();
+        const result = await ui?.showDataInspectorTabs({
+          tabs,
+          initialType: type,
+          selectable: true,
+          editable: true,
+          addable: true,
+          submitText: utils.t("save_changes"),
+          confirmDisabledUntilDirty: true,
+          host: utils.extractHost?.(key)
         });
+        if (!result) return;
+        const nextValues = {};
+        Object.entries(result.tabs || {}).forEach(([tabType, tabResult]) => {
+          nextValues[tabType] = tabType === "cookies" ? tabResult.data : normalizeStorageRows(tabResult.rows);
+        });
+        const hasChanges = Object.entries(nextValues).some(
+          ([tabType, nextContent]) => !isSameData(getContentByType(data, tabType), nextContent)
+        );
+        if (!hasChanges) return;
+        const confirmed = await ui?.confirm?.(utils.t("confirm_save_changes"));
+        if (!confirmed) return;
+        const nextData = GM_getValue(key);
+        if (!nextData) return;
+        GM_setValue(key, {
+          ...nextData,
+          time: Date.now(),
+          ...nextValues
+        });
+        ui?.refresh?.();
+        ui?.showToast?.(utils.t("toast_account_updated"));
       }
     };
   }
@@ -2478,16 +2597,28 @@
       ...syncState
     };
   }
-  var getCookieSelectionKey2 = (cookie) => [cookie?.name || "", cookie?.domain || "", cookie?.path || ""].join("");
+  var getCookieSelectionKey3 = (cookie) => [cookie?.name || "", cookie?.domain || "", cookie?.path || ""].join("");
   var getStorageEntries = (storageData) => Object.entries(storageData || {}).map(([key, value]) => ({
     key,
     title: key,
     value: value ?? "",
     meta: ""
   }));
+  var normalizeForCompare2 = (value) => {
+    if (Array.isArray(value)) {
+      return value.map(normalizeForCompare2).sort((left, right) => JSON.stringify(left).localeCompare(JSON.stringify(right)));
+    }
+    if (value && typeof value === "object") {
+      return Object.fromEntries(
+        Object.keys(value).sort().map((key) => [key, normalizeForCompare2(value[key])])
+      );
+    }
+    return value;
+  };
+  var isSameData2 = (left, right) => JSON.stringify(normalizeForCompare2(left)) === JSON.stringify(normalizeForCompare2(right));
   var getCookieEntries = (cookies) => (Array.isArray(cookies) ? cookies : []).map((cookie) => {
     return {
-      key: getCookieSelectionKey2(cookie),
+      key: getCookieSelectionKey3(cookie),
       title: cookie.name || "",
       value: cookie.value ?? "",
       cookie,
@@ -2500,6 +2631,41 @@
     if (typeof value === "object") return JSON.stringify(value);
     return String(value);
   };
+  var getExpirationSortValue = (value) => {
+    const normalized = String(value ?? "").trim();
+    if (!normalized || /^session$/i.test(normalized)) return Number.POSITIVE_INFINITY;
+    const numericValue = Number(normalized);
+    if (Number.isFinite(numericValue)) return numericValue > 1e11 ? numericValue : numericValue * 1e3;
+    const timestamp = Date.parse(normalized);
+    return Number.isNaN(timestamp) ? Number.POSITIVE_INFINITY : timestamp;
+  };
+  var compareInspectorValues = (left, right, column, direction = "asc") => {
+    let result = 0;
+    if (column === "expirationDate") {
+      result = getExpirationSortValue(left) - getExpirationSortValue(right);
+    } else {
+      result = String(left ?? "").localeCompare(String(right ?? ""), void 0, {
+        numeric: true,
+        sensitivity: "base"
+      });
+    }
+    return direction === "desc" ? -result : result;
+  };
+  var getEntrySortValue = (type, entry, column) => {
+    if (type === "cookies") {
+      return column === "value" ? entry.value : getCookieCellValue(entry.cookie || {}, column);
+    }
+    return column === "value" ? entry.value : entry.key;
+  };
+  var sortInspectorEntries = (entries, type, column = type === "cookies" ? "name" : "key", direction = "asc") => [...entries].sort((left, right) => {
+    const result = compareInspectorValues(
+      getEntrySortValue(type, left, column),
+      getEntrySortValue(type, right, column),
+      column,
+      direction
+    );
+    return result || String(left.key || "").localeCompare(String(right.key || ""), void 0, { numeric: true });
+  });
   var getCookieCellValue = (cookie, column) => {
     if (column === "expirationDate") {
       return typeof cookie.expirationDate === "number" ? new Date(cookie.expirationDate * 1e3).toLocaleString() : "Session";
@@ -2507,7 +2673,7 @@
     return formatInspectorValue(cookie[column]);
   };
   var getCookieColumns = (entries) => {
-    const preferredColumns = ["name", "value", "domain", "path", "expirationDate", "httpOnly", "secure", "sameSite"];
+    const preferredColumns = ["name", "value", "domain", "path", "expirationDate", "secure", "httpOnly", "session", "hostOnly", "sameSite"];
     const actualColumns = /* @__PURE__ */ new Set();
     entries.forEach((entry) => {
       Object.keys(entry.cookie || {}).forEach((column) => {
@@ -2524,11 +2690,81 @@
   var getCookieColumnWidth = (column) => {
     if (column === "value") return 360;
     if (column === "name") return 160;
-    if (column === "domain" || column === "path") return 140;
+    if (column === "domain") return 140;
+    if (column === "path") return 72;
     if (column === "expirationDate") return 150;
-    if (column === "httpOnly" || column === "secure") return 70;
+    if (column === "httpOnly" || column === "secure" || column === "session" || column === "hostOnly") return 70;
     if (column === "sameSite") return 96;
     return 120;
+  };
+  var getDefaultCookieColumns = () => ["name", "value", "domain", "path", "expirationDate", "secure", "httpOnly", "session", "hostOnly", "sameSite"];
+  var getDefaultCookie = (host) => ({
+    name: "",
+    value: "",
+    domain: host || location.hostname,
+    path: "/",
+    expirationDate: "",
+    secure: false,
+    httpOnly: false,
+    session: false,
+    hostOnly: false,
+    sameSite: "lax"
+  });
+  var parseCookieCellValue = (value, column) => {
+    const normalized = String(value ?? "").trim();
+    if (column === "expirationDate") {
+      if (!normalized || /^session$/i.test(normalized)) return void 0;
+      const numericValue = Number(normalized);
+      if (Number.isFinite(numericValue)) return numericValue > 1e11 ? numericValue / 1e3 : numericValue;
+      const timestamp = Date.parse(normalized);
+      return Number.isNaN(timestamp) ? void 0 : timestamp / 1e3;
+    }
+    if (column === "secure" || column === "httpOnly" || column === "hostOnly" || column === "session") {
+      return /^(true|1|yes)$/i.test(normalized);
+    }
+    return String(value ?? "");
+  };
+  var serializeCookieRows = ({ mask, entries, columns, host, includeOnlyChecked }) => {
+    const rows = [];
+    mask.querySelectorAll(".acc-data-row").forEach((row) => {
+      const check = row.querySelector(".acc-data-check");
+      if (includeOnlyChecked && !check?.checked) return;
+      const index = Number(row.dataset.index);
+      const originalCookie = entries[index]?.cookie;
+      const cookie = originalCookie ? { ...originalCookie } : getDefaultCookie(host);
+      columns.forEach((column) => {
+        const input = row.querySelector(`[data-column="${column}"]`);
+        if (!input) return;
+        const originalValue = originalCookie ? getCookieCellValue(originalCookie, column) : "";
+        if (originalCookie && input.value === originalValue) return;
+        const parsedValue = parseCookieCellValue(input.value, column);
+        if (parsedValue === void 0 || parsedValue === "") {
+          if (column !== "name" && column !== "value" && column !== "domain" && column !== "path") {
+            delete cookie[column];
+            return;
+          }
+        }
+        cookie[column] = parsedValue ?? "";
+      });
+      cookie.name = String(cookie.name || "").trim();
+      cookie.value = String(cookie.value ?? "");
+      cookie.domain = String(cookie.domain || host || location.hostname).trim();
+      cookie.path = String(cookie.path || "/").trim();
+      if (!cookie.name) return;
+      rows.push(cookie);
+    });
+    return rows;
+  };
+  var serializeStorageRows = ({ mask, includeOnlyChecked }) => {
+    const rows = [];
+    mask.querySelectorAll(".acc-data-row").forEach((row) => {
+      const check = row.querySelector(".acc-data-check");
+      if (includeOnlyChecked && !check?.checked) return;
+      const key = row.querySelector('[data-column="key"]')?.value.trim();
+      if (!key) return;
+      rows.push([key, row.querySelector('[data-column="value"]')?.value ?? ""]);
+    });
+    return rows;
   };
   var canScrollInDirection = (element, deltaX, deltaY) => {
     const isHorizontal = Math.abs(deltaX) > Math.abs(deltaY);
@@ -2861,134 +3097,348 @@
           state.dataInspectorMask.style.display = "none";
         }
       },
-      showDataInspector({ title, type, data, selectable = false, selectedKeys = [] }) {
+      showDataInspector({
+        title,
+        type,
+        data,
+        selectable = false,
+        selectedKeys = [],
+        editable = false,
+        addable = false,
+        submitText = utils.t("dlg_ok"),
+        confirmDisabledUntilDirty = false,
+        host = constants.HOST
+      }) {
+        return ui.showDataInspectorTabs({
+          tabs: [{ title, type, data, selectedKeys }],
+          initialType: type,
+          selectable,
+          editable,
+          addable,
+          submitText,
+          confirmDisabledUntilDirty,
+          host
+        }).then((result) => result?.tabs?.[type] || result || null);
+      },
+      showDataInspectorTabs({
+        tabs,
+        initialType,
+        selectable = false,
+        editable = false,
+        addable = false,
+        submitText = utils.t("dlg_ok"),
+        confirmDisabledUntilDirty = false,
+        host = constants.HOST
+      }) {
         return new Promise((resolve) => {
           const mask = ui.ensureDataInspectorMask();
-          const entries = getInspectorEntries(type, data);
-          const isCookieData = type === "cookies";
-          const cookieColumns = isCookieData ? getCookieColumns(entries) : [];
-          const cookieTableWidth = cookieColumns.reduce(
-            (width, column) => width + getCookieColumnWidth(column),
-            selectable ? 34 : 0
-          );
-          const storageTableWidth = selectable ? 674 : 640;
-          const selectedSet = new Set(selectedKeys);
-          const selectedCountText = () => `${mask.querySelectorAll(".acc-data-check:checked").length}/${entries.length}`;
-          const checkboxHtml = (entry, index) => selectable ? `<input type="checkbox" class="acc-custom-chk acc-data-check" data-index="${index}" ${selectedSet.has(entry.key) ? "checked" : ""}>` : "";
+          mask.__anmeDataInspectorCleanup?.();
+          const targetHost = host || constants.HOST;
+          const tabStates = (tabs || []).filter((tab) => tab?.type).map((tab) => {
+            const defaultSortColumn = tab.type === "cookies" ? "name" : "key";
+            const entries = sortInspectorEntries(getInspectorEntries(tab.type, tab.data), tab.type, defaultSortColumn);
+            const isCookieData = tab.type === "cookies";
+            const cookieColumns = isCookieData ? [.../* @__PURE__ */ new Set([...getDefaultCookieColumns(), ...getCookieColumns(entries)])] : [];
+            const cookieTableWidth = cookieColumns.reduce(
+              (width, column) => width + getCookieColumnWidth(column),
+              selectable ? 34 : 0
+            );
+            return {
+              ...tab,
+              entries,
+              isCookieData,
+              cookieColumns,
+              cookieTableWidth,
+              storageTableWidth: selectable ? 674 : 640,
+              selectedSet: new Set(tab.selectedKeys || []),
+              sortColumn: defaultSortColumn,
+              sortDirection: "asc"
+            };
+          });
+          if (tabStates.length === 0) {
+            resolve(null);
+            return;
+          }
+          let activeType = tabStates.some((tab) => tab.type === initialType) ? initialType : tabStates[0].type;
+          const canEditCells = selectable || editable;
+          const checkboxHtml = (entry, index, checked) => selectable ? `<input type="checkbox" class="acc-custom-chk acc-data-check" data-index="${index}" ${checked ? "checked" : ""}>` : "";
           const selectAllHtml = selectable ? '<input type="checkbox" class="acc-custom-chk acc-data-check-all" checked>' : "";
-          const renderCookieTable = () => `
+          const sortHeaderHtml = (tab, column, label) => `
+          <button type="button" class="acc-data-sort-header${tab.sortColumn === column ? " active" : ""}" data-column="${utils.escapeHtml(column)}" data-direction="${tab.sortColumn === column ? tab.sortDirection : ""}">
+            <span class="acc-data-sort-label">${utils.escapeHtml(label)}</span>
+            <span class="acc-data-sort-indicator" aria-hidden="true"></span>
+          </button>
+        `;
+          const editableAttrs = (column, index, readonly = !canEditCells) => `data-index="${index}" data-column="${column}" ${readonly ? "readonly" : ""} autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"`;
+          const storageKeyAttrs = (index) => `data-index="${index}" data-column="key" ${canEditCells ? "" : "readonly"} autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"`;
+          const renderCookieRow = (tab, entry, index, isNew = false) => `
+          <tr class="acc-data-row${entry.isExpired ? " is-expired" : ""}" data-index="${index}">
+            ${selectable ? `<td class="acc-cookie-check-col">${checkboxHtml(entry, index, isNew || tab.selectedSet.has(entry.key))}</td>` : ""}
+            ${tab.cookieColumns.map((column) => {
+            const value = column === "value" ? entry.value : getCookieCellValue(entry.cookie || {}, column);
+            const readonly = !canEditCells || !isNew && !editable && !selectable && column !== "value";
+            return `<td><input type="text" class="acc-cell-input${column === "value" ? " acc-data-value-input" : ""}" ${editableAttrs(
+              column,
+              index,
+              readonly
+            )} value="${utils.escapeHtml(value)}"></td>`;
+          }).join("")}
+          </tr>
+        `;
+          const renderStorageRow = (tab, entry, index, isNew = false) => `
+          <tr class="acc-data-row" data-index="${index}">
+            ${selectable ? `<td class="acc-storage-check-col">${checkboxHtml(entry, index, isNew || tab.selectedSet.has(entry.key))}</td>` : ""}
+            <td><input type="text" class="acc-cell-input" ${storageKeyAttrs(index)} value="${utils.escapeHtml(entry.title)}"></td>
+            <td><input type="text" class="acc-cell-input acc-data-value-input" ${editableAttrs(
+            "value",
+            index,
+            !canEditCells
+          )} value="${utils.escapeHtml(formatInspectorValue(entry.value))}"></td>
+          </tr>
+        `;
+          const renderCookieTable = (tab) => `
           <div class="acc-cookie-table-wrap">
-            <table class="acc-cookie-table" style="min-width:${cookieTableWidth}px">
+            <table class="acc-cookie-table" style="min-width:${tab.cookieTableWidth}px">
               <colgroup>
-                ${selectable ? `<col class="acc-cookie-check-col" style="width:${34 / cookieTableWidth * 100}%">` : ""}
-                ${cookieColumns.map(
+                ${selectable ? '<col class="acc-cookie-check-col" style="width:34px">' : ""}
+                ${tab.cookieColumns.map(
             (column) => `<col class="${column === "value" ? "acc-cookie-value-col" : ""}" style="width:${getCookieColumnWidth(
               column
-            ) / cookieTableWidth * 100}%">`
+            ) / tab.cookieTableWidth * 100}%">`
           ).join("")}
               </colgroup>
               <thead>
                 <tr>
                   ${selectable ? `<th class="acc-cookie-check-col">${selectAllHtml}</th>` : ""}
-                  ${cookieColumns.map((column) => `<th>${utils.escapeHtml(column)}</th>`).join("")}
+                  ${tab.cookieColumns.map((column) => `<th>${sortHeaderHtml(tab, column, column)}</th>`).join("")}
                 </tr>
               </thead>
-              <tbody>
-                ${entries.map(
-            (entry, index) => `
-                      <tr>
-                        ${selectable ? `<td class="acc-cookie-check-col">${checkboxHtml(entry, index)}</td>` : ""}
-                        ${cookieColumns.map(
-              (column) => `<td><input type="text" class="acc-cell-input" readonly value="${utils.escapeHtml(
-                getCookieCellValue(entry.cookie || {}, column)
-              )}"></td>`
-            ).join("")}
-                      </tr>
-                    `
-          ).join("")}
-              </tbody>
+              <tbody>${tab.entries.map((entry, index) => renderCookieRow(tab, entry, index)).join("")}</tbody>
             </table>
           </div>
         `;
-          const renderStorageList = () => `
+          const renderStorageList = (tab) => `
           <div class="acc-storage-table-wrap">
-            <table class="acc-storage-table" style="min-width:${storageTableWidth}px">
+            <table class="acc-storage-table" style="min-width:${tab.storageTableWidth}px">
               <colgroup>
-                ${selectable ? '<col class="acc-storage-check-col" style="width:5%">' : ""}
-                <col class="acc-storage-key-col" style="width:${selectable ? 31 : 34}%">
-                <col class="acc-storage-value-col" style="width:${selectable ? 64 : 66}%">
+                ${selectable ? '<col class="acc-storage-check-col" style="width:34px">' : ""}
+                <col class="acc-storage-key-col" style="width:${selectable ? "calc(34% - 17px)" : "34%"}">
+                <col class="acc-storage-value-col" style="width:${selectable ? "calc(66% - 17px)" : "66%"}">
               </colgroup>
               <thead>
                 <tr>
                   ${selectable ? `<th class="acc-storage-check-col">${selectAllHtml}</th>` : ""}
-                  <th>Key</th>
-                  <th>Value</th>
+                  <th>${sortHeaderHtml(tab, "key", "Key")}</th>
+                  <th>${sortHeaderHtml(tab, "value", "Value")}</th>
                 </tr>
               </thead>
-              <tbody>
-                ${entries.map(
-            (entry, index) => `
-                      <tr>
-                        ${selectable ? `<td class="acc-storage-check-col">${checkboxHtml(entry, index)}</td>` : ""}
-                        <td><input type="text" class="acc-cell-input" readonly value="${utils.escapeHtml(entry.title)}"></td>
-                        <td><input type="text" class="acc-cell-input" readonly value="${utils.escapeHtml(formatInspectorValue(entry.value))}"></td>
-                      </tr>
-                    `
-          ).join("")}
-              </tbody>
+              <tbody>${tab.entries.map((entry, index) => renderStorageRow(tab, entry, index)).join("")}</tbody>
             </table>
+          </div>
+        `;
+          const renderTabPanel = (tab) => `
+          <div class="acc-data-tab-panel${tab.type === activeType ? " active" : ""}" data-type="${utils.escapeHtml(tab.type)}">
+            ${tab.isCookieData ? renderCookieTable(tab) : renderStorageList(tab)}
           </div>
         `;
           utils.setHTML(mask, `
           <div class="acc-data-box">
             <div class="acc-data-header">
-              <div class="acc-data-title">${utils.escapeHtml(title || type)}</div>
+              <div class="acc-data-title">${utils.escapeHtml(tabStates.find((tab) => tab.type === activeType)?.title || activeType)}</div>
               <div class="acc-data-header-actions">
+                ${addable ? `<button type="button" class="acc-toolbar-btn acc-data-add" title="${utils.t("add_item")}" aria-label="${utils.t("add_item")}">${constants.ICONS.ADD}</button>` : ""}
                 <button type="button" class="acc-toolbar-btn acc-data-window-btn acc-data-maximize" title="${utils.t("maximize_panel")}">
                   <span class="acc-maximize-icon">${constants.ICONS.MAXIMIZE}</span>
                   <span class="acc-restore-icon">${constants.ICONS.RESTORE}</span>
                 </button>
-                <button type="button" class="acc-dialog-btn acc-dialog-btn-ok acc-data-confirm">${utils.t("dlg_ok")}</button>
+                <button type="button" class="acc-toolbar-btn acc-data-confirm" title="${utils.escapeHtml(submitText)}" aria-label="${utils.escapeHtml(submitText)}">${constants.ICONS.SAVE}</button>
                 <button type="button" class="acc-toolbar-btn acc-data-close" title="${utils.t("dlg_cancel")}">${constants.ICONS.CLOSE}</button>
               </div>
             </div>
+            ${tabStates.length > 1 ? `<div class="acc-data-tabs">
+                    ${tabStates.map(
+            (tab) => `<button type="button" class="acc-data-tab${tab.type === activeType ? " active" : ""}" data-type="${utils.escapeHtml(
+              tab.type
+            )}">${utils.escapeHtml(tab.title || tab.type)}</button>`
+          ).join("")}
+                  </div>` : ""}
             ${selectable ? `<div class="acc-data-toolbar">
                     <span class="acc-data-count"></span>
                   </div>` : ""}
             <div class="acc-data-list">
-              ${entries.length ? isCookieData ? renderCookieTable() : renderStorageList() : `<div class="acc-data-empty">${utils.t("no_data")}</div>`}
+              ${tabStates.map(renderTabPanel).join("")}
             </div>
           </div>
         `);
           mask.style.display = "flex";
-          const updateCount = () => {
-            const count = mask.querySelector(".acc-data-count");
-            if (count) count.textContent = selectedCountText();
-            const checkedCount = mask.querySelectorAll(".acc-data-check:checked").length;
-            const checkAll = mask.querySelector(".acc-data-check-all");
-            if (checkAll) {
-              checkAll.checked = entries.length > 0 && checkedCount === entries.length;
-              checkAll.indeterminate = checkedCount > 0 && checkedCount < entries.length;
+          const getTabPanel = (tabType) => [...mask.querySelectorAll(".acc-data-tab-panel")].find((panel) => panel.dataset.type === tabType);
+          const getActivePanel = () => getTabPanel(activeType);
+          const getRowSortValue = (row, column) => row.querySelector(`[data-column="${column}"]`)?.value ?? "";
+          const updateSortHeaders = (panel, tab) => {
+            panel?.querySelectorAll(".acc-data-sort-header").forEach((button) => {
+              const active = button.dataset.column === tab.sortColumn;
+              button.classList.toggle("active", active);
+              button.dataset.direction = active ? tab.sortDirection : "";
+            });
+          };
+          const sortPanelRows = (panel, tab, column) => {
+            const tbody = panel?.querySelector("tbody");
+            if (!tbody) return;
+            const direction = tab.sortColumn === column && tab.sortDirection === "asc" ? "desc" : "asc";
+            tab.sortColumn = column;
+            tab.sortDirection = direction;
+            [...tbody.querySelectorAll(".acc-data-row")].sort((left, right) => {
+              const result = compareInspectorValues(
+                getRowSortValue(left, column),
+                getRowSortValue(right, column),
+                column,
+                direction
+              );
+              return result || Number(left.dataset.index) - Number(right.dataset.index);
+            }).forEach((row) => tbody.appendChild(row));
+            updateSortHeaders(panel, tab);
+            updateConfirmState();
+          };
+          const collectResults = () => {
+            const resultsByType = {};
+            tabStates.forEach((tab) => {
+              const panel = getTabPanel(tab.type);
+              if (!panel) return;
+              if (tab.isCookieData) {
+                const allData = serializeCookieRows({ mask: panel, entries: tab.entries, columns: tab.cookieColumns, host: targetHost });
+                const selectedData = serializeCookieRows({
+                  mask: panel,
+                  entries: tab.entries,
+                  columns: tab.cookieColumns,
+                  host: targetHost,
+                  includeOnlyChecked: selectable
+                });
+                resultsByType[tab.type] = {
+                  data: selectable ? selectedData : allData,
+                  allData,
+                  selectedKeys: selectedData.map((cookie) => getCookieSelectionKey3(cookie)),
+                  rows: selectedData
+                };
+                return;
+              }
+              const allRows = serializeStorageRows({ mask: panel });
+              const selectedRows = serializeStorageRows({ mask: panel, includeOnlyChecked: selectable });
+              resultsByType[tab.type] = {
+                data: Object.fromEntries(selectable ? selectedRows : allRows),
+                allData: Object.fromEntries(allRows),
+                selectedKeys: selectedRows.map(([key]) => key),
+                rows: selectable ? selectedRows : allRows
+              };
+            });
+            return resultsByType;
+          };
+          const hasDirtyData = () => {
+            const resultsByType = collectResults();
+            return tabStates.some((tab) => !isSameData2(tab.data, resultsByType[tab.type]?.data));
+          };
+          const updateConfirmState = () => {
+            const confirmBtn = mask.querySelector(".acc-data-confirm");
+            if (confirmBtn && confirmDisabledUntilDirty) {
+              confirmBtn.disabled = !hasDirtyData();
             }
           };
+          const updateCount = () => {
+            const panel = getActivePanel();
+            const count = mask.querySelector(".acc-data-count");
+            if (count && panel) count.textContent = `${panel.querySelectorAll(".acc-data-check:checked").length}/${panel.querySelectorAll(".acc-data-row").length}`;
+            const checkedCount = panel?.querySelectorAll(".acc-data-check:checked").length || 0;
+            const checkAll = panel?.querySelector(".acc-data-check-all");
+            if (checkAll) {
+              const rowCount = panel.querySelectorAll(".acc-data-row").length;
+              checkAll.checked = rowCount > 0 && checkedCount === rowCount;
+              checkAll.indeterminate = checkedCount > 0 && checkedCount < rowCount;
+            }
+            updateConfirmState();
+          };
           const close = (result) => {
+            mask.__anmeDataInspectorCleanup?.();
             mask.__anmeCellInputSelectionCleanup?.();
             mask.style.display = "none";
             resolve(result);
           };
           mask.querySelector(".acc-data-close").onclick = () => close(null);
           mask.querySelector(".acc-data-confirm").onclick = () => {
-            close(
-              selectable ? [...mask.querySelectorAll(".acc-data-check:checked")].map((input) => entries[Number(input.dataset.index)]?.key).filter(Boolean) : true
-            );
+            const resultsByType = collectResults();
+            close({
+              tabs: resultsByType,
+              activeType,
+              ...resultsByType[activeType] || {}
+            });
           };
           mask.querySelectorAll(".acc-data-check").forEach((input) => input.addEventListener("change", updateCount));
-          mask.querySelector(".acc-data-check-all")?.addEventListener("change", (event) => {
-            mask.querySelectorAll(".acc-data-check").forEach((input) => {
-              input.checked = event.target.checked;
+          mask.querySelectorAll(".acc-data-check-all").forEach((input) => {
+            input.addEventListener("change", (event) => {
+              event.target.closest(".acc-data-tab-panel")?.querySelectorAll(".acc-data-check").forEach((checkbox) => {
+                checkbox.checked = event.target.checked;
+              });
+              updateCount();
             });
+          });
+          mask.querySelectorAll(".acc-data-tab").forEach((button) => {
+            button.addEventListener("click", () => {
+              activeType = button.dataset.type;
+              mask.querySelectorAll(".acc-data-tab").forEach((tabButton) => {
+                tabButton.classList.toggle("active", tabButton.dataset.type === activeType);
+              });
+              mask.querySelectorAll(".acc-data-tab-panel").forEach((panel) => {
+                panel.classList.toggle("active", panel.dataset.type === activeType);
+              });
+              const titleEl = mask.querySelector(".acc-data-title");
+              const activeTab = tabStates.find((tab) => tab.type === activeType);
+              if (titleEl) titleEl.textContent = activeTab?.title || activeType;
+              updateCount();
+            });
+          });
+          mask.querySelectorAll(".acc-data-sort-header").forEach((button) => {
+            button.addEventListener("click", (event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              const panel = button.closest(".acc-data-tab-panel");
+              const tab = tabStates.find((item) => item.type === panel?.dataset.type);
+              if (!panel || !tab || !button.dataset.column) return;
+              sortPanelRows(panel, tab, button.dataset.column);
+            });
+          });
+          mask.querySelector(".acc-data-add")?.addEventListener("click", () => {
+            const panel = getActivePanel();
+            const tab = tabStates.find((item) => item.type === activeType);
+            const tbody = panel?.querySelector("tbody");
+            if (!tbody || !tab) return;
+            const nextIndex = tab.entries.length + panel.querySelectorAll(".acc-data-row").length;
+            if (tab.isCookieData) {
+              const cookie = getDefaultCookie(targetHost);
+              const entry = {
+                key: getCookieSelectionKey3(cookie),
+                title: cookie.name,
+                value: cookie.value,
+                cookie
+              };
+              tbody.insertAdjacentHTML("beforeend", renderCookieRow(tab, entry, nextIndex, true));
+            } else {
+              tbody.insertAdjacentHTML(
+                "beforeend",
+                renderStorageRow(tab, { key: "", title: "", value: "", meta: "" }, nextIndex, true)
+              );
+            }
+            const newRow = tbody.lastElementChild;
+            newRow?.querySelector(".acc-data-check")?.addEventListener("change", updateCount);
+            newRow?.querySelector(".acc-cell-input")?.focus();
+            setupCellInputSelectionAssist(mask);
             updateCount();
           });
+          const updateDirtyState = () => updateConfirmState();
+          mask.addEventListener("input", updateDirtyState);
+          mask.addEventListener("change", updateDirtyState);
+          mask.__anmeDataInspectorCleanup = () => {
+            mask.removeEventListener("input", updateDirtyState);
+            mask.removeEventListener("change", updateDirtyState);
+            mask.__anmeDataInspectorCleanup = null;
+          };
           setupCellInputSelectionAssist(mask);
           updateCount();
           const dataBox = mask.querySelector(".acc-data-box");
@@ -3049,15 +3499,13 @@
           <div class="acc-chk">
             <span class="acc-source-row">
               <label class="acc-chk-label" title="Cookie"><input type="checkbox" id="form-c-ck" class="acc-custom-chk" checked> Cookie</label>
-              <button type="button" class="acc-source-eye" data-type="cookies" title="${utils.t("inspect_items")}">${constants.ICONS.EYE}</button>
             </span>
             <span class="acc-source-row">
               <label class="acc-chk-label" title="LocalStorage"><input type="checkbox" id="form-c-ls" class="acc-custom-chk"> LS</label>
-              <button type="button" class="acc-source-eye" data-type="localStorage" title="${utils.t("inspect_items")}">${constants.ICONS.EYE}</button>
             </span>
             <span class="acc-source-row">
               <label class="acc-chk-label" title="SessionStorage"><input type="checkbox" id="form-c-ss" class="acc-custom-chk"> SS</label>
-              <button type="button" class="acc-source-eye" data-type="sessionStorage" title="${utils.t("inspect_items")}">${constants.ICONS.EYE}</button>
+              <button type="button" class="acc-source-eye" id="form-source-eye" title="${utils.t("inspect_items")}">${constants.ICONS.EYE}</button>
             </span>
             <span class="acc-source-tips">
               <span class="acc-help-tip" title="${utils.t("tip_help")}">${constants.ICONS.HELP}</span>
@@ -3077,15 +3525,27 @@
             const noteInput = qs("#form-acc-note");
             let saveNoteSyncState = createSaveNoteSyncState();
             const snapshotSources = await core.getCurrentSnapshotSources();
-            const selectedSourceKeys = {
-              cookies: new Set(getCookieEntries(snapshotSources.cookies).map((entry) => entry.key)),
-              localStorage: new Set(Object.keys(snapshotSources.localStorage)),
-              sessionStorage: new Set(Object.keys(snapshotSources.sessionStorage))
+            const selectedSourceData = {
+              cookies: snapshotSources.cookies,
+              localStorage: snapshotSources.localStorage,
+              sessionStorage: snapshotSources.sessionStorage
             };
+            const sourceOrder = ["cookies", "localStorage", "sessionStorage"];
+            const getAllSourceKeys = (type) => getInspectorEntries(type, selectedSourceData[type]).map((entry) => entry.key);
+            const getSourceCount = (type) => getAllSourceKeys(type).length;
+            const defaultSourceType = sourceOrder.find((type) => getSourceCount(type) > 0) || "";
+            const selectedSourceKeys = Object.fromEntries(
+              sourceOrder.map((type) => [type, new Set(type === defaultSourceType ? getAllSourceKeys(type) : [])])
+            );
             const typeToCheckbox = {
               cookies: "#form-c-ck",
               localStorage: "#form-c-ls",
               sessionStorage: "#form-c-ss"
+            };
+            const typeTitles = {
+              cookies: "Cookie",
+              localStorage: "LocalStorage",
+              sessionStorage: "SessionStorage"
             };
             siteNameInput.value = utils.suggestSiteName(utils.getPageTitle(), constants.HOST);
             nameInput.value = utils.suggestAccountName(constants.HOST);
@@ -3107,60 +3567,81 @@
                 noteInput.value = nextNote;
               }
             };
-            const toggleAvailability = (selector, available) => {
-              const input = qs(selector);
+            const syncSourceCheckbox = (type) => {
+              const input = qs(typeToCheckbox[type]);
               const label = input?.closest(".acc-chk-label");
-              const eyeButton = input?.closest(".acc-source-row")?.querySelector(".acc-source-eye");
               if (!input || !label) return;
+              const totalCount = getSourceCount(type);
+              const selectedCount = selectedSourceKeys[type]?.size || 0;
+              const available = totalCount > 0;
               input.disabled = !available;
-              input.checked = available && input.id === "form-c-ck";
+              input.checked = available && selectedCount > 0 && selectedCount === totalCount;
+              input.indeterminate = available && selectedCount > 0 && selectedCount < totalCount;
               label.classList.toggle("disabled", !available);
-              if (eyeButton) {
-                eyeButton.disabled = !available;
-              }
             };
-            const getSelectedKeys = (type) => [...selectedSourceKeys[type] || /* @__PURE__ */ new Set()];
-            const resetSelectionIfEmpty = (type) => {
-              if (selectedSourceKeys[type]?.size > 0) return;
-              selectedSourceKeys[type] = new Set(getInspectorEntries(type, snapshotSources[type]).map((entry) => entry.key));
+            const syncSourceCheckboxes = () => {
+              sourceOrder.forEach(syncSourceCheckbox);
             };
+            const getSelectedKeys2 = (type) => [...selectedSourceKeys[type] || /* @__PURE__ */ new Set()];
+            const getSelectedCookieRows = () => {
+              const selectedKeys = new Set(getSelectedKeys2("cookies"));
+              return (selectedSourceData.cookies || []).filter((cookie) => selectedKeys.has(getCookieSelectionKey3(cookie)));
+            };
+            const getSelectedStorageRows = (type) => {
+              const selectedKeys = new Set(getSelectedKeys2(type));
+              return Object.entries(selectedSourceData[type] || {}).filter(([key]) => selectedKeys.has(key));
+            };
+            const selectAllSourceKeys = (type) => {
+              selectedSourceKeys[type] = new Set(getInspectorEntries(type, selectedSourceData[type]).map((entry) => entry.key));
+            };
+            const getAvailableInspectorTypes = () => sourceOrder.filter((type) => getSourceCount(type) > 0);
             const updateState = () => {
-              const ck = qs("#form-c-ck")?.checked;
-              const ls = qs("#form-c-ls")?.checked;
-              const ss = qs("#form-c-ss")?.checked;
-              const canSave = (ck || ls || ss) && nameInput.value.trim().length > 0 && siteNameInput.value.trim().length > 0;
+              syncSourceCheckboxes();
+              const hasSelectedSource = (type) => (selectedSourceKeys[type]?.size || 0) > 0;
+              const canSave = sourceOrder.some(hasSelectedSource) && nameInput.value.trim().length > 0 && siteNameInput.value.trim().length > 0;
               submitBtn.disabled = !canSave;
+              const sourceEye = qs("#form-source-eye");
+              if (sourceEye) {
+                sourceEye.disabled = getAvailableInspectorTypes().length === 0;
+              }
             };
             Object.entries(typeToCheckbox).forEach(([type, selector]) => {
               qs(selector)?.addEventListener("change", (event) => {
                 if (event.target.checked) {
-                  resetSelectionIfEmpty(type);
+                  selectAllSourceKeys(type);
+                } else {
+                  selectedSourceKeys[type] = /* @__PURE__ */ new Set();
                 }
                 updateState();
               });
             });
-            const openSourceSelector = async (type) => {
-              const selectedKeys = await ui.showDataInspector({
-                title: type,
-                type,
-                data: snapshotSources[type],
+            const openSourceSelector = async (initialType = "") => {
+              const availableTypes = getAvailableInspectorTypes();
+              if (availableTypes.length === 0) return;
+              const result = await ui.showDataInspectorTabs({
+                tabs: availableTypes.map((type) => ({
+                  title: typeTitles[type],
+                  type,
+                  data: selectedSourceData[type],
+                  selectedKeys: getSelectedKeys2(type)
+                })),
+                initialType: availableTypes.includes(initialType) ? initialType : availableTypes[0],
                 selectable: true,
-                selectedKeys: getSelectedKeys(type)
+                addable: true,
+                host: constants.HOST
               });
-              if (!selectedKeys) return;
-              selectedSourceKeys[type] = new Set(selectedKeys);
-              const input = qs(typeToCheckbox[type]);
-              if (input) {
-                input.checked = selectedKeys.length > 0;
-              }
+              if (!result) return;
+              Object.entries(result.tabs || {}).forEach(([type, tabResult]) => {
+                selectedSourceKeys[type] = new Set(tabResult.selectedKeys);
+                selectedSourceData[type] = tabResult.allData;
+              });
               updateState();
             };
-            qs(".acc-chk")?.querySelectorAll(".acc-source-eye").forEach((button) => {
-              button.addEventListener("click", (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                openSourceSelector(button.dataset.type);
-              });
+            qs("#form-source-eye")?.addEventListener("click", (event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              const checkedType = sourceOrder.find((type) => (selectedSourceKeys[type]?.size || 0) > 0);
+              openSourceSelector(checkedType);
             });
             siteNameInput.addEventListener("input", updateState);
             nameInput.addEventListener("input", () => {
@@ -3191,12 +3672,15 @@
                 if (!confirmed) return;
               }
               const saved = await core.saveAccount(name, siteName, {
-                ck: qs("#form-c-ck").checked,
-                ls: qs("#form-c-ls").checked,
-                ss: qs("#form-c-ss").checked,
-                cookieKeys: getSelectedKeys("cookies"),
-                localStorageKeys: getSelectedKeys("localStorage"),
-                sessionStorageKeys: getSelectedKeys("sessionStorage"),
+                ck: getSelectedKeys2("cookies").length > 0,
+                ls: getSelectedKeys2("localStorage").length > 0,
+                ss: getSelectedKeys2("sessionStorage").length > 0,
+                cookieKeys: getSelectedKeys2("cookies"),
+                localStorageKeys: getSelectedKeys2("localStorage"),
+                sessionStorageKeys: getSelectedKeys2("sessionStorage"),
+                cookieRows: getSelectedCookieRows(),
+                localStorageRows: getSelectedStorageRows("localStorage"),
+                sessionStorageRows: getSelectedStorageRows("sessionStorage"),
                 note: noteInput.value
               });
               if (!saved) return;
@@ -3204,14 +3688,6 @@
               ui.refresh();
               ui.showToast(utils.t("toast_saved"));
             };
-            const availableSources = {
-              ck: snapshotSources.cookies.length > 0,
-              ls: Object.keys(snapshotSources.localStorage).length > 0,
-              ss: Object.keys(snapshotSources.sessionStorage).length > 0
-            };
-            toggleAvailability("#form-c-ck", availableSources.ck);
-            toggleAvailability("#form-c-ls", availableSources.ls);
-            toggleAvailability("#form-c-ss", availableSources.ss);
             syncExistingAccountNote();
             updateState();
             if (utils.getSortedKeysByHost(constants.HOST).length > 0) {
