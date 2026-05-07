@@ -65,6 +65,10 @@ export function createUtils({ state, constants, i18nData }) {
     extractName(key) {
       return key.split('::')[1] || key;
     },
+    extractHost(key) {
+      const hostPart = String(key || '').split('::')[0] || '';
+      return hostPart.startsWith(constants.PREFIX) ? hostPart.slice(constants.PREFIX.length) : hostPart;
+    },
     makeKey(name, host = constants.HOST) {
       return `${constants.PREFIX}${host}::${name}`;
     },

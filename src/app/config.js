@@ -35,6 +35,7 @@ export const CONST = {
             SETTINGS: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.84308 3.80211C9.8718 2.6007 10.8862 2 12 2C13.1138 2 14.1282 2.6007 16.1569 3.80211L16.8431 4.20846C18.8718 5.40987 19.8862 6.01057 20.4431 7C21 7.98943 21 9.19084 21 11.5937V12.4063C21 14.8092 21 16.0106 20.4431 17C19.8862 17.9894 18.8718 18.5901 16.8431 19.7915L16.1569 20.1979C14.1282 21.3993 13.1138 22 12 22C10.8862 22 9.8718 21.3993 7.84308 20.1979L7.15692 19.7915C5.1282 18.5901 4.11384 17.9894 3.55692 17C3 16.0106 3 14.8092 3 12.4063V11.5937C3 9.19084 3 7.98943 3.55692 7C4.11384 6.01057 5.1282 5.40987 7.15692 4.20846L7.84308 3.80211Z" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/></svg>`,
             HELP: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.75C12.4142 17.75 12.75 17.4142 12.75 17V11C12.75 10.5858 12.4142 10.25 12 10.25C11.5858 10.25 11.25 10.5858 11.25 11V17C11.25 17.4142 11.5858 17.75 12 17.75Z" fill="currentColor"/><path d="M12 7C12.5523 7 13 7.44772 13 8C13 8.55228 12.5523 9 12 9C11.4477 9 11 8.55228 11 8C11 7.44772 11.4477 7 12 7Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M1.25 12C1.25 6.06294 6.06294 1.25 12 1.25C17.9371 1.25 22.75 6.06294 22.75 12C22.75 17.9371 17.9371 22.75 12 22.75C6.06294 22.75 1.25 17.9371 1.25 12ZM12 2.75C6.89137 2.75 2.75 6.89137 2.75 12C2.75 17.1086 6.89137 21.25 12 21.25C17.1086 21.25 21.25 17.1086 21.25 12C21.25 6.89137 17.1086 2.75 12 2.75Z" fill="currentColor"/></svg>`,
             EYE: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.25 12S5.75 5.75 12 5.75S21.75 12 21.75 12 18.25 18.25 12 18.25 2.25 12 2.25 12Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/></svg>`,
+            ADD: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
             MAXIMIZE: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="5" width="14" height="14" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>`,
             RESTORE: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 7.5V5.75C8 4.7835 8.7835 4 9.75 4H18.25C19.2165 4 20 4.7835 20 5.75V14.25C20 15.2165 19.2165 16 18.25 16H16.5" stroke="currentColor" stroke-width="1.5"/><rect x="4" y="8" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>`,
             LOCK: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M5.25 9.30277V8C5.25 4.27208 8.27208 1.25 12 1.25C15.7279 1.25 18.75 4.27208 18.75 8V9.30277C18.9768 9.31872 19.1906 9.33948 19.3918 9.36652C20.2919 9.48754 21.0497 9.74643 21.6517 10.3483C22.2536 10.9503 22.5125 11.7081 22.6335 12.6082C22.75 13.4752 22.75 14.5775 22.75 15.9451V16.0549C22.75 17.4225 22.75 18.5248 22.6335 19.3918C22.5125 20.2919 22.2536 21.0497 21.6517 21.6516C21.0497 22.2536 20.2919 22.5125 19.3918 22.6335C18.5248 22.75 17.4225 22.75 16.0549 22.75H7.94513C6.57754 22.75 5.47522 22.75 4.60825 22.6335C3.70814 22.5125 2.95027 22.2536 2.34835 21.6516C1.74643 21.0497 1.48754 20.2919 1.36652 19.3918C1.24996 18.5248 1.24998 17.4225 1.25 16.0549V15.9451C1.24998 14.5775 1.24996 13.4752 1.36652 12.6082C1.48754 11.7081 1.74643 10.9503 2.34835 10.3483C2.95027 9.74643 3.70814 9.48754 4.60825 9.36652C4.80938 9.33948 5.02317 9.31872 5.25 9.30277ZM6.75 8C6.75 5.10051 9.10051 2.75 12 2.75C14.8995 2.75 17.25 5.10051 17.25 8V9.25344C16.8765 9.24999 16.4784 9.24999 16.0549 9.25H7.94513C7.52161 9.24999 7.12353 9.24999 6.75 9.25344V8ZM3.40901 11.409C3.68577 11.1322 4.07435 10.9518 4.80812 10.8531C5.56347 10.7516 6.56459 10.75 8 10.75H16C17.4354 10.75 18.4365 10.7516 19.1919 10.8531C19.9257 10.9518 20.3142 11.1322 20.591 11.409C20.8678 11.6858 21.0482 12.0743 21.1469 12.8081C21.2484 13.5635 21.25 14.5646 21.25 16C21.25 17.4354 21.2484 18.4365 21.1469 19.1919C21.0482 19.9257 20.8678 20.3142 20.591 20.591C20.3142 20.8678 19.9257 21.0482 19.1919 21.1469C18.4365 21.2484 17.4354 21.25 16 21.25H8C6.56459 21.25 5.56347 21.2484 4.80812 21.1469C4.07435 21.0482 3.68577 20.8678 3.40901 20.591C3.13225 20.3142 2.9518 19.9257 2.85315 19.1919C2.75159 18.4365 2.75 17.4354 2.75 16C2.75 14.5646 2.75159 13.5635 2.85315 12.8081C2.9518 12.0743 3.13225 11.6858 3.40901 11.409Z" fill="currentColor"/></svg>`,
@@ -69,6 +70,10 @@ Object.assign(I18N_DATA.zh, {
     local_storage_tag_title: "LocalStorage",
     session_storage_tag_title: "SessionStorage",
     inspect_items: "查看明细",
+    add_item: "新增",
+    confirm_save_changes: "是否保存已修改内容",
+    save_account_title: "保存账号",
+    exit_account_title: "退出账号",
     maximize_panel: "最大化",
     restore_panel: "还原",
     select_all: "全选",
@@ -131,6 +136,10 @@ Object.assign(I18N_DATA.en, {
      local_storage_tag_title: "LocalStorage",
      session_storage_tag_title: "SessionStorage",
     inspect_items: "Inspect items",
+    add_item: "Add",
+    confirm_save_changes: "Save these changes? Unchecked rows will not be kept.",
+    save_account_title: "Save account",
+    exit_account_title: "Exit account",
     maximize_panel: "Maximize",
     restore_panel: "Restore",
     select_all: "Select all",
@@ -193,6 +202,10 @@ Object.assign(I18N_DATA.es, {
      local_storage_tag_title: "LocalStorage",
      session_storage_tag_title: "SessionStorage",
     inspect_items: "Ver detalles",
+    add_item: "Agregar",
+    confirm_save_changes: "¿Guardar estos cambios? Las filas sin marcar no se conservarán.",
+    save_account_title: "Guardar cuenta",
+    exit_account_title: "Salir de la cuenta",
     maximize_panel: "Maximizar",
     restore_panel: "Restaurar",
     select_all: "Seleccionar todo",
@@ -382,15 +395,24 @@ export const STYLE_CSS = `
         .acc-data-header { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:7px 10px; border-bottom:1px solid #eef2f6; }
         .acc-data-title { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:13px; font-weight:700; color:#333; }
         .acc-data-header-actions { display:flex; align-items:center; gap:8px; flex-shrink:0; }
-        .acc-data-header-actions .acc-dialog-btn { flex:0 0 auto; min-width:64px; padding:6px 12px; }
+        .acc-data-confirm,
         .acc-data-close,
         .acc-data-window-btn { width:28px; height:28px; min-width:28px; }
+        .acc-data-confirm:disabled { opacity:.35; cursor:not-allowed; background:#fff; border-color:#ddd; color:#98a2b3; }
+        .acc-data-confirm:disabled:hover { background:#fff; border-color:#ddd; color:#98a2b3; }
+        .acc-data-confirm svg { font-size:14px; }
         .acc-data-window-btn svg { font-size:14px; }
         .acc-data-window-btn .acc-restore-icon { display:none; }
         .acc-data-box.is-maximized .acc-data-window-btn .acc-maximize-icon { display:none; }
         .acc-data-box.is-maximized .acc-data-window-btn .acc-restore-icon { display:inline-flex; }
         .acc-data-toolbar { display:flex; align-items:center; gap:8px; padding:5px 10px; border-bottom:1px solid #eef2f6; }
         .acc-data-count { margin-right:auto; font-size:12px; color:#667085; }
+        .acc-data-tabs { display:flex; align-items:flex-end; gap:0; padding:6px 10px 0; border-bottom:1px solid #e6ebf1; background:#f8fafc; }
+        .acc-data-tab { min-width:78px; height:30px; padding:0 12px; border:1px solid transparent; border-bottom:none; border-radius:8px 8px 0 0; background:transparent; color:#667085; font-size:12px; font-weight:700; cursor:pointer; }
+        .acc-data-tab:hover { color:#2196F3; background:#eef7ff; }
+        .acc-data-tab.active { color:#1d4f7a; background:#fff; border-color:#e6ebf1; margin-bottom:-1px; }
+        .acc-data-tab-panel { display:none; height:100%; min-height:0; }
+        .acc-data-tab-panel.active { display:block; }
         .acc-data-tool-btn { border:1px solid #d0d5dd; background:#fff; color:#344054; border-radius:6px; padding:4px 8px; font-size:12px; cursor:pointer; }
         .acc-data-tool-btn:hover,
         .acc-data-tool-btn:focus-visible { border-color:#2196F3; color:#2196F3; background:#f5fbff; outline:none; }
@@ -410,17 +432,29 @@ export const STYLE_CSS = `
         .acc-storage-table th,
         .acc-storage-table td { border-bottom:1px solid #eef2f6; border-right:1px solid #eef2f6; padding:0; text-align:left; vertical-align:top; color:#344054; font-family:"SF Mono", Consolas, monospace; font-size:11px; line-height:1.4; }
         .acc-cookie-table th,
-        .acc-storage-table th { position:sticky; top:0; z-index:1; background:#f8fafc; color:#667085; font-family:inherit; font-size:11px; font-weight:700; padding:4px 6px; white-space:nowrap; }
+        .acc-storage-table th { position:sticky; top:0; z-index:1; background:#edf2f7; color:#475467; font-family:inherit; font-size:11px; font-weight:700; padding:2px 3px; white-space:nowrap; text-align:center; vertical-align:middle; }
+        .acc-data-sort-header { position:relative; width:100%; min-width:0; min-height:16px; border:none; background:transparent; color:inherit; padding:0 2px; display:flex; align-items:center; justify-content:center; font:inherit; font-weight:inherit; text-align:center; cursor:pointer; letter-spacing:0; }
+        .acc-data-sort-header:hover,
+        .acc-data-sort-header:focus-visible,
+        .acc-data-sort-header.active { color:#2196F3; outline:none; }
+        .acc-data-sort-label { min-width:0; overflow:visible; text-overflow:clip; white-space:nowrap; }
+        .acc-data-sort-indicator { position:absolute; right:0; bottom:0; width:0; height:0; opacity:0; border-left:2.5px solid transparent; border-right:2.5px solid transparent; border-bottom:4px solid currentColor; transform-origin:center; }
+        .acc-data-sort-header.active .acc-data-sort-indicator { opacity:0.85; }
+        .acc-data-sort-header.active[data-direction="desc"] .acc-data-sort-indicator { transform:rotate(180deg); }
         .acc-cookie-table td:focus-within,
         .acc-storage-table td:focus-within { outline:1px solid #2196F3; outline-offset:-1px; box-shadow:inset 0 0 0 1px rgba(33,150,243,.2); background:#f5fbff !important; }
         .acc-cell-input { display:block; width:100%; min-width:0; height:22px; padding:3px 6px; border:none; outline:none; box-shadow:none; background:transparent; color:inherit; font:inherit; line-height:1.4; box-sizing:border-box; cursor:text; user-select:text; }
         .acc-cell-input[readonly] { -webkit-text-fill-color:currentColor; opacity:1; }
         .acc-cookie-table tr:nth-child(even) td { background:#fafbfc; }
         .acc-storage-table tr:nth-child(even) td { background:#fafbfc; }
+        .acc-cookie-table tr.is-expired td { background:#fff1f2; color:#9f1239; }
+        .acc-cookie-table tr.is-expired td:focus-within { background:#fff7f8 !important; }
         .acc-cookie-check-col,
         .acc-storage-check-col { width:34px; min-width:34px; text-align:center !important; }
         .acc-cookie-check-col .acc-custom-chk,
-        .acc-storage-check-col .acc-custom-chk { margin:7px auto !important; display:block !important; }
+        .acc-storage-check-col .acc-custom-chk,
+        .acc-data-check,
+        .acc-data-check-all { display:block !important; width:14px !important; height:14px !important; min-width:14px !important; min-height:14px !important; margin:7px auto !important; flex:0 0 14px !important; opacity:1 !important; visibility:visible !important; pointer-events:auto !important; }
         .acc-cookie-value-col { width:36%; }
         .acc-data-empty { padding:18px; text-align:center; color:#667085; font-size:12px; }
         .acc-data-footer { display:flex; justify-content:flex-end; gap:8px; padding:10px 12px; border-top:1px solid #eef2f6; }
@@ -512,7 +546,7 @@ export const STYLE_CSS = `
         .acc-link-btn { color: #2196F3; cursor: pointer; font-size: 12px; }
         .acc-select-ui { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; background: #fff; cursor: pointer; outline: none; color: #333; }
         .acc-chk {display:flex; align-items:center; flex-wrap:nowrap; gap:3px; font-size:11px; color:#666; margin:5px 0;-webkit-user-select: none;}
-        .acc-source-row { display:inline-flex; align-items:center; gap:0; flex-shrink:0; }
+        .acc-source-row { display:inline-flex; align-items:center; gap:2px; flex-shrink:0; }
         .acc-source-tips { margin-left:auto; display:inline-flex; align-items:center; gap:5px; flex-shrink:0; padding-left:4px; }
         .acc-source-eye { width:18px; height:18px; border:none; background:transparent; color:#667085; display:inline-flex; align-items:center; justify-content:center; padding:0; cursor:pointer; border-radius:5px; flex-shrink:0; }
         .acc-source-eye svg { font-size:13px; }
@@ -525,6 +559,8 @@ export const STYLE_CSS = `
         .acc-custom-chk:disabled { cursor: not-allowed !important; background: #f3f4f6 !important; border-color: #d0d5dd !important; }
         .acc-custom-chk:checked { background-color: #2196F3 !important; border-color: #2196F3 !important; }
         .acc-custom-chk:checked::after { content: ''; position: absolute !important; left: 4px !important; top: 1px !important; width: 3px !important; height: 7px !important; border: solid white !important; border-width: 0 2px 2px 0 !important; transform: rotate(45deg) !important; }
+        .acc-custom-chk:indeterminate { background-color: #2196F3 !important; border-color: #2196F3 !important; }
+        .acc-custom-chk:indeterminate::after { content: ''; position: absolute !important; left: 3px !important; top: 5px !important; width: 6px !important; height: 2px !important; background: white !important; border: none !important; transform: none !important; }
 
         .acc-loading-mask{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,.7);backdrop-filter:blur(2px);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:2000010;border-radius:12px}
         .acc-spinner{width:30px;height:30px;border:3px solid #f3f3f3;border-top:3px solid #2196F3;border-radius:50%;animation:acc-spin 1s linear infinite}

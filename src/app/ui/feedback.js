@@ -18,6 +18,25 @@ const getStorageEntries = (storageData) =>
     meta: ''
   }));
 
+const normalizeForCompare = (value) => {
+  if (Array.isArray(value)) {
+    return value
+      .map(normalizeForCompare)
+      .sort((left, right) => JSON.stringify(left).localeCompare(JSON.stringify(right)));
+  }
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.keys(value)
+        .sort()
+        .map((key) => [key, normalizeForCompare(value[key])])
+    );
+  }
+  return value;
+};
+
+const isSameData = (left, right) =>
+  JSON.stringify(normalizeForCompare(left)) === JSON.stringify(normalizeForCompare(right));
+
 const getCookieEntries = (cookies) =>
   (Array.isArray(cookies) ? cookies : []).map((cookie) => {
     return {
@@ -37,6 +56,46 @@ const formatInspectorValue = (value) => {
   return String(value);
 };
 
+const getExpirationSortValue = (value) => {
+  const normalized = String(value ?? '').trim();
+  if (!normalized || /^session$/i.test(normalized)) return Number.POSITIVE_INFINITY;
+  const numericValue = Number(normalized);
+  if (Number.isFinite(numericValue)) return numericValue > 100000000000 ? numericValue : numericValue * 1000;
+  const timestamp = Date.parse(normalized);
+  return Number.isNaN(timestamp) ? Number.POSITIVE_INFINITY : timestamp;
+};
+
+const compareInspectorValues = (left, right, column, direction = 'asc') => {
+  let result = 0;
+  if (column === 'expirationDate') {
+    result = getExpirationSortValue(left) - getExpirationSortValue(right);
+  } else {
+    result = String(left ?? '').localeCompare(String(right ?? ''), undefined, {
+      numeric: true,
+      sensitivity: 'base'
+    });
+  }
+  return direction === 'desc' ? -result : result;
+};
+
+const getEntrySortValue = (type, entry, column) => {
+  if (type === 'cookies') {
+    return column === 'value' ? entry.value : getCookieCellValue(entry.cookie || {}, column);
+  }
+  return column === 'value' ? entry.value : entry.key;
+};
+
+const sortInspectorEntries = (entries, type, column = type === 'cookies' ? 'name' : 'key', direction = 'asc') =>
+  [...entries].sort((left, right) => {
+    const result = compareInspectorValues(
+      getEntrySortValue(type, left, column),
+      getEntrySortValue(type, right, column),
+      column,
+      direction
+    );
+    return result || String(left.key || '').localeCompare(String(right.key || ''), undefined, { numeric: true });
+  });
+
 const getCookieCellValue = (cookie, column) => {
   if (column === 'expirationDate') {
     return typeof cookie.expirationDate === 'number'
@@ -47,7 +106,7 @@ const getCookieCellValue = (cookie, column) => {
 };
 
 const getCookieColumns = (entries) => {
-  const preferredColumns = ['name', 'value', 'domain', 'path', 'expirationDate', 'httpOnly', 'secure', 'sameSite'];
+  const preferredColumns = ['name', 'value', 'domain', 'path', 'expirationDate', 'secure', 'httpOnly', 'session', 'hostOnly', 'sameSite'];
   const actualColumns = new Set();
   entries.forEach((entry) => {
     Object.keys(entry.cookie || {}).forEach((column) => {
@@ -65,11 +124,92 @@ const getCookieColumns = (entries) => {
 const getCookieColumnWidth = (column) => {
   if (column === 'value') return 360;
   if (column === 'name') return 160;
-  if (column === 'domain' || column === 'path') return 140;
+  if (column === 'domain') return 140;
+  if (column === 'path') return 72;
   if (column === 'expirationDate') return 150;
-  if (column === 'httpOnly' || column === 'secure') return 70;
+  if (column === 'httpOnly' || column === 'secure' || column === 'session' || column === 'hostOnly') return 70;
   if (column === 'sameSite') return 96;
   return 120;
+};
+
+const getDefaultCookieColumns = () => ['name', 'value', 'domain', 'path', 'expirationDate', 'secure', 'httpOnly', 'session', 'hostOnly', 'sameSite'];
+
+const getDefaultCookie = (host) => ({
+  name: '',
+  value: '',
+  domain: host || location.hostname,
+  path: '/',
+  expirationDate: '',
+  secure: false,
+  httpOnly: false,
+  session: false,
+  hostOnly: false,
+  sameSite: 'lax'
+});
+
+const parseCookieCellValue = (value, column) => {
+  const normalized = String(value ?? '').trim();
+  if (column === 'expirationDate') {
+    if (!normalized || /^session$/i.test(normalized)) return undefined;
+    const numericValue = Number(normalized);
+    if (Number.isFinite(numericValue)) return numericValue > 100000000000 ? numericValue / 1000 : numericValue;
+    const timestamp = Date.parse(normalized);
+    return Number.isNaN(timestamp) ? undefined : timestamp / 1000;
+  }
+  if (column === 'secure' || column === 'httpOnly' || column === 'hostOnly' || column === 'session') {
+    return /^(true|1|yes)$/i.test(normalized);
+  }
+  return String(value ?? '');
+};
+
+const serializeCookieRows = ({ mask, entries, columns, host, includeOnlyChecked }) => {
+  const rows = [];
+  mask.querySelectorAll('.acc-data-row').forEach((row) => {
+    const check = row.querySelector('.acc-data-check');
+    if (includeOnlyChecked && !check?.checked) return;
+
+    const index = Number(row.dataset.index);
+    const originalCookie = entries[index]?.cookie;
+    const cookie = originalCookie ? { ...originalCookie } : getDefaultCookie(host);
+
+    columns.forEach((column) => {
+      const input = row.querySelector(`[data-column="${column}"]`);
+      if (!input) return;
+
+      const originalValue = originalCookie ? getCookieCellValue(originalCookie, column) : '';
+      if (originalCookie && input.value === originalValue) return;
+
+      const parsedValue = parseCookieCellValue(input.value, column);
+      if (parsedValue === undefined || parsedValue === '') {
+        if (column !== 'name' && column !== 'value' && column !== 'domain' && column !== 'path') {
+          delete cookie[column];
+          return;
+        }
+      }
+      cookie[column] = parsedValue ?? '';
+    });
+
+    cookie.name = String(cookie.name || '').trim();
+    cookie.value = String(cookie.value ?? '');
+    cookie.domain = String(cookie.domain || host || location.hostname).trim();
+    cookie.path = String(cookie.path || '/').trim();
+    if (!cookie.name) return;
+    rows.push(cookie);
+  });
+  return rows;
+};
+
+const serializeStorageRows = ({ mask, includeOnlyChecked }) => {
+  const rows = [];
+  mask.querySelectorAll('.acc-data-row').forEach((row) => {
+    const check = row.querySelector('.acc-data-check');
+    if (includeOnlyChecked && !check?.checked) return;
+
+    const key = row.querySelector('[data-column="key"]')?.value.trim();
+    if (!key) return;
+    rows.push([key, row.querySelector('[data-column="value"]')?.value ?? '']);
+  });
+  return rows;
 };
 
 const canScrollInDirection = (element, deltaX, deltaY) => {
@@ -445,38 +585,133 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
         state.dataInspectorMask.style.display = 'none';
       }
     },
-    showDataInspector({ title, type, data, selectable = false, selectedKeys = [] }) {
+    showDataInspector({
+      title,
+      type,
+      data,
+      selectable = false,
+      selectedKeys = [],
+      editable = false,
+      addable = false,
+      submitText = utils.t('dlg_ok'),
+      confirmDisabledUntilDirty = false,
+      host = constants.HOST
+    }) {
+      return ui
+        .showDataInspectorTabs({
+          tabs: [{ title, type, data, selectedKeys }],
+          initialType: type,
+          selectable,
+          editable,
+          addable,
+          submitText,
+          confirmDisabledUntilDirty,
+          host
+        })
+        .then((result) => result?.tabs?.[type] || result || null);
+    },
+    showDataInspectorTabs({
+      tabs,
+      initialType,
+      selectable = false,
+      editable = false,
+      addable = false,
+      submitText = utils.t('dlg_ok'),
+      confirmDisabledUntilDirty = false,
+      host = constants.HOST
+    }) {
       return new Promise((resolve) => {
         const mask = ui.ensureDataInspectorMask();
-        const entries = getInspectorEntries(type, data);
-        const isCookieData = type === 'cookies';
-        const cookieColumns = isCookieData ? getCookieColumns(entries) : [];
-        const cookieTableWidth = cookieColumns.reduce(
-          (width, column) => width + getCookieColumnWidth(column),
-          selectable ? 34 : 0
-        );
-        const storageTableWidth = selectable ? 674 : 640;
-        const selectedSet = new Set(selectedKeys);
-        const selectedCountText = () => `${mask.querySelectorAll('.acc-data-check:checked').length}/${entries.length}`;
-        const checkboxHtml = (entry, index) =>
+        mask.__anmeDataInspectorCleanup?.();
+        const targetHost = host || constants.HOST;
+        const tabStates = (tabs || [])
+          .filter((tab) => tab?.type)
+          .map((tab) => {
+            const defaultSortColumn = tab.type === 'cookies' ? 'name' : 'key';
+            const entries = sortInspectorEntries(getInspectorEntries(tab.type, tab.data), tab.type, defaultSortColumn);
+            const isCookieData = tab.type === 'cookies';
+            const cookieColumns = isCookieData
+              ? [...new Set([...getDefaultCookieColumns(), ...getCookieColumns(entries)])]
+              : [];
+            const cookieTableWidth = cookieColumns.reduce(
+              (width, column) => width + getCookieColumnWidth(column),
+              selectable ? 34 : 0
+            );
+            return {
+              ...tab,
+              entries,
+              isCookieData,
+              cookieColumns,
+              cookieTableWidth,
+              storageTableWidth: selectable ? 674 : 640,
+              selectedSet: new Set(tab.selectedKeys || []),
+              sortColumn: defaultSortColumn,
+              sortDirection: 'asc'
+            };
+          });
+        if (tabStates.length === 0) {
+          resolve(null);
+          return;
+        }
+
+        let activeType = tabStates.some((tab) => tab.type === initialType) ? initialType : tabStates[0].type;
+        const canEditCells = selectable || editable;
+        const checkboxHtml = (entry, index, checked) =>
           selectable
-            ? `<input type="checkbox" class="acc-custom-chk acc-data-check" data-index="${index}" ${selectedSet.has(entry.key) ? 'checked' : ''}>`
+            ? `<input type="checkbox" class="acc-custom-chk acc-data-check" data-index="${index}" ${checked ? 'checked' : ''}>`
             : '';
         const selectAllHtml = selectable
           ? '<input type="checkbox" class="acc-custom-chk acc-data-check-all" checked>'
           : '';
-        const renderCookieTable = () => `
+        const sortHeaderHtml = (tab, column, label) => `
+          <button type="button" class="acc-data-sort-header${tab.sortColumn === column ? ' active' : ''}" data-column="${utils.escapeHtml(column)}" data-direction="${tab.sortColumn === column ? tab.sortDirection : ''}">
+            <span class="acc-data-sort-label">${utils.escapeHtml(label)}</span>
+            <span class="acc-data-sort-indicator" aria-hidden="true"></span>
+          </button>
+        `;
+        const editableAttrs = (column, index, readonly = !canEditCells) =>
+          `data-index="${index}" data-column="${column}" ${readonly ? 'readonly' : ''} autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"`;
+        const storageKeyAttrs = (index) =>
+          `data-index="${index}" data-column="key" ${canEditCells ? '' : 'readonly'} autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"`;
+        const renderCookieRow = (tab, entry, index, isNew = false) => `
+          <tr class="acc-data-row${entry.isExpired ? ' is-expired' : ''}" data-index="${index}">
+            ${selectable ? `<td class="acc-cookie-check-col">${checkboxHtml(entry, index, isNew || tab.selectedSet.has(entry.key))}</td>` : ''}
+            ${tab.cookieColumns
+              .map((column) => {
+                const value = column === 'value' ? entry.value : getCookieCellValue(entry.cookie || {}, column);
+                const readonly = !canEditCells || (!isNew && !editable && !selectable && column !== 'value');
+                return `<td><input type="text" class="acc-cell-input${column === 'value' ? ' acc-data-value-input' : ''}" ${editableAttrs(
+                  column,
+                  index,
+                  readonly
+                )} value="${utils.escapeHtml(value)}"></td>`;
+              })
+              .join('')}
+          </tr>
+        `;
+        const renderStorageRow = (tab, entry, index, isNew = false) => `
+          <tr class="acc-data-row" data-index="${index}">
+            ${selectable ? `<td class="acc-storage-check-col">${checkboxHtml(entry, index, isNew || tab.selectedSet.has(entry.key))}</td>` : ''}
+            <td><input type="text" class="acc-cell-input" ${storageKeyAttrs(index)} value="${utils.escapeHtml(entry.title)}"></td>
+            <td><input type="text" class="acc-cell-input acc-data-value-input" ${editableAttrs(
+              'value',
+              index,
+              !canEditCells
+            )} value="${utils.escapeHtml(formatInspectorValue(entry.value))}"></td>
+          </tr>
+        `;
+        const renderCookieTable = (tab) => `
           <div class="acc-cookie-table-wrap">
-            <table class="acc-cookie-table" style="min-width:${cookieTableWidth}px">
+            <table class="acc-cookie-table" style="min-width:${tab.cookieTableWidth}px">
               <colgroup>
-                ${selectable ? `<col class="acc-cookie-check-col" style="width:${(34 / cookieTableWidth) * 100}%">` : ''}
-                ${cookieColumns
+                ${selectable ? '<col class="acc-cookie-check-col" style="width:34px">' : ''}
+                ${tab.cookieColumns
                   .map(
                     (column) =>
                       `<col class="${column === 'value' ? 'acc-cookie-value-col' : ''}" style="width:${(getCookieColumnWidth(
                         column
                       ) /
-                        cookieTableWidth) *
+                        tab.cookieTableWidth) *
                         100}%">`
                   )
                   .join('')}
@@ -484,76 +719,70 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
               <thead>
                 <tr>
                   ${selectable ? `<th class="acc-cookie-check-col">${selectAllHtml}</th>` : ''}
-                  ${cookieColumns.map((column) => `<th>${utils.escapeHtml(column)}</th>`).join('')}
+                  ${tab.cookieColumns.map((column) => `<th>${sortHeaderHtml(tab, column, column)}</th>`).join('')}
                 </tr>
               </thead>
-              <tbody>
-                ${entries
-                  .map(
-                    (entry, index) => `
-                      <tr>
-                        ${selectable ? `<td class="acc-cookie-check-col">${checkboxHtml(entry, index)}</td>` : ''}
-                        ${cookieColumns
-                          .map(
-                            (column) =>
-                              `<td><input type="text" class="acc-cell-input" readonly value="${utils.escapeHtml(
-                                getCookieCellValue(entry.cookie || {}, column)
-                              )}"></td>`
-                          )
-                          .join('')}
-                      </tr>
-                    `
-                  )
-                  .join('')}
-              </tbody>
+              <tbody>${tab.entries.map((entry, index) => renderCookieRow(tab, entry, index)).join('')}</tbody>
             </table>
           </div>
         `;
-        const renderStorageList = () => `
+        const renderStorageList = (tab) => `
           <div class="acc-storage-table-wrap">
-            <table class="acc-storage-table" style="min-width:${storageTableWidth}px">
+            <table class="acc-storage-table" style="min-width:${tab.storageTableWidth}px">
               <colgroup>
-                ${selectable ? '<col class="acc-storage-check-col" style="width:5%">' : ''}
-                <col class="acc-storage-key-col" style="width:${selectable ? 31 : 34}%">
-                <col class="acc-storage-value-col" style="width:${selectable ? 64 : 66}%">
+                ${selectable ? '<col class="acc-storage-check-col" style="width:34px">' : ''}
+                <col class="acc-storage-key-col" style="width:${selectable ? 'calc(34% - 17px)' : '34%'}">
+                <col class="acc-storage-value-col" style="width:${selectable ? 'calc(66% - 17px)' : '66%'}">
               </colgroup>
               <thead>
                 <tr>
                   ${selectable ? `<th class="acc-storage-check-col">${selectAllHtml}</th>` : ''}
-                  <th>Key</th>
-                  <th>Value</th>
+                  <th>${sortHeaderHtml(tab, 'key', 'Key')}</th>
+                  <th>${sortHeaderHtml(tab, 'value', 'Value')}</th>
                 </tr>
               </thead>
-              <tbody>
-                ${entries
-                  .map(
-                    (entry, index) => `
-                      <tr>
-                        ${selectable ? `<td class="acc-storage-check-col">${checkboxHtml(entry, index)}</td>` : ''}
-                        <td><input type="text" class="acc-cell-input" readonly value="${utils.escapeHtml(entry.title)}"></td>
-                        <td><input type="text" class="acc-cell-input" readonly value="${utils.escapeHtml(formatInspectorValue(entry.value))}"></td>
-                      </tr>
-                    `
-                  )
-                  .join('')}
-              </tbody>
+              <tbody>${tab.entries.map((entry, index) => renderStorageRow(tab, entry, index)).join('')}</tbody>
             </table>
+          </div>
+        `;
+        const renderTabPanel = (tab) => `
+          <div class="acc-data-tab-panel${tab.type === activeType ? ' active' : ''}" data-type="${utils.escapeHtml(tab.type)}">
+            ${tab.isCookieData ? renderCookieTable(tab) : renderStorageList(tab)}
           </div>
         `;
 
         utils.setHTML(mask, `
           <div class="acc-data-box">
             <div class="acc-data-header">
-              <div class="acc-data-title">${utils.escapeHtml(title || type)}</div>
+              <div class="acc-data-title">${utils.escapeHtml(tabStates.find((tab) => tab.type === activeType)?.title || activeType)}</div>
               <div class="acc-data-header-actions">
+                ${
+                  addable
+                    ? `<button type="button" class="acc-toolbar-btn acc-data-add" title="${utils.t('add_item')}" aria-label="${utils.t('add_item')}">${constants.ICONS.ADD}</button>`
+                    : ''
+                }
                 <button type="button" class="acc-toolbar-btn acc-data-window-btn acc-data-maximize" title="${utils.t('maximize_panel')}">
                   <span class="acc-maximize-icon">${constants.ICONS.MAXIMIZE}</span>
                   <span class="acc-restore-icon">${constants.ICONS.RESTORE}</span>
                 </button>
-                <button type="button" class="acc-dialog-btn acc-dialog-btn-ok acc-data-confirm">${utils.t('dlg_ok')}</button>
+                <button type="button" class="acc-toolbar-btn acc-data-confirm" title="${utils.escapeHtml(submitText)}" aria-label="${utils.escapeHtml(submitText)}">${constants.ICONS.SAVE}</button>
                 <button type="button" class="acc-toolbar-btn acc-data-close" title="${utils.t('dlg_cancel')}">${constants.ICONS.CLOSE}</button>
               </div>
             </div>
+            ${
+              tabStates.length > 1
+                ? `<div class="acc-data-tabs">
+                    ${tabStates
+                      .map(
+                        (tab) =>
+                          `<button type="button" class="acc-data-tab${tab.type === activeType ? ' active' : ''}" data-type="${utils.escapeHtml(
+                            tab.type
+                          )}">${utils.escapeHtml(tab.title || tab.type)}</button>`
+                      )
+                      .join('')}
+                  </div>`
+                : ''
+            }
             ${
               selectable
                 ? `<div class="acc-data-toolbar">
@@ -562,29 +791,105 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
                 : ''
             }
             <div class="acc-data-list">
-              ${
-                entries.length
-                  ? isCookieData
-                    ? renderCookieTable()
-                    : renderStorageList()
-                  : `<div class="acc-data-empty">${utils.t('no_data')}</div>`
-              }
+              ${tabStates.map(renderTabPanel).join('')}
             </div>
           </div>
         `);
         mask.style.display = 'flex';
 
-        const updateCount = () => {
-          const count = mask.querySelector('.acc-data-count');
-          if (count) count.textContent = selectedCountText();
-          const checkedCount = mask.querySelectorAll('.acc-data-check:checked').length;
-          const checkAll = mask.querySelector('.acc-data-check-all');
-          if (checkAll) {
-            checkAll.checked = entries.length > 0 && checkedCount === entries.length;
-            checkAll.indeterminate = checkedCount > 0 && checkedCount < entries.length;
+        const getTabPanel = (tabType) =>
+          [...mask.querySelectorAll('.acc-data-tab-panel')].find((panel) => panel.dataset.type === tabType);
+        const getActivePanel = () => getTabPanel(activeType);
+        const getRowSortValue = (row, column) =>
+          row.querySelector(`[data-column="${column}"]`)?.value ?? '';
+        const updateSortHeaders = (panel, tab) => {
+          panel?.querySelectorAll('.acc-data-sort-header').forEach((button) => {
+            const active = button.dataset.column === tab.sortColumn;
+            button.classList.toggle('active', active);
+            button.dataset.direction = active ? tab.sortDirection : '';
+          });
+        };
+        const sortPanelRows = (panel, tab, column) => {
+          const tbody = panel?.querySelector('tbody');
+          if (!tbody) return;
+
+          const direction = tab.sortColumn === column && tab.sortDirection === 'asc' ? 'desc' : 'asc';
+          tab.sortColumn = column;
+          tab.sortDirection = direction;
+
+          [...tbody.querySelectorAll('.acc-data-row')]
+            .sort((left, right) => {
+              const result = compareInspectorValues(
+                getRowSortValue(left, column),
+                getRowSortValue(right, column),
+                column,
+                direction
+              );
+              return result || Number(left.dataset.index) - Number(right.dataset.index);
+            })
+            .forEach((row) => tbody.appendChild(row));
+          updateSortHeaders(panel, tab);
+          updateConfirmState();
+        };
+        const collectResults = () => {
+          const resultsByType = {};
+          tabStates.forEach((tab) => {
+            const panel = getTabPanel(tab.type);
+            if (!panel) return;
+            if (tab.isCookieData) {
+              const allData = serializeCookieRows({ mask: panel, entries: tab.entries, columns: tab.cookieColumns, host: targetHost });
+              const selectedData = serializeCookieRows({
+                mask: panel,
+                entries: tab.entries,
+                columns: tab.cookieColumns,
+                host: targetHost,
+                includeOnlyChecked: selectable
+              });
+              resultsByType[tab.type] = {
+                data: selectable ? selectedData : allData,
+                allData,
+                selectedKeys: selectedData.map((cookie) => getCookieSelectionKey(cookie)),
+                rows: selectedData
+              };
+              return;
+            }
+
+            const allRows = serializeStorageRows({ mask: panel });
+            const selectedRows = serializeStorageRows({ mask: panel, includeOnlyChecked: selectable });
+            resultsByType[tab.type] = {
+              data: Object.fromEntries(selectable ? selectedRows : allRows),
+              allData: Object.fromEntries(allRows),
+              selectedKeys: selectedRows.map(([key]) => key),
+              rows: selectable ? selectedRows : allRows
+            };
+          });
+          return resultsByType;
+        };
+        const hasDirtyData = () => {
+          const resultsByType = collectResults();
+          return tabStates.some((tab) => !isSameData(tab.data, resultsByType[tab.type]?.data));
+        };
+        const updateConfirmState = () => {
+          const confirmBtn = mask.querySelector('.acc-data-confirm');
+          if (confirmBtn && confirmDisabledUntilDirty) {
+            confirmBtn.disabled = !hasDirtyData();
           }
         };
+        const updateCount = () => {
+          const panel = getActivePanel();
+          const count = mask.querySelector('.acc-data-count');
+          if (count && panel) count.textContent = `${panel.querySelectorAll('.acc-data-check:checked').length}/${panel.querySelectorAll('.acc-data-row').length}`;
+          const checkedCount = panel?.querySelectorAll('.acc-data-check:checked').length || 0;
+          const checkAll = panel?.querySelector('.acc-data-check-all');
+          if (checkAll) {
+            const rowCount = panel.querySelectorAll('.acc-data-row').length;
+            checkAll.checked = rowCount > 0 && checkedCount === rowCount;
+            checkAll.indeterminate = checkedCount > 0 && checkedCount < rowCount;
+          }
+          updateConfirmState();
+        };
         const close = (result) => {
+          mask.__anmeDataInspectorCleanup?.();
           mask.__anmeCellInputSelectionCleanup?.();
           mask.style.display = 'none';
           resolve(result);
@@ -592,19 +897,83 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
 
         mask.querySelector('.acc-data-close').onclick = () => close(null);
         mask.querySelector('.acc-data-confirm').onclick = () => {
-          close(
-            selectable
-              ? [...mask.querySelectorAll('.acc-data-check:checked')].map((input) => entries[Number(input.dataset.index)]?.key).filter(Boolean)
-              : true
-          );
+          const resultsByType = collectResults();
+          close({
+            tabs: resultsByType,
+            activeType,
+            ...(resultsByType[activeType] || {})
+          });
         };
         mask.querySelectorAll('.acc-data-check').forEach((input) => input.addEventListener('change', updateCount));
-        mask.querySelector('.acc-data-check-all')?.addEventListener('change', (event) => {
-          mask.querySelectorAll('.acc-data-check').forEach((input) => {
-            input.checked = event.target.checked;
+        mask.querySelectorAll('.acc-data-check-all').forEach((input) => {
+          input.addEventListener('change', (event) => {
+            event.target.closest('.acc-data-tab-panel')?.querySelectorAll('.acc-data-check').forEach((checkbox) => {
+              checkbox.checked = event.target.checked;
+            });
+            updateCount();
           });
+        });
+        mask.querySelectorAll('.acc-data-tab').forEach((button) => {
+          button.addEventListener('click', () => {
+            activeType = button.dataset.type;
+            mask.querySelectorAll('.acc-data-tab').forEach((tabButton) => {
+              tabButton.classList.toggle('active', tabButton.dataset.type === activeType);
+            });
+            mask.querySelectorAll('.acc-data-tab-panel').forEach((panel) => {
+              panel.classList.toggle('active', panel.dataset.type === activeType);
+            });
+            const titleEl = mask.querySelector('.acc-data-title');
+            const activeTab = tabStates.find((tab) => tab.type === activeType);
+            if (titleEl) titleEl.textContent = activeTab?.title || activeType;
+            updateCount();
+          });
+        });
+        mask.querySelectorAll('.acc-data-sort-header').forEach((button) => {
+          button.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const panel = button.closest('.acc-data-tab-panel');
+            const tab = tabStates.find((item) => item.type === panel?.dataset.type);
+            if (!panel || !tab || !button.dataset.column) return;
+            sortPanelRows(panel, tab, button.dataset.column);
+          });
+        });
+        mask.querySelector('.acc-data-add')?.addEventListener('click', () => {
+          const panel = getActivePanel();
+          const tab = tabStates.find((item) => item.type === activeType);
+          const tbody = panel?.querySelector('tbody');
+          if (!tbody || !tab) return;
+
+          const nextIndex = tab.entries.length + panel.querySelectorAll('.acc-data-row').length;
+          if (tab.isCookieData) {
+            const cookie = getDefaultCookie(targetHost);
+            const entry = {
+              key: getCookieSelectionKey(cookie),
+              title: cookie.name,
+              value: cookie.value,
+              cookie
+            };
+            tbody.insertAdjacentHTML('beforeend', renderCookieRow(tab, entry, nextIndex, true));
+          } else {
+            tbody.insertAdjacentHTML(
+              'beforeend',
+              renderStorageRow(tab, { key: '', title: '', value: '', meta: '' }, nextIndex, true)
+            );
+          }
+          const newRow = tbody.lastElementChild;
+          newRow?.querySelector('.acc-data-check')?.addEventListener('change', updateCount);
+          newRow?.querySelector('.acc-cell-input')?.focus();
+          setupCellInputSelectionAssist(mask);
           updateCount();
         });
+        const updateDirtyState = () => updateConfirmState();
+        mask.addEventListener('input', updateDirtyState);
+        mask.addEventListener('change', updateDirtyState);
+        mask.__anmeDataInspectorCleanup = () => {
+          mask.removeEventListener('input', updateDirtyState);
+          mask.removeEventListener('change', updateDirtyState);
+          mask.__anmeDataInspectorCleanup = null;
+        };
         setupCellInputSelectionAssist(mask);
         updateCount();
 
@@ -670,15 +1039,13 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
           <div class="acc-chk">
             <span class="acc-source-row">
               <label class="acc-chk-label" title="Cookie"><input type="checkbox" id="form-c-ck" class="acc-custom-chk" checked> Cookie</label>
-              <button type="button" class="acc-source-eye" data-type="cookies" title="${utils.t('inspect_items')}">${constants.ICONS.EYE}</button>
             </span>
             <span class="acc-source-row">
               <label class="acc-chk-label" title="LocalStorage"><input type="checkbox" id="form-c-ls" class="acc-custom-chk"> LS</label>
-              <button type="button" class="acc-source-eye" data-type="localStorage" title="${utils.t('inspect_items')}">${constants.ICONS.EYE}</button>
             </span>
             <span class="acc-source-row">
               <label class="acc-chk-label" title="SessionStorage"><input type="checkbox" id="form-c-ss" class="acc-custom-chk"> SS</label>
-              <button type="button" class="acc-source-eye" data-type="sessionStorage" title="${utils.t('inspect_items')}">${constants.ICONS.EYE}</button>
+              <button type="button" class="acc-source-eye" id="form-source-eye" title="${utils.t('inspect_items')}">${constants.ICONS.EYE}</button>
             </span>
             <span class="acc-source-tips">
               <span class="acc-help-tip" title="${utils.t('tip_help')}">${constants.ICONS.HELP}</span>
@@ -698,15 +1065,27 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
           const noteInput = qs('#form-acc-note');
           let saveNoteSyncState = createSaveNoteSyncState();
           const snapshotSources = await core.getCurrentSnapshotSources();
-          const selectedSourceKeys = {
-            cookies: new Set(getCookieEntries(snapshotSources.cookies).map((entry) => entry.key)),
-            localStorage: new Set(Object.keys(snapshotSources.localStorage)),
-            sessionStorage: new Set(Object.keys(snapshotSources.sessionStorage))
+          const selectedSourceData = {
+            cookies: snapshotSources.cookies,
+            localStorage: snapshotSources.localStorage,
+            sessionStorage: snapshotSources.sessionStorage
           };
+          const sourceOrder = ['cookies', 'localStorage', 'sessionStorage'];
+          const getAllSourceKeys = (type) => getInspectorEntries(type, selectedSourceData[type]).map((entry) => entry.key);
+          const getSourceCount = (type) => getAllSourceKeys(type).length;
+          const defaultSourceType = sourceOrder.find((type) => getSourceCount(type) > 0) || '';
+          const selectedSourceKeys = Object.fromEntries(
+            sourceOrder.map((type) => [type, new Set(type === defaultSourceType ? getAllSourceKeys(type) : [])])
+          );
           const typeToCheckbox = {
             cookies: '#form-c-ck',
             localStorage: '#form-c-ls',
             sessionStorage: '#form-c-ss'
+          };
+          const typeTitles = {
+            cookies: 'Cookie',
+            localStorage: 'LocalStorage',
+            sessionStorage: 'SessionStorage'
           };
           siteNameInput.value = utils.suggestSiteName(utils.getPageTitle(), constants.HOST);
           nameInput.value = utils.suggestAccountName(constants.HOST);
@@ -730,69 +1109,95 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
             }
           };
 
-          const toggleAvailability = (selector, available) => {
-            const input = qs(selector);
+          const syncSourceCheckbox = (type) => {
+            const input = qs(typeToCheckbox[type]);
             const label = input?.closest('.acc-chk-label');
-            const eyeButton = input?.closest('.acc-source-row')?.querySelector('.acc-source-eye');
             if (!input || !label) return;
 
+            const totalCount = getSourceCount(type);
+            const selectedCount = selectedSourceKeys[type]?.size || 0;
+            const available = totalCount > 0;
             input.disabled = !available;
-            input.checked = available && input.id === 'form-c-ck';
+            input.checked = available && selectedCount > 0 && selectedCount === totalCount;
+            input.indeterminate = available && selectedCount > 0 && selectedCount < totalCount;
             label.classList.toggle('disabled', !available);
-            if (eyeButton) {
-              eyeButton.disabled = !available;
-            }
+          };
+
+          const syncSourceCheckboxes = () => {
+            sourceOrder.forEach(syncSourceCheckbox);
           };
 
           const getSelectedKeys = (type) => [...(selectedSourceKeys[type] || new Set())];
-
-          const resetSelectionIfEmpty = (type) => {
-            if (selectedSourceKeys[type]?.size > 0) return;
-            selectedSourceKeys[type] = new Set(getInspectorEntries(type, snapshotSources[type]).map((entry) => entry.key));
+          const getSelectedCookieRows = () => {
+            const selectedKeys = new Set(getSelectedKeys('cookies'));
+            return (selectedSourceData.cookies || []).filter((cookie) => selectedKeys.has(getCookieSelectionKey(cookie)));
+          };
+          const getSelectedStorageRows = (type) => {
+            const selectedKeys = new Set(getSelectedKeys(type));
+            return Object.entries(selectedSourceData[type] || {}).filter(([key]) => selectedKeys.has(key));
           };
 
+          const selectAllSourceKeys = (type) => {
+            selectedSourceKeys[type] = new Set(getInspectorEntries(type, selectedSourceData[type]).map((entry) => entry.key));
+          };
+          const getAvailableInspectorTypes = () =>
+            sourceOrder.filter((type) => getSourceCount(type) > 0);
+
           const updateState = () => {
-            const ck = qs('#form-c-ck')?.checked;
-            const ls = qs('#form-c-ls')?.checked;
-            const ss = qs('#form-c-ss')?.checked;
+            syncSourceCheckboxes();
+            const hasSelectedSource = (type) => (selectedSourceKeys[type]?.size || 0) > 0;
             const canSave =
-              (ck || ls || ss) && nameInput.value.trim().length > 0 && siteNameInput.value.trim().length > 0;
+              sourceOrder.some(hasSelectedSource) &&
+              nameInput.value.trim().length > 0 &&
+              siteNameInput.value.trim().length > 0;
             submitBtn.disabled = !canSave;
+            const sourceEye = qs('#form-source-eye');
+            if (sourceEye) {
+              sourceEye.disabled = getAvailableInspectorTypes().length === 0;
+            }
           };
 
           Object.entries(typeToCheckbox).forEach(([type, selector]) => {
             qs(selector)?.addEventListener('change', (event) => {
               if (event.target.checked) {
-                resetSelectionIfEmpty(type);
+                selectAllSourceKeys(type);
+              } else {
+                selectedSourceKeys[type] = new Set();
               }
               updateState();
             });
           });
 
-          const openSourceSelector = async (type) => {
-            const selectedKeys = await ui.showDataInspector({
-              title: type,
-              type,
-              data: snapshotSources[type],
-              selectable: true,
-              selectedKeys: getSelectedKeys(type)
-            });
-            if (!selectedKeys) return;
+          const openSourceSelector = async (initialType = '') => {
+            const availableTypes = getAvailableInspectorTypes();
+            if (availableTypes.length === 0) return;
 
-            selectedSourceKeys[type] = new Set(selectedKeys);
-            const input = qs(typeToCheckbox[type]);
-            if (input) {
-              input.checked = selectedKeys.length > 0;
-            }
+            const result = await ui.showDataInspectorTabs({
+              tabs: availableTypes.map((type) => ({
+                title: typeTitles[type],
+                type,
+                data: selectedSourceData[type],
+                selectedKeys: getSelectedKeys(type)
+              })),
+              initialType: availableTypes.includes(initialType) ? initialType : availableTypes[0],
+              selectable: true,
+              addable: true,
+              host: constants.HOST
+            });
+            if (!result) return;
+
+            Object.entries(result.tabs || {}).forEach(([type, tabResult]) => {
+              selectedSourceKeys[type] = new Set(tabResult.selectedKeys);
+              selectedSourceData[type] = tabResult.allData;
+            });
             updateState();
           };
 
-          qs('.acc-chk')?.querySelectorAll('.acc-source-eye').forEach((button) => {
-            button.addEventListener('click', (event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              openSourceSelector(button.dataset.type);
-            });
+          qs('#form-source-eye')?.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const checkedType = sourceOrder.find((type) => (selectedSourceKeys[type]?.size || 0) > 0);
+            openSourceSelector(checkedType);
           });
 
           siteNameInput.addEventListener('input', updateState);
@@ -827,12 +1232,15 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
             }
 
             const saved = await core.saveAccount(name, siteName, {
-              ck: qs('#form-c-ck').checked,
-              ls: qs('#form-c-ls').checked,
-              ss: qs('#form-c-ss').checked,
+              ck: getSelectedKeys('cookies').length > 0,
+              ls: getSelectedKeys('localStorage').length > 0,
+              ss: getSelectedKeys('sessionStorage').length > 0,
               cookieKeys: getSelectedKeys('cookies'),
               localStorageKeys: getSelectedKeys('localStorage'),
               sessionStorageKeys: getSelectedKeys('sessionStorage'),
+              cookieRows: getSelectedCookieRows(),
+              localStorageRows: getSelectedStorageRows('localStorage'),
+              sessionStorageRows: getSelectedStorageRows('sessionStorage'),
               note: noteInput.value
             });
             if (!saved) return;
@@ -842,14 +1250,6 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
             ui.showToast(utils.t('toast_saved'));
           };
 
-          const availableSources = {
-            ck: snapshotSources.cookies.length > 0,
-            ls: Object.keys(snapshotSources.localStorage).length > 0,
-            ss: Object.keys(snapshotSources.sessionStorage).length > 0
-          };
-          toggleAvailability('#form-c-ck', availableSources.ck);
-          toggleAvailability('#form-c-ls', availableSources.ls);
-          toggleAvailability('#form-c-ss', availableSources.ss);
           syncExistingAccountNote();
           updateState();
 
