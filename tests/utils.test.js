@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { createUtils } from '../src/app/utils.js';
+import { createUtils, getCookieExpirationTime } from '../src/app/utils.js';
 import {
+  getCookieCellValue,
+  getCookieEntries,
   resolveWebDavPasswordForSubmit,
   syncSaveNoteFromMatchedAccount,
   trackSaveNoteManualEdit
@@ -204,4 +206,51 @@ test('webdav config submit keeps the saved password when the masked field was no
     }),
     'saved-password'
   );
+});
+
+test('cookie expiration parsing accepts seconds, milliseconds, and numeric strings', () => {
+  assert.equal(getCookieExpirationTime(1_700_000_000), 1_700_000_000_000);
+  assert.equal(getCookieExpirationTime('1700000000'), 1_700_000_000_000);
+  assert.equal(getCookieExpirationTime('1700000000000'), 1_700_000_000_000);
+  assert.equal(getCookieExpirationTime('Session'), null);
+});
+
+test('cookie inspector renders local expiration time and highlights expired numeric strings', () => {
+  const originalNow = Date.now;
+  Date.now = () => 1_700_000_001_000;
+
+  try {
+    const cookie = {
+      name: 'expired',
+      value: 'value',
+      domain: 'current.test',
+      path: '/',
+      expirationDate: '1700000000'
+    };
+    const entries = getCookieEntries([cookie]);
+
+    assert.equal(entries[0].isExpired, true);
+    assert.equal(getCookieCellValue(cookie, 'expirationDate'), new Date(1_700_000_000_000).toLocaleString());
+  } finally {
+    Date.now = originalNow;
+  }
+});
+
+test('expired cookie count uses the same expiration parser as the inspector', () => {
+  const originalNow = Date.now;
+  Date.now = () => 1_700_000_001_000;
+
+  try {
+    const utils = createTestUtils();
+    assert.equal(
+      utils.countExpiredCookies([
+        { expirationDate: '1700000000' },
+        { expirationDate: 1_700_000_002 },
+        { expirationDate: 'Session' }
+      ]),
+      1
+    );
+  } finally {
+    Date.now = originalNow;
+  }
 });

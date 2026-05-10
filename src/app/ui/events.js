@@ -432,6 +432,11 @@ export function createEventMethods({ state, constants, utils, core, ui }) {
         ui.refresh();
       };
 
+      $('#btn-open-viewing-host').onclick = () => {
+        if (state.currentViewingHost === constants.HOST) return;
+        window.open(`https://${state.currentViewingHost}`, '_blank', 'noopener,noreferrer');
+      };
+
       $('#btn-header-back').onclick = () => {
         if (state.activePage === 'pg-notice' || state.activePage === 'pg-about') {
           ui.activatePage('pg-set', utils.t('nav_set'));
