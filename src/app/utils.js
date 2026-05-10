@@ -1,3 +1,16 @@
+export function getCookieExpirationTime(expirationDate) {
+  const normalized = String(expirationDate ?? '').trim();
+  if (!normalized || /^session$/i.test(normalized)) return null;
+
+  const numericValue = Number(normalized);
+  if (Number.isFinite(numericValue) && numericValue > 0) {
+    return numericValue > 100000000000 ? numericValue : numericValue * 1000;
+  }
+
+  const timestamp = Date.parse(normalized);
+  return Number.isNaN(timestamp) ? null : timestamp;
+}
+
 export function createUtils({ state, constants, i18nData }) {
   let trustedHtmlPolicy;
 
@@ -118,8 +131,8 @@ export function createUtils({ state, constants, i18nData }) {
       if (!Array.isArray(cookies) || cookies.length === 0) return 0;
       const now = Date.now();
       return cookies.filter((cookie) => {
-        const expirationDate = Number(cookie?.expirationDate);
-        return Number.isFinite(expirationDate) && expirationDate > 0 && expirationDate * 1000 <= now;
+        const expirationTime = getCookieExpirationTime(cookie?.expirationDate);
+        return expirationTime !== null && expirationTime <= now;
       }).length;
     },
     normalizeSiteName(siteName, host = constants.HOST) {

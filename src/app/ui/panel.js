@@ -156,6 +156,7 @@ export function createPanelMethods({ state, constants, utils, templates, styleCs
 
       const backBtn = ui.qs('#btn-header-back');
       const homeBtn = ui.qs('#btn-go-current-host');
+      const viewingHostBtn = ui.qs('#btn-open-viewing-host');
       const cleanBtn = ui.qs('#btn-clean-env');
       const saveBtn = ui.qs('#btn-open-save-modal');
       const settingsBtn = ui.qs('#btn-open-settings');
@@ -163,6 +164,7 @@ export function createPanelMethods({ state, constants, utils, templates, styleCs
 
       if (backBtn) backBtn.style.display = isSetActive || isNoticeActive || isAboutActive || isAccountSettingsActive || isWebDavActive ? 'flex' : 'none';
       if (homeBtn) homeBtn.style.display = isSwitchActive && !canOperateCurrentHost ? 'flex' : 'none';
+      if (viewingHostBtn) viewingHostBtn.style.display = isSwitchActive && !canOperateCurrentHost ? 'flex' : 'none';
       if (settingsBtn) settingsBtn.style.display = isSwitchActive ? 'flex' : 'none';
       if (webdavBtn) webdavBtn.style.display = isSwitchActive ? 'flex' : 'none';
       if (cleanBtn) cleanBtn.style.display = isSwitchActive && canOperateCurrentHost ? 'flex' : 'none';

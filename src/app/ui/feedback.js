@@ -1,3 +1,5 @@
+import { getCookieExpirationTime } from '../utils.js';
+
 function createSaveNoteSyncState(syncState = {}) {
   return {
     lastMatchedKey: '',
@@ -37,14 +39,15 @@ const normalizeForCompare = (value) => {
 const isSameData = (left, right) =>
   JSON.stringify(normalizeForCompare(left)) === JSON.stringify(normalizeForCompare(right));
 
-const getCookieEntries = (cookies) =>
+export const getCookieEntries = (cookies) =>
   (Array.isArray(cookies) ? cookies : []).map((cookie) => {
+    const expirationTime = getCookieExpirationTime(cookie?.expirationDate);
     return {
       key: getCookieSelectionKey(cookie),
       title: cookie.name || '',
       value: cookie.value ?? '',
       cookie,
-      isExpired: typeof cookie.expirationDate === 'number' && cookie.expirationDate * 1000 < Date.now()
+      isExpired: expirationTime !== null && expirationTime <= Date.now()
     };
   });
 
@@ -96,11 +99,10 @@ const sortInspectorEntries = (entries, type, column = type === 'cookies' ? 'name
     return result || String(left.key || '').localeCompare(String(right.key || ''), undefined, { numeric: true });
   });
 
-const getCookieCellValue = (cookie, column) => {
+export const getCookieCellValue = (cookie, column) => {
   if (column === 'expirationDate') {
-    return typeof cookie.expirationDate === 'number'
-      ? new Date(cookie.expirationDate * 1000).toLocaleString()
-      : 'Session';
+    const expirationTime = getCookieExpirationTime(cookie.expirationDate);
+    return expirationTime === null ? 'Session' : new Date(expirationTime).toLocaleString();
   }
   return formatInspectorValue(cookie[column]);
 };

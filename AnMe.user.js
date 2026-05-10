@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AnMe
 // @author       zjw
-// @version      10.0.10
-// @updated      2026-05-07
+// @version      10.0.11
+// @updated      2026-05-10
 // @namespace    https://github.com/Zhu-junwei/AnMe
 // @description  通用多网站多账号切换器
 // @description:zh  通用多网站多账号切换器
@@ -94,6 +94,7 @@
       CLEAN: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 7V5.5C10 4.11929 11.1193 3 12.5 3H17.5C18.8807 3 20 4.11929 20 5.5V18.5C20 19.8807 18.8807 21 17.5 21H12.5C11.1193 21 10 19.8807 10 18.5V17" stroke="currentColor" stroke-width="1.5"/><path d="M14 12H4M4 12L7 9M4 12L7 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
       BACK: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 12H4M4 12L10 6M4 12L10 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
       HOME: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 10.75L10.4697 4.72557C11.3788 3.99241 12.6212 3.99241 13.5303 4.72557L21 10.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.75 9.5V18C5.75 19.2426 6.75736 20.25 8 20.25H16C17.2426 20.25 18.25 19.2426 18.25 18V9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10 20.25V15.5C10 14.8096 10.5596 14.25 11.25 14.25H12.75C13.4404 14.25 14 14.8096 14 15.5V20.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+      GLOBE: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/><path d="M3.75 12H20.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M12 3C14.25 5.25 15.5 8.25 15.5 12C15.5 15.75 14.25 18.75 12 21C9.75 18.75 8.5 15.75 8.5 12C8.5 8.25 9.75 5.25 12 3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>`,
       NOTICE: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3.75C8.27208 3.75 5.25 6.77208 5.25 10.5V11.2143C5.25 12.1418 4.93935 13.0426 4.36716 13.7727L3.73289 14.5818C3.06791 15.4302 3.67234 16.6754 4.75031 16.6754H19.2497C20.3277 16.6754 20.9321 15.4302 20.2671 14.5818L19.6328 13.7727C19.0607 13.0426 18.75 12.1418 18.75 11.2143V10.5C18.75 6.77208 15.7279 3.75 12 3.75Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9.75 19C10.2373 19.7252 11.0642 20.25 12 20.25C12.9358 20.25 13.7627 19.7252 14.25 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M12 7.75V10.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="13.25" r="1" fill="currentColor"/></svg>`
     }
   };
@@ -115,6 +116,8 @@
     confirm_save_changes: "是否保存已修改内容",
     save_account_title: "保存账号",
     exit_account_title: "退出账号",
+    open_selected_host: "跳转到选中的网站",
+    confirm_clean: "确定退出当前网站已登录账号？",
     maximize_panel: "最大化",
     restore_panel: "还原",
     select_all: "全选",
@@ -180,6 +183,8 @@
     confirm_save_changes: "Save these changes? Unchecked rows will not be kept.",
     save_account_title: "Save account",
     exit_account_title: "Exit account",
+    open_selected_host: "Go to selected site",
+    confirm_clean: "Sign out of the current site's logged-in account?",
     maximize_panel: "Maximize",
     restore_panel: "Restore",
     select_all: "Select all",
@@ -245,6 +250,8 @@
     confirm_save_changes: "¿Guardar estos cambios? Las filas sin marcar no se conservarán.",
     save_account_title: "Guardar cuenta",
     exit_account_title: "Salir de la cuenta",
+    open_selected_host: "Ir al sitio seleccionado",
+    confirm_clean: "¿Cerrar sesión de la cuenta iniciada en el sitio actual?",
     maximize_panel: "Maximizar",
     restore_panel: "Restaurar",
     select_all: "Seleccionar todo",
@@ -668,6 +675,16 @@
   }
 
   // src/app/utils.js
+  function getCookieExpirationTime(expirationDate) {
+    const normalized = String(expirationDate ?? "").trim();
+    if (!normalized || /^session$/i.test(normalized)) return null;
+    const numericValue = Number(normalized);
+    if (Number.isFinite(numericValue) && numericValue > 0) {
+      return numericValue > 1e11 ? numericValue : numericValue * 1e3;
+    }
+    const timestamp = Date.parse(normalized);
+    return Number.isNaN(timestamp) ? null : timestamp;
+  }
   function createUtils({ state, constants, i18nData }) {
     let trustedHtmlPolicy;
     return {
@@ -766,8 +783,8 @@
         if (!Array.isArray(cookies) || cookies.length === 0) return 0;
         const now = Date.now();
         return cookies.filter((cookie) => {
-          const expirationDate = Number(cookie?.expirationDate);
-          return Number.isFinite(expirationDate) && expirationDate > 0 && expirationDate * 1e3 <= now;
+          const expirationTime = getCookieExpirationTime(cookie?.expirationDate);
+          return expirationTime !== null && expirationTime <= now;
         }).length;
       },
       normalizeSiteName(siteName, host = constants.HOST) {
@@ -851,6 +868,7 @@
           <div class="acc-header-actions" id="acc-header-actions">
               <button class="acc-toolbar-btn" id="btn-header-back" title="${utils.t("back")}">${constants.ICONS.BACK}</button>
               <button class="acc-toolbar-btn" id="btn-go-current-host" title="${utils.t("back_current_host")}">${constants.ICONS.HOME}</button>
+              <button class="acc-toolbar-btn" id="btn-open-viewing-host" title="${utils.t("open_selected_host")}">${constants.ICONS.GLOBE}</button>
               <button class="acc-toolbar-btn" id="btn-open-save-modal" title="${utils.t("save_account_title")}">${constants.ICONS.SAVE}</button>
               <button class="acc-toolbar-btn" id="btn-clean-env" title="${utils.t("exit_account_title")}">${constants.ICONS.CLEAN}</button>
           </div>
@@ -2425,6 +2443,10 @@
           resetHostPicker();
           ui.refresh();
         };
+        $("#btn-open-viewing-host").onclick = () => {
+          if (state.currentViewingHost === constants.HOST) return;
+          window.open(`https://${state.currentViewingHost}`, "_blank", "noopener,noreferrer");
+        };
         $("#btn-header-back").onclick = () => {
           if (state.activePage === "pg-notice" || state.activePage === "pg-about") {
             ui.activatePage("pg-set", utils.t("nav_set"));
@@ -2617,12 +2639,13 @@
   };
   var isSameData2 = (left, right) => JSON.stringify(normalizeForCompare2(left)) === JSON.stringify(normalizeForCompare2(right));
   var getCookieEntries = (cookies) => (Array.isArray(cookies) ? cookies : []).map((cookie) => {
+    const expirationTime = getCookieExpirationTime(cookie?.expirationDate);
     return {
       key: getCookieSelectionKey3(cookie),
       title: cookie.name || "",
       value: cookie.value ?? "",
       cookie,
-      isExpired: typeof cookie.expirationDate === "number" && cookie.expirationDate * 1e3 < Date.now()
+      isExpired: expirationTime !== null && expirationTime <= Date.now()
     };
   });
   var getInspectorEntries = (type, data) => type === "cookies" ? getCookieEntries(data) : getStorageEntries(data);
@@ -2668,7 +2691,8 @@
   });
   var getCookieCellValue = (cookie, column) => {
     if (column === "expirationDate") {
-      return typeof cookie.expirationDate === "number" ? new Date(cookie.expirationDate * 1e3).toLocaleString() : "Session";
+      const expirationTime = getCookieExpirationTime(cookie.expirationDate);
+      return expirationTime === null ? "Session" : new Date(expirationTime).toLocaleString();
     }
     return formatInspectorValue(cookie[column]);
   };
@@ -3971,12 +3995,14 @@
         headerActions.style.display = "flex";
         const backBtn = ui.qs("#btn-header-back");
         const homeBtn = ui.qs("#btn-go-current-host");
+        const viewingHostBtn = ui.qs("#btn-open-viewing-host");
         const cleanBtn = ui.qs("#btn-clean-env");
         const saveBtn = ui.qs("#btn-open-save-modal");
         const settingsBtn = ui.qs("#btn-open-settings");
         const webdavBtn = ui.qs("#btn-open-webdav");
         if (backBtn) backBtn.style.display = isSetActive || isNoticeActive || isAboutActive || isAccountSettingsActive || isWebDavActive ? "flex" : "none";
         if (homeBtn) homeBtn.style.display = isSwitchActive && !canOperateCurrentHost ? "flex" : "none";
+        if (viewingHostBtn) viewingHostBtn.style.display = isSwitchActive && !canOperateCurrentHost ? "flex" : "none";
         if (settingsBtn) settingsBtn.style.display = isSwitchActive ? "flex" : "none";
         if (webdavBtn) webdavBtn.style.display = isSwitchActive ? "flex" : "none";
         if (cleanBtn) cleanBtn.style.display = isSwitchActive && canOperateCurrentHost ? "flex" : "none";
