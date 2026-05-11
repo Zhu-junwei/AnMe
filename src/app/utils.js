@@ -73,7 +73,23 @@ export function createUtils({ state, constants, i18nData }) {
     },
     setHTML(element, html) {
       if (!element) return;
-      element.innerHTML = this.toTrustedHtml(html);
+      element.textContent = '';
+      this.appendHTML(element, html);
+    },
+    appendHTML(element, html, position = 'beforeend') {
+      if (!element) return;
+      const range = document.createRange();
+      if (position === 'afterbegin') {
+        range.selectNodeContents(element);
+        range.collapse(true);
+        element.insertBefore(range.createContextualFragment(this.toTrustedHtml(html)), element.firstChild);
+        range.detach?.();
+        return;
+      }
+      range.selectNodeContents(element);
+      range.collapse(false);
+      element.appendChild(range.createContextualFragment(this.toTrustedHtml(html)));
+      range.detach?.();
     },
     extractName(key) {
       return key.split('::')[1] || key;

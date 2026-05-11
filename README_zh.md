@@ -1,133 +1,55 @@
+# AnMe Browser Extension
+
 中文 | [English](./README.md)
 
----
+AnMe 是一个面向 Chrome、Edge、Firefox 的浏览器扩展。它可以保存和恢复多个网站的账号快照，包括 Cookie、LocalStorage、SessionStorage，让你通过紧凑的悬浮面板快速切换账号。
 
-<p align="center">
-  <img src="./img/logo.svg" width="96" alt="AnMe Logo" />
-</p>
-<h1 align="center">AnMe</h1>
-<p align="center">通用多网站多账号切换器</p>
+## 功能
 
----
+- 同时保存和恢复 Cookie、LocalStorage、SessionStorage。
+- 在同一个悬浮面板里管理多个网站和多个账号。
+- 支持站点搜索、账号搜索、站点改名、已保存数据编辑、账号排序。
+- 支持本地 JSON 导入导出。
+- 支持可选的 WebDAV 备份与恢复。
+- 支持简体中文、英文、西班牙语界面。
 
-[AnMe](https://github.com/Zhu-junwei/AnMe) 是一个运行在 [Tampermonkey](https://www.tampermonkey.net/) 和 [ScriptCat](https://scriptcat.org) 上的多账号快照切换脚本。它会保存网站的 Cookie、LocalStorage 和 SessionStorage，让你在同一个浏览器窗口里快速切换多个账号。
+## 构建
 
-## 功能概览
+```bash
+npm install
+npm test
+npm run build
+```
 
-- 一键保存和切换账号快照
-- 同时保存 Cookie、LocalStorage、SessionStorage
-- 在同一个面板里管理多个网站的账号
-- 支持站点名字显示，并兼容历史数据回退到域名
-- 支持本地 JSON 备份与导入
-- 支持可选的 WebDAV 云备份与恢复
-- 悬浮球可拖拽，支持智能、常驻、隐藏三种模式
-- 支持站点搜索、账号搜索、账号拖拽排序
-- 支持简体中文、英文、西班牙语
+`npm run build` 就是浏览器扩展构建，会生成：
 
-## 运行截图
+- `dist/extension/chromium`：Chrome / Edge 开发者模式加载目录。
+- `dist/extension/firefox`：Firefox 临时调试加载目录。
+- `dist/packages/AnMe-chromium-<version>.zip`：提交 Chrome Web Store 或 Edge Add-ons 的压缩包。
+- `dist/packages/AnMe-firefox-<version>.xpi`：Firefox 调试或提交 AMO 的 XPI 包。
 
-![](./img/run.png)
+## 开发安装
 
-## 安装方式
+### Chrome / Edge
 
-1. 安装 [Tampermonkey](https://www.tampermonkey.net/) 或 [ScriptCat](https://scriptcat.org)。
-2. 如果你使用 Tampermonkey，需要先开启 Cookie 权限：
-   - 打开 Tampermonkey 管理面板
-   - 进入 `Settings`
-   - 将 `Config mode` 改为 `Advanced`
-   - 在 `Security` 中把 `Allow scripts to access cookies` 改成 `ALL`
-   - 保存设置
+1. 打开扩展管理页面。
+2. 开启开发者模式。
+3. 选择“加载已解压的扩展程序”。
+4. 选择 `dist/extension/chromium`。
 
-   ![Tampermonkey 设置](./img/Tampermonkey_setting_cn.png)
+### Firefox
 
-   ScriptCat 不需要这一步，缺少权限时会自动提示。
+1. 打开 `about:debugging#/runtime/this-firefox`。
+2. 选择“临时载入附加组件”。
+3. 选择 `dist/extension/firefox/manifest.json`。
 
-3. 安装脚本：
-   - [从 Greasy Fork 安装](https://greasyfork.org/scripts/563142-anme)
-   - 或者自行构建并安装仓库生成的 `AnMe.user.js`
-
-## 基本使用
-
-### 保存账号
-
-1. 登录你要保存的网站账号。
-2. 打开悬浮面板。
-3. 点击保存按钮。
-4. 确认站点名称和账号名称。
-5. 选择需要保存的数据类型。
-6. 保存快照。
-
-如果当前网站已经有账号记录，保存弹窗会优先聚焦到“账号名称”，方便你继续添加新账号。
-
-### 切换账号
-
-1. 在目标网站打开面板。
-2. 点击要切换的账号卡片。
-3. 脚本会清空当前环境、恢复对应快照并刷新页面。
-
-账号卡片下方的 `CK`、`LS`、`SS` 标签可以直接查看已保存的数据内容。
-
-### 管理站点和账号
-
-- 站点下拉列表可以切换为显示“站点名字”或“域名”
-- 如果历史记录没有保存站点名字，AnMe 会稳定显示域名，不会临时改成当前页面标题
-- 同一个域名下站点名字一致，账号名字彼此独立
-
-## 备份与恢复
-
-### 本地备份
-
-- 导出当前网站数据
-- 导出全部网站数据
-- 从 JSON 文件导入备份
-- 在高级设置里清空全部脚本数据
-
-### WebDAV 云备份
-
-AnMe 提供可选的 WebDAV 云同步页面，支持：
-
-- 配置服务器地址、用户名和密码
-- 验证后保存账号信息
-- 将当前本地数据打包成单个 `.anme` 备份文件上传
-- 先从本地缓存读取备份列表元数据，减少页面进入时的等待
-- 手动刷新云端备份列表
-- 从任意云端备份恢复
-- 删除云端备份
-- 退出 WebDAV 并清除本地保存的账号信息
-
-所有 WebDAV 请求都带超时控制，避免长时间停留在 loading 状态。
-
-## 隐私与安全
-
-- 本地数据通过 `GM_setValue` 保存在脚本管理器中
-- 脚本默认不会主动上传任何数据
-- 只有在你手动配置并使用 WebDAV 同步时，脚本才会访问远程服务
-- 快照是否仍然有效，取决于网站本身的登录策略
-- 不建议在公共电脑或不可信设备上保存敏感账号
-
-## 已知限制
-
-- 某些网站会结合设备环境、浏览器指纹、风控策略校验登录态
-- 这类网站即使恢复了 Cookie 和存储数据，也可能无法直接切换成功
-- 如果账号快照过期，可以在重新登录后覆盖保存同名账号来刷新状态
+普通用户安装需要浏览器商店签名：Chrome 对应 Chrome Web Store，Edge 对应 Edge Add-ons，Firefox 对应 AMO。
 
 ## 开发说明
 
-源码入口：`src/main.js`
+- 源码入口：`src/main.js`。
+- 扩展后台入口：`src/extension/background.js`。
+- 扩展构建脚本：`scripts/build-extension.mjs`。
+- 测试文件：`tests/*.test.js`。
 
-常用命令：
-
-- `npm test`
-- `npm run build`
-
-构建产物：
-
-- `AnMe.user.js`
-
-## 支持作者
-
-如果这个项目对你有帮助，欢迎点个 Star，或者支持作者。
-
-| 微信赞赏 | 支付宝 |
-| :--: | :--: |
-| ![](https://cdn.jsdelivr.net/gh/Zhu-junwei/media-library@master/imgs/qrcode/wechatpay.png) | ![](https://cdn.jsdelivr.net/gh/Zhu-junwei/media-library@master/imgs/qrcode/alipay.png) |
+生成的 `dist/` 目录不会提交到 git。

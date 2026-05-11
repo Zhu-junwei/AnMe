@@ -73,7 +73,7 @@ test('saveAccount stores only selected cookie and storage keys', async () => {
   assert.equal(snapshot.note, 'Important');
 });
 
-test('saveAccount stores edited values only in userscript snapshot', async () => {
+test('saveAccount stores edited values only in extension snapshot', async () => {
   const cookies = [
     { name: 'keepCookie', value: 'cookie-value', domain: 'current.test', path: '/' }
   ];
