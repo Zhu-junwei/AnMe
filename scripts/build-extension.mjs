@@ -40,7 +40,7 @@ const commonManifest = {
     48: 'icons/icon-48.png',
     128: 'icons/icon-128.png'
   },
-  permissions: ['storage', 'cookies'],
+  permissions: ['storage', 'cookies', 'contextMenus'],
   content_scripts: [
     {
       matches: ['http://*/*', 'https://*/*'],

@@ -1,3 +1,5 @@
+import { getMenuOpenTitle, MENU_LANGUAGE_STORAGE_KEY, MENU_OPEN_ID } from './menu.js';
+
 const EXTENSION_MESSAGE_TYPE = 'ANME_EXTENSION_BRIDGE';
 
 function getApi() {
@@ -124,6 +126,47 @@ async function handleMessage(payload = {}) {
   throw new Error(`unknown_action:${payload.action}`);
 }
 
+function getNavigatorLanguage() {
+  return globalThis.navigator?.language?.split('-')[0] || 'en';
+}
+
+async function getStoredMenuLanguage() {
+  const storageArea = api.storage?.local;
+  if (!storageArea?.get) return getNavigatorLanguage();
+
+  try {
+    const result = await callApi(storageArea.get.bind(storageArea), MENU_LANGUAGE_STORAGE_KEY);
+    const storedLanguage =
+      result && typeof result === 'object' && !Array.isArray(result) ? result[MENU_LANGUAGE_STORAGE_KEY] : undefined;
+    return storedLanguage || getNavigatorLanguage();
+  } catch {
+    return getNavigatorLanguage();
+  }
+}
+
+async function setupContextMenu() {
+  const contextMenus = api.contextMenus;
+  if (!contextMenus?.create) return;
+
+  const title = getMenuOpenTitle(await getStoredMenuLanguage(), getNavigatorLanguage());
+  if (contextMenus.remove) {
+    await callApi(contextMenus.remove.bind(contextMenus), MENU_OPEN_ID).catch(() => {});
+  }
+  await callApi(contextMenus.create.bind(contextMenus), {
+    id: MENU_OPEN_ID,
+    title,
+    contexts: ['page']
+  }).catch(() => {});
+}
+
+async function refreshContextMenuTitle() {
+  const contextMenus = api.contextMenus;
+  if (!contextMenus?.update) return setupContextMenu();
+
+  const title = getMenuOpenTitle(await getStoredMenuLanguage(), getNavigatorLanguage());
+  await callApi(contextMenus.update.bind(contextMenus), MENU_OPEN_ID, { title }).catch(() => setupContextMenu());
+}
+
 api.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type !== EXTENSION_MESSAGE_TYPE) return undefined;
 
@@ -134,9 +177,14 @@ api.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 });
 
 async function openPanel(tab) {
-  if (!tab?.id) return;
+  let targetTab = tab;
+  if (!targetTab?.id && api.tabs?.query) {
+    const tabs = await callApi(api.tabs.query.bind(api.tabs), { active: true, currentWindow: true }).catch(() => []);
+    targetTab = Array.isArray(tabs) ? tabs[0] : null;
+  }
+  if (!targetTab?.id) return;
   try {
-    await callApi(api.tabs.sendMessage.bind(api.tabs), tab.id, {
+    await callApi(api.tabs.sendMessage.bind(api.tabs), targetTab.id, {
       type: EXTENSION_MESSAGE_TYPE,
       payload: { action: 'menu.open' }
     });
@@ -147,3 +195,22 @@ async function openPanel(tab) {
 
 api.action?.onClicked?.addListener?.(openPanel);
 api.browserAction?.onClicked?.addListener?.(openPanel);
+api.contextMenus?.onClicked?.addListener?.((info, tab) => {
+  if (info?.menuItemId === MENU_OPEN_ID) {
+    openPanel(tab);
+  }
+});
+api.runtime.onInstalled?.addListener?.(() => {
+  setupContextMenu();
+});
+api.runtime.onStartup?.addListener?.(() => {
+  setupContextMenu();
+});
+api.storage?.onChanged?.addListener?.((changes, areaName) => {
+  if (areaName && areaName !== 'local') return;
+  if (Object.prototype.hasOwnProperty.call(changes || {}, MENU_LANGUAGE_STORAGE_KEY)) {
+    refreshContextMenuTitle();
+  }
+});
+
+setupContextMenu();
