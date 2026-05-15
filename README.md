@@ -15,8 +15,9 @@ AnMe is available in two forms:
 
 | Target | Download | Notes |
 | :-- | :-- | :-- |
-| Tampermonkey / ScriptCat | [Greasy Fork](https://greasyfork.org/scripts/563142-anme) | Recommended userscript install source. |
-| Local build | `AnMe.user.js` | Build this repository and install the generated userscript manually. |
+| Greasy Fork | [Install from Greasy Fork](https://greasyfork.org/zh-CN/scripts/563142) | Recommended Tampermonkey install source. |
+| ScriptCat | [Install from ScriptCat](https://scriptcat.org/zh-CN/script-show-page/5275) | Recommended ScriptCat install source. |
+| jsDelivr | [AnMe.user.js](https://cdn.jsdelivr.net/gh/Zhu-junwei/AnMe/AnMe.user.js) | Direct userscript file. |
 
 ### Browser Extension
 
@@ -60,7 +61,7 @@ Firefox:
 
 ## Userscript Setup
 
-Install [Tampermonkey](https://www.tampermonkey.net/) or [ScriptCat](https://scriptcat.org), then install AnMe from [Greasy Fork](https://greasyfork.org/scripts/563142-anme) or build this repository and install the generated `AnMe.user.js`.
+Install [Tampermonkey](https://www.tampermonkey.net/) or [ScriptCat](https://scriptcat.org), then install AnMe from [Greasy Fork](https://greasyfork.org/zh-CN/scripts/563142), [ScriptCat](https://scriptcat.org/zh-CN/script-show-page/5275), or the direct [jsDelivr userscript file](https://cdn.jsdelivr.net/gh/Zhu-junwei/AnMe/AnMe.user.js).
 
 For Tampermonkey, enable Cookie access:
 
