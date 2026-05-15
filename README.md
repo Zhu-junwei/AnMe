@@ -9,13 +9,24 @@ AnMe is available in two forms:
 - Browser extension for Firefox, Edge, Chrome, and other Chromium-based browsers.
 - Userscript for Tampermonkey and ScriptCat.
 
-## Browser Extension
+## Downloads
 
-- Firefox: [Install from Firefox Add-ons](https://addons.mozilla.org/zh-CN/firefox/addon/anme/).
-- Edge: the Edge Add-ons listing is under review.
-- Chrome: the author has not completed the Chrome Web Store verification fee, so Chrome users need to build and load the extension manually.
+### Userscript
 
-### Build the Extension
+| Target | Download | Notes |
+| :-- | :-- | :-- |
+| Tampermonkey / ScriptCat | [Greasy Fork](https://greasyfork.org/scripts/563142-anme) | Recommended userscript install source. |
+| Local build | `AnMe.user.js` | Build this repository and install the generated userscript manually. |
+
+### Browser Extension
+
+| Browser | Download | Notes |
+| :-- | :-- | :-- |
+| Firefox | [Firefox Add-ons](https://addons.mozilla.org/zh-CN/firefox/addon/anme/) | Available now. |
+| Edge | Under review | Edge Add-ons listing is still being reviewed. |
+| Chrome | Build manually | The author has not completed the Chrome Web Store verification fee, so Chrome users need to build and load the extension manually. |
+
+## Build the Browser Extension
 
 On the browser-extension branch:
 
@@ -32,7 +43,7 @@ The extension build creates:
 - `dist/packages/AnMe-chromium-<version>.zip`: Chromium package.
 - `dist/packages/AnMe-firefox-<version>.xpi`: Firefox package.
 
-### Load the Extension Manually
+## Load the Extension Manually
 
 Chrome / Edge:
 
@@ -47,7 +58,7 @@ Firefox:
 2. Choose `Load Temporary Add-on`.
 3. Select `dist/extension/firefox/manifest.json`.
 
-## Userscript
+## Userscript Setup
 
 Install [Tampermonkey](https://www.tampermonkey.net/) or [ScriptCat](https://scriptcat.org), then install AnMe from [Greasy Fork](https://greasyfork.org/scripts/563142-anme) or build this repository and install the generated `AnMe.user.js`.
 
