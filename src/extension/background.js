@@ -1,4 +1,5 @@
 import { getMenuOpenTitle, MENU_LANGUAGE_STORAGE_KEY, MENU_OPEN_ID } from './menu.js';
+import { applySenderCookieStore, resolveSenderCookieStoreId } from './cookie-store.js';
 
 const EXTENSION_MESSAGE_TYPE = 'ANME_EXTENSION_BRIDGE';
 
@@ -105,12 +106,17 @@ async function httpRequest(request = {}) {
   return result;
 }
 
-async function handleMessage(payload = {}) {
+async function applyCurrentCookieStore(details = {}, sender = {}) {
+  const storeId = await resolveSenderCookieStoreId({ api, callApi, sender });
+  return applySenderCookieStore(details, storeId, sender);
+}
+
+async function handleMessage(payload = {}, sender = {}) {
   if (payload.action === 'cookies.list') {
-    return callApi(api.cookies.getAll.bind(api.cookies), payload.details || {});
+    return callApi(api.cookies.getAll.bind(api.cookies), await applyCurrentCookieStore(payload.details || {}, sender));
   }
   if (payload.action === 'cookies.delete') {
-    const details = payload.details || {};
+    const details = await applyCurrentCookieStore(payload.details || {}, sender);
     return callApi(api.cookies.remove.bind(api.cookies), {
       url: cookieUrl(details, details.url),
       name: details.name,
@@ -118,7 +124,10 @@ async function handleMessage(payload = {}) {
     });
   }
   if (payload.action === 'cookies.set') {
-    return callApi(api.cookies.set.bind(api.cookies), normalizeCookieForSet(payload.details || {}));
+    return callApi(
+      api.cookies.set.bind(api.cookies),
+      normalizeCookieForSet(await applyCurrentCookieStore(payload.details || {}, sender))
+    );
   }
   if (payload.action === 'http.request') {
     return httpRequest(payload.request || {});
@@ -167,10 +176,10 @@ async function refreshContextMenuTitle() {
   await callApi(contextMenus.update.bind(contextMenus), MENU_OPEN_ID, { title }).catch(() => setupContextMenu());
 }
 
-api.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+api.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type !== EXTENSION_MESSAGE_TYPE) return undefined;
 
-  handleMessage(message.payload)
+  handleMessage(message.payload, sender)
     .then((result) => sendResponse({ ok: true, result }))
     .catch((error) => sendResponse({ ok: false, error: error?.message || String(error) }));
   return true;

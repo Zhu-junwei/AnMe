@@ -407,10 +407,13 @@ export const STYLE_CSS = `
         .acc-data-confirm:disabled { opacity:.35; cursor:not-allowed; background:#fff; border-color:#ddd; color:#98a2b3; }
         .acc-data-confirm:disabled:hover { background:#fff; border-color:#ddd; color:#98a2b3; }
         .acc-data-confirm svg { font-size:14px; }
-        .acc-data-window-btn svg { font-size:14px; }
+        .acc-data-window-btn svg { display:block; font-size:14px; }
+        .acc-data-window-btn .acc-maximize-icon,
+        .acc-data-window-btn .acc-restore-icon { width:100%; height:100%; align-items:center; justify-content:center; line-height:0; }
+        .acc-data-window-btn .acc-maximize-icon { display:flex; }
         .acc-data-window-btn .acc-restore-icon { display:none; }
         .acc-data-box.is-maximized .acc-data-window-btn .acc-maximize-icon { display:none; }
-        .acc-data-box.is-maximized .acc-data-window-btn .acc-restore-icon { display:inline-flex; }
+        .acc-data-box.is-maximized .acc-data-window-btn .acc-restore-icon { display:flex; }
         .acc-data-toolbar { display:flex; align-items:center; gap:8px; padding:5px 10px; border-bottom:1px solid #eef2f6; }
         .acc-data-count { margin-right:auto; font-size:12px; color:#667085; }
         .acc-data-tabs { display:flex; align-items:flex-end; gap:0; padding:6px 10px 0; border-bottom:1px solid #e6ebf1; background:#f8fafc; }

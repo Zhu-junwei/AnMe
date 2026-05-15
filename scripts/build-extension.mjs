@@ -34,6 +34,7 @@ const commonManifest = {
   version: pkg.version,
   author: 'zjw',
   description: 'Universal Multi-Site Account Switcher',
+  incognito: 'spanning',
   icons: {
     16: 'icons/icon-16.png',
     32: 'icons/icon-32.png',
