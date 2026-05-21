@@ -6,9 +6,6 @@ on:
 permissions:
   contents: read
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   build:
     name: Build userscript and extensions
@@ -16,10 +13,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -50,21 +47,21 @@ jobs:
           ls dist/packages/AnMe-firefox-*.xpi
 
       - name: Upload userscript
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: AnMe-userscript-${{ steps.package.outputs.version }}.user.js
           path: dist/packages/AnMe-userscript-*.user.js
           if-no-files-found: error
 
       - name: Upload Chromium extension
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: AnMe-chromium-${{ steps.package.outputs.version }}.zip
           path: dist/packages/AnMe-chromium-*.zip
           if-no-files-found: error
 
       - name: Upload Firefox extension
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: AnMe-firefox-${{ steps.package.outputs.version }}.xpi
           path: dist/packages/AnMe-firefox-*.xpi
