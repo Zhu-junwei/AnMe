@@ -1,4 +1,4 @@
-const EXTENSION_META = globalThis.__ANME_EXTENSION_META__ || {};
+const BUILD_META = globalThis.__ANME_BUILD_META__ || globalThis.__ANME_EXTENSION_META__ || {};
 
 
 export const CONST = {
@@ -17,10 +17,10 @@ export const CONST = {
         },
         HOST: location.hostname,
         META: {
-            NAME: EXTENSION_META.name || 'AnMe',
-            VERSION: EXTENSION_META.version || '0.0.0',
-            UPDATED_AT: EXTENSION_META.updatedAt || '',
-            AUTHOR: EXTENSION_META.author || 'zjw',
+            NAME: BUILD_META.name || 'AnMe',
+            VERSION: BUILD_META.version || '0.0.0',
+            UPDATED_AT: BUILD_META.updatedAt || '',
+            AUTHOR: BUILD_META.author || 'zjw',
             LINKS: {
                 PROJECT: "https://github.com/Zhu-junwei/AnMe",
                 DONATE: "https://www.cnblogs.com/zjw-blog/p/19466109"

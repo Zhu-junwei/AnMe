@@ -26,7 +26,7 @@ const meta = {
 };
 
 const define = {
-  'globalThis.__ANME_EXTENSION_META__': JSON.stringify(meta)
+  'globalThis.__ANME_BUILD_META__': JSON.stringify(meta)
 };
 
 const commonManifest = {
