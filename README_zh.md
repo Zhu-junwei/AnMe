@@ -24,7 +24,7 @@ AnMe 提供两种形态：
 | 浏览器 | 下载地址 | 说明 |
 | :-- | :-- | :-- |
 | Firefox | [Firefox Add-ons](https://addons.mozilla.org/zh-CN/firefox/addon/anme/) | 已可安装。 |
-| Edge | 审核中 | Edge Add-ons 商店仍在审核。 |
+| Edge | [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/anme/fecgekkgfnbkkcfneaklegnemelbobge) | 已可安装。 |
 | Chrome | 自行构建 | 作者未完成 Chrome Web Store 认证费用，Chrome 用户需要自行构建并加载插件。 |
 
 ## 构建浏览器插件

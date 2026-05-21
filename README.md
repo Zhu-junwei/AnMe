@@ -24,7 +24,7 @@ AnMe is available in two forms:
 | Browser | Download | Notes |
 | :-- | :-- | :-- |
 | Firefox | [Firefox Add-ons](https://addons.mozilla.org/zh-CN/firefox/addon/anme/) | Available now. |
-| Edge | Under review | Edge Add-ons listing is still being reviewed. |
+| Edge | [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/anme/fecgekkgfnbkkcfneaklegnemelbobge) | Available now. |
 | Chrome | Build manually | The author has not completed the Chrome Web Store verification fee, so Chrome users need to build and load the extension manually. |
 
 ## Build the Browser Extension
