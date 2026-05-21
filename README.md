@@ -25,17 +25,46 @@ AnMe is available in two forms:
 | :-- | :-- | :-- |
 | Firefox | [Firefox Add-ons](https://addons.mozilla.org/zh-CN/firefox/addon/anme/) | Available now. |
 | Edge | [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/anme/fecgekkgfnbkkcfneaklegnemelbobge) | Available now. |
-| Chrome | Build manually | The author has not completed the Chrome Web Store verification fee, so Chrome users need to build and load the extension manually. |
+| Chrome | [GitHub Actions build](https://github.com/Zhu-junwei/AnMe/actions/workflows/build-artifacts.yml) | Chrome Web Store is not available yet. Use the Chromium extension artifact from the latest successful workflow run, or build locally. |
 
-## Build the Browser Extension
+### GitHub Actions Downloads
 
-On the browser-extension branch:
+Open [Build Artifacts](https://github.com/Zhu-junwei/AnMe/actions/workflows/build-artifacts.yml), run the workflow manually, then download the artifacts from the completed run:
+
+- `AnMe.user.js`: userscript for Tampermonkey or ScriptCat.
+- `AnMe-chromium-extension`: Chromium package for Chrome and Edge.
+- `AnMe-firefox-extension`: Firefox package.
+
+## Build Locally
+
+Install dependencies and run tests:
 
 ```bash
 npm install
 npm test
+```
+
+Build only the userscript:
+
+```bash
+npm run build:userscript
+```
+
+Build only the browser extensions:
+
+```bash
+npm run build:extension
+```
+
+Build everything:
+
+```bash
 npm run build
 ```
+
+The userscript build creates:
+
+- `AnMe.user.js`: direct userscript file.
 
 The extension build creates:
 
@@ -124,15 +153,18 @@ Available commands:
 
 ```bash
 npm test
+npm run build:userscript
+npm run build:extension
 npm run build
 ```
 
-Build output depends on the branch:
+Build outputs:
 
-- Userscript branches generate `AnMe.user.js`.
-- Browser-extension branches generate `dist/extension/*` and `dist/packages/*`.
+- `npm run build:userscript` generates `AnMe.user.js`.
+- `npm run build:extension` generates `dist/extension/*` and `dist/packages/*`.
+- `npm run build` / `npm run build:all` generates both userscript and extension outputs.
 
-Generated extension `dist/` output is ignored by git.
+Generated extension `dist/` output is ignored by git. `AnMe.user.js` is kept in the repository for direct userscript downloads.
 
 ## Support
 

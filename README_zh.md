@@ -25,17 +25,46 @@ AnMe 提供两种形态：
 | :-- | :-- | :-- |
 | Firefox | [Firefox Add-ons](https://addons.mozilla.org/zh-CN/firefox/addon/anme/) | 已可安装。 |
 | Edge | [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/anme/fecgekkgfnbkkcfneaklegnemelbobge) | 已可安装。 |
-| Chrome | 自行构建 | 作者未完成 Chrome Web Store 认证费用，Chrome 用户需要自行构建并加载插件。 |
+| Chrome | [GitHub Actions 构建](https://github.com/Zhu-junwei/AnMe/actions/workflows/build-artifacts.yml) | Chrome Web Store 暂未提供。可以下载最新成功 workflow 里的 Chromium 插件产物，或本地构建后加载。 |
 
-## 构建浏览器插件
+### GitHub Actions 下载
 
-在 browser-extension 分支上：
+打开 [Build Artifacts](https://github.com/Zhu-junwei/AnMe/actions/workflows/build-artifacts.yml)，手动运行 workflow，等待完成后下载产物：
+
+- `AnMe.user.js`：给 Tampermonkey 或 ScriptCat 使用的 userscript。
+- `AnMe-chromium-extension`：给 Chrome 和 Edge 使用的 Chromium 插件包。
+- `AnMe-firefox-extension`：给 Firefox 使用的插件包。
+
+## 本地构建
+
+安装依赖并运行测试：
 
 ```bash
 npm install
 npm test
+```
+
+只构建 userscript：
+
+```bash
+npm run build:userscript
+```
+
+只构建浏览器插件：
+
+```bash
+npm run build:extension
+```
+
+全量构建 userscript 和浏览器插件：
+
+```bash
 npm run build
 ```
+
+userscript 构建会生成：
+
+- `AnMe.user.js`：直接脚本文件。
 
 扩展构建会生成：
 
@@ -124,15 +153,18 @@ ScriptCat 会在需要时请求权限，不需要额外设置。
 
 ```bash
 npm test
+npm run build:userscript
+npm run build:extension
 npm run build
 ```
 
-构建产物取决于所在分支：
+构建产物：
 
-- Userscript 分支生成 `AnMe.user.js`。
-- 浏览器插件分支生成 `dist/extension/*` 和 `dist/packages/*`。
+- `npm run build:userscript` 生成 `AnMe.user.js`。
+- `npm run build:extension` 生成 `dist/extension/*` 和 `dist/packages/*`。
+- `npm run build` / `npm run build:all` 同时生成 userscript 和浏览器插件产物。
 
-生成的扩展 `dist/` 目录不会提交到 git。
+生成的扩展 `dist/` 目录不会提交到 git。`AnMe.user.js` 保留在仓库中，用于直接脚本下载。
 
 ## 支持
 
