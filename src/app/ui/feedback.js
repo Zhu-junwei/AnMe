@@ -955,12 +955,9 @@ export function createFeedbackMethods({ state, constants, utils, core, ui }) {
               value: cookie.value,
               cookie
             };
-            tbody.insertAdjacentHTML('beforeend', renderCookieRow(tab, entry, nextIndex, true));
+            utils.appendHTML(tbody, renderCookieRow(tab, entry, nextIndex, true));
           } else {
-            tbody.insertAdjacentHTML(
-              'beforeend',
-              renderStorageRow(tab, { key: '', title: '', value: '', meta: '' }, nextIndex, true)
-            );
+            utils.appendHTML(tbody, renderStorageRow(tab, { key: '', title: '', value: '', meta: '' }, nextIndex, true));
           }
           const newRow = tbody.lastElementChild;
           newRow?.querySelector('.acc-data-check')?.addEventListener('change', updateCount);

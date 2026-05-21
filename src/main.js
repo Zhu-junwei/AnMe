@@ -4,11 +4,13 @@ import { createUtils } from './app/utils.js';
 import { createTemplates } from './app/templates.js';
 import { createCore } from './app/core.js';
 import { createUI } from './app/ui.js';
+import { installExtensionRuntimeIfNeeded } from './app/runtime.js';
 
-(() => {
+(async () => {
   'use strict';
 
   if (window.self !== window.top) return;
+  await installExtensionRuntimeIfNeeded();
 
   const state = createState({ constants: CONST, i18nData: I18N_DATA });
   const utils = createUtils({ state, constants: CONST, i18nData: I18N_DATA });

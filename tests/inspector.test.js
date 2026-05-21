@@ -25,7 +25,7 @@ function createMethods({ ui }) {
   });
 }
 
-test('inspectData edits selected userscript data after confirmation and refreshes time', async () => {
+test('inspectData edits selected extension data after confirmation and refreshes time', async () => {
   const accountKey = `${constants.PREFIX}current.test::Alpha`;
   const store = createStore({
     [accountKey]: {
