@@ -6,14 +6,14 @@
 
 AnMe 是一个同时面向浏览器扩展和 userscript 的多网站多账号切换工具。扩展形态支持 Chrome、Edge、Firefox，脚本形态面向用户脚本管理器。它保存 Cookie、LocalStorage、SessionStorage 快照，并在不同运行环境下管理数据、Cookie、WebDAV 请求。
 
-共享业务入口是 `src/main.js`。扩展后台入口是 `src/extension/background.js`。userscript 产物由 `npm run build:userscript` 生成到 `AnMe.user.js`。扩展开发加载目录和提交包由 `npm run build:extension` 生成到 `dist/`。全量构建用 `npm run build` 或 `npm run build:all`。
+共享业务入口是 `src/main.js`。扩展后台入口是 `src/extension/background.js`。userscript 产物由 `npm run build:userscript` 生成到 `AnMe.user.js` 和 `dist/packages/AnMe-userscript-<version>.user.js`。扩展开发加载目录和提交包由 `npm run build:extension` 生成到 `dist/`。全量构建用 `npm run build` 或 `npm run build:all`。
 
 ## 常用命令
 
 - `npm test`：运行 Node 测试。
 - `npm run build`：全量构建 userscript 和浏览器扩展。
 - `npm run build:all`：同上，显式全量构建命令。
-- `npm run build:userscript`：只构建 userscript，输出 `AnMe.user.js`。
+- `npm run build:userscript`：只构建 userscript，输出 `AnMe.user.js` 和 `dist/packages/AnMe-userscript-<version>.user.js`。
 - `npm run build:extension`：只构建浏览器扩展，输出 `dist/extension` 和 `dist/packages`。
 
 改行为逻辑后要跑测试。改扩展入口、manifest、后台脚本或打包逻辑后，要跑 `npm run build:extension`，确认 `dist/extension/chromium`、`dist/extension/firefox`、`dist/packages` 都能生成。改脚本入口、userscript 头部元数据或脚本发布链路时，要跑 `npm run build:userscript`，确认 `AnMe.user.js` 能生成。改共享逻辑时优先跑 `npm run build` 做全量验证。
@@ -91,7 +91,7 @@ AnMe 是一个同时面向浏览器扩展和 userscript 的多网站多账号切
 
 扩展普通用户安装需要商店签名：Chrome Web Store、Edge Add-ons、Firefox AMO。脚本普通用户安装需要对应 userscript 发布页或脚本管理器可识别的安装入口。
 
-GitHub 上需要临时构建下载包时，手动运行 `Build Artifacts` workflow；它会跑测试和 `npm run build`，并提供 `AnMe.user.js`、`AnMe-chromium-extension`、`AnMe-firefox-extension` 三个 artifact 下载项。
+GitHub 上需要临时构建下载包时，手动运行 `Build Artifacts` workflow；它会跑测试和 `npm run build`，并在原生 Artifacts 区提供 `AnMe-userscript-<version>.user.js`、`AnMe-chromium-<version>.zip`、`AnMe-firefox-<version>.xpi` 三个下载项。
 
 ## 测试提示
 

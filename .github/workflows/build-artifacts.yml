@@ -6,6 +6,9 @@ on:
 permissions:
   contents: read
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     name: Build userscript and extensions
@@ -24,6 +27,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Read package version
+        id: package
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Run tests
         run: npm test
 
@@ -36,39 +45,27 @@ jobs:
           test -f AnMe.user.js
           test -d dist/extension/chromium
           test -d dist/extension/firefox
+          ls dist/packages/AnMe-userscript-*.user.js
           ls dist/packages/AnMe-chromium-*.zip
           ls dist/packages/AnMe-firefox-*.xpi
 
       - name: Upload userscript
-        id: upload_userscript
         uses: actions/upload-artifact@v4
         with:
-          name: AnMe.user.js
-          path: AnMe.user.js
+          name: AnMe-userscript-${{ steps.package.outputs.version }}.user.js
+          path: dist/packages/AnMe-userscript-*.user.js
           if-no-files-found: error
 
       - name: Upload Chromium extension
-        id: upload_chromium_extension
         uses: actions/upload-artifact@v4
         with:
-          name: AnMe-chromium-extension
+          name: AnMe-chromium-${{ steps.package.outputs.version }}.zip
           path: dist/packages/AnMe-chromium-*.zip
           if-no-files-found: error
 
       - name: Upload Firefox extension
-        id: upload_firefox_extension
         uses: actions/upload-artifact@v4
         with:
-          name: AnMe-firefox-extension
+          name: AnMe-firefox-${{ steps.package.outputs.version }}.xpi
           path: dist/packages/AnMe-firefox-*.xpi
           if-no-files-found: error
-
-      - name: Add download links to summary
-        run: |
-          {
-            echo "## Downloads"
-            echo
-            echo "- [AnMe.user.js](${{ steps.upload_userscript.outputs.artifact-url }})"
-            echo "- [Chromium extension](${{ steps.upload_chromium_extension.outputs.artifact-url }})"
-            echo "- [Firefox extension](${{ steps.upload_firefox_extension.outputs.artifact-url }})"
-          } >> "$GITHUB_STEP_SUMMARY"

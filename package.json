@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "npm run build:all",
-    "build:all": "npm run build:userscript && npm run build:extension",
+    "build:all": "npm run build:extension && npm run build:userscript",
     "build:userscript": "node scripts/build-userscript.mjs",
     "build:extension": "node scripts/build-extension.mjs",
     "test": "node --test"

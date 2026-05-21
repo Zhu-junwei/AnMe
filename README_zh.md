@@ -31,9 +31,9 @@ AnMe 提供两种形态：
 
 打开 [Build Artifacts](https://github.com/Zhu-junwei/AnMe/actions/workflows/build-artifacts.yml)，手动运行 workflow，等待完成后下载产物：
 
-- `AnMe.user.js`：给 Tampermonkey 或 ScriptCat 使用的 userscript。
-- `AnMe-chromium-extension`：给 Chrome 和 Edge 使用的 Chromium 插件包。
-- `AnMe-firefox-extension`：给 Firefox 使用的插件包。
+- `AnMe-userscript-<version>.user.js`：带版本号的 userscript 包。
+- `AnMe-chromium-<version>.zip`：给 Chrome 和 Edge 使用的 Chromium 插件包。
+- `AnMe-firefox-<version>.xpi`：给 Firefox 使用的插件包。
 
 ## 本地构建
 
@@ -65,6 +65,7 @@ npm run build
 userscript 构建会生成：
 
 - `AnMe.user.js`：直接脚本文件。
+- `dist/packages/AnMe-userscript-<version>.user.js`：带版本号的 userscript 包。
 
 扩展构建会生成：
 
@@ -160,7 +161,7 @@ npm run build
 
 构建产物：
 
-- `npm run build:userscript` 生成 `AnMe.user.js`。
+- `npm run build:userscript` 生成 `AnMe.user.js` 和 `dist/packages/AnMe-userscript-<version>.user.js`。
 - `npm run build:extension` 生成 `dist/extension/*` 和 `dist/packages/*`。
 - `npm run build` / `npm run build:all` 同时生成 userscript 和浏览器插件产物。
 

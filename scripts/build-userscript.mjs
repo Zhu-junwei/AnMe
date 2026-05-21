@@ -1,7 +1,9 @@
-import { readFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import path from 'node:path';
 import { build } from 'esbuild';
 
 const pkg = JSON.parse(await readFile('package.json', 'utf8'));
+const packageRoot = path.join('dist', 'packages');
 
 function formatBuildUpdatedAt(date = new Date()) {
   const parts = new Intl.DateTimeFormat('sv-SE', {
@@ -41,3 +43,9 @@ await build({
   logLevel: 'info',
   legalComments: 'none'
 });
+
+await mkdir(packageRoot, { recursive: true });
+await writeFile(
+  path.join(packageRoot, `AnMe-userscript-${pkg.version}.user.js`),
+  await readFile('AnMe.user.js')
+);

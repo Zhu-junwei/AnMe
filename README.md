@@ -31,9 +31,9 @@ AnMe is available in two forms:
 
 Open [Build Artifacts](https://github.com/Zhu-junwei/AnMe/actions/workflows/build-artifacts.yml), run the workflow manually, then download the artifacts from the completed run:
 
-- `AnMe.user.js`: userscript for Tampermonkey or ScriptCat.
-- `AnMe-chromium-extension`: Chromium package for Chrome and Edge.
-- `AnMe-firefox-extension`: Firefox package.
+- `AnMe-userscript-<version>.user.js`: versioned userscript package.
+- `AnMe-chromium-<version>.zip`: Chromium package for Chrome and Edge.
+- `AnMe-firefox-<version>.xpi`: Firefox package.
 
 ## Build Locally
 
@@ -65,6 +65,7 @@ npm run build
 The userscript build creates:
 
 - `AnMe.user.js`: direct userscript file.
+- `dist/packages/AnMe-userscript-<version>.user.js`: versioned userscript package.
 
 The extension build creates:
 
@@ -160,7 +161,7 @@ npm run build
 
 Build outputs:
 
-- `npm run build:userscript` generates `AnMe.user.js`.
+- `npm run build:userscript` generates `AnMe.user.js` and `dist/packages/AnMe-userscript-<version>.user.js`.
 - `npm run build:extension` generates `dist/extension/*` and `dist/packages/*`.
 - `npm run build` / `npm run build:all` generates both userscript and extension outputs.
 
